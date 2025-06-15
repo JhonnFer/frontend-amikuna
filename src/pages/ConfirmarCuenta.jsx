@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import  {React, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -11,12 +11,12 @@ const ConfirmarCuenta = () => {
   const ejecutado = useRef(false); // bandera para evitar doble ejecución
 
   useEffect(() => {
-    if (ejecutado.current) return; // si ya se ejecutó, no vuelve a ejecutar
+    if (ejecutado.current) return;
     ejecutado.current = true;
 
     const confirmarCuenta = async () => {
       try {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/api/confirmar/${token}`; // Revisa si tu ruta backend tiene prefijo /api
+        const url = `${import.meta.env.VITE_BACKEND_URL}/api/confirmar/${token}`;
         const { data } = await axios.get(url);
 
         if (data.msg.includes("ya ha sido confirmada")) {
@@ -32,12 +32,14 @@ const ConfirmarCuenta = () => {
         }, 3000);
       } catch (error) {
         toast.error(error.response?.data?.msg || "Token inválido o expirado");
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000); // 👉 también navega aunque falle
       }
     };
 
     confirmarCuenta();
   }, [token, navigate]);
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center text-center p-4 bg-gradient-to-r from-orange-100 to-yellow-200">
       <ToastContainer />
