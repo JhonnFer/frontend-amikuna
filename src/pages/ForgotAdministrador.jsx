@@ -9,62 +9,76 @@ export const ForgotAdministrador = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [masterKey, setMasterKey] = useState('')
-const [semestre, setSemestre] = useState('')
+  const [semestre, setSemestre] = useState('')
 
+  // Estado para la nueva contraseña temporal y control modal
+  const [nuevaPassword, setNuevaPassword] = useState('')
+  const [showModal, setShowModal] = useState(false)
 
- const handleGenerarNueva = async (e) => {
-  e.preventDefault();
-  if (!email || !masterKey || !semestre) {
-    toast.error("Completa todos los campos");
-    return;
+  const handleGenerarNueva = async (e) => {
+    e.preventDefault()
+    if (!email || !masterKey || !semestre) {
+      toast.error("Completa todos los campos")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/admin/generar-nueva-password`
+      const response = await axios.post(url, {
+        email,
+        masterKey,
+        securityAnswer: semestre,
+      })
+      toast.success(response.data.msg)
+      setNuevaPassword(response.data.nuevaPassword)
+      setShowModal(true) // Mostrar modal con la contraseña
+    } catch (error) {
+      toast.error(error.response?.data?.msg || "Error al generar contraseña")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  setLoading(true);
-  try {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/api/admin/generar-nueva-password`;
-    const response = await axios.post(url, {
-      email,
-      masterKey,
-      securityAnswer: semestre,
-    });
-    toast.success(response.data.msg);
-    toast.info(`Nueva contraseña: ${response.data.nuevaPassword}`);
-  } catch (error) {
-    toast.error(error.response?.data?.msg || "Error al generar contraseña");
-  } finally {
-    setLoading(false);
+  const handleCambiarPassword = async (e) => {
+    e.preventDefault()
+    const newPassword = prompt("Ingresa tu nueva contraseña")
+    const confirmPassword = prompt("Confirma la nueva contraseña")
+
+    if (!newPassword || !confirmPassword) {
+      toast.error("Debes completar ambas contraseñas")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/admin/cambiar-password`
+      const response = await axios.put(url, {
+        email,
+        masterKey,
+        securityAnswer: semestre,
+        newPassword,
+        confirmPassword,
+      })
+      toast.success(response.data.msg)
+    } catch (error) {
+      toast.error(error.response?.data?.msg || "Error al cambiar contraseña")
+    } finally {
+      setLoading(false)
+    }
   }
-};
 
-const handleCambiarPassword = async (e) => {
-  e.preventDefault();
-  const newPassword = prompt("Ingresa tu nueva contraseña");
-  const confirmPassword = prompt("Confirma la nueva contraseña");
-
-  if (!newPassword || !confirmPassword) {
-    toast.error("Debes completar ambas contraseñas");
-    return;
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(nuevaPassword)
+    toast.success("Contraseña copiada al portapapeles")
   }
 
-  setLoading(true);
-  try {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/api/admin/cambiar-password`;
-    const response = await axios.put(url, {
-      email,
-      masterKey,
-      securityAnswer: semestre,
-      newPassword,
-      confirmPassword,
-    });
-    toast.success(response.data.msg);
-  } catch (error) {
-    toast.error(error.response?.data?.msg || "Error al cambiar contraseña");
-  } finally {
-    setLoading(false);
+  const closeModal = () => {
+    setShowModal(false)
+    setNuevaPassword('')
   }
-};
 
-   return (
+  return (
     <div
       className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 py-10 text-white"
       style={{
@@ -139,7 +153,44 @@ const handleCambiarPassword = async (e) => {
       <Link to="/" className="block text-white hover:underline text-2xl text-center mt-6">
         Regresar
       </Link>
+
+      {/* Modal para mostrar la nueva contraseña */}
+      {showModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white text-black rounded-lg p-6 max-w-sm w-full"
+            onClick={e => e.stopPropagation()} // evita cerrar modal al click dentro
+          >
+            <h2 className="text-xl font-bold mb-4 text-center">Nueva contraseña generada</h2>
+            <input
+              type="text"
+              readOnly
+              value={nuevaPassword}
+              className="w-full p-2 border border-gray-400 rounded mb-4 text-center font-mono select-all"
+              onFocus={e => e.target.select()}
+            />
+            <div className="flex justify-between">
+              <button
+                onClick={copyToClipboard}
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+              >
+                Copiar
+              </button>
+              <button
+                onClick={closeModal}
+                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+
 export default ForgotAdministrador
