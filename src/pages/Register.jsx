@@ -27,11 +27,11 @@ const Register = () => {
   // Esta función solo se encarga de hacer la petición, no muestra mensajes
   const registerUser = async (data) => {
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/registro`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/registro`;
       const response = await axios.post(url, data);
       return response.data; // solo retorna la respuesta
     } catch (error) {
-      return Promise.reject(error.response?.data?.msg || "Error al registrar usuario.");
+      return Promise.reject(error?.response?.data?.msg || "Error al registrar usuario.");
     }
   };
 
