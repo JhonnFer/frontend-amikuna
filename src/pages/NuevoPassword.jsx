@@ -43,12 +43,12 @@ export const NuevoPassword = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6"
       style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${fondo1})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-          }}
+          }}>
       <ToastContainer />
       <h1 className="text-3xl font-semibold mb-6">Crear nueva contraseña</h1>
       <form onSubmit={handleSubmit} className="w-full max-w-sm bg-white p-6 rounded shadow-md">
@@ -76,6 +76,12 @@ export const NuevoPassword = () => {
           type="submit"
           disabled={loading}
           className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 disabled:opacity-50"
+        >
+          {loading ? 'Actualizando...' : 'Actualizar contraseña'}
+        </button>
+        <button
+          type="submit"
+          className="w-full bg-red-300 text-black p-2 rounded hover:bg-white disabled:opacity-50"
         >
           {loading ? 'Actualizando...' : 'Actualizar contraseña'}
         </button>
