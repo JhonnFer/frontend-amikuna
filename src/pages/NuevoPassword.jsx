@@ -72,6 +72,7 @@ export const NuevoPassword = () => {
           className="w-full p-2 mb-4 border rounded"
           required
         />
+        <div className="w-full p-1 mb-4 border border-gray-300 rounded bg-white bg-opacity-80 text-black">
         <button
           type="submit"
           disabled={loading}
@@ -81,10 +82,12 @@ export const NuevoPassword = () => {
         </button>
         <button
           type="submit"
-          className="w-full bg-red-300 text-black p-2 rounded hover:bg-white disabled:opacity-50"
+          className="w-full bg-gray-300 text-black p-2 rounded hover:bg-red-500 disabled:opacity-50"
         >
-          {loading ? 'Actualizando...' : 'Actualizar contraseña'}
+          Regresar
         </button>
+        </div>
+        
       </form>
     </div>
   )
