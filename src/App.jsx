@@ -10,7 +10,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import NuevoPassword from "./pages/NuevoPassword";
 import ForgotAdministrador from "./pages/ForgotAdministrador";
 import ConfirmarCuenta from "./pages/ConfirmarCuenta";
-import RedirigirConfirmacion from "./pages/RedirigirConfirmacion";
+
 
 
 function App() {
@@ -28,9 +28,6 @@ function App() {
         <Route path="/recuperarPassword/:token" element={<><Navbar /><NuevoPassword /></>} />
         <Route path="/admin/cambiar-password" element={<><Navbar /><ForgotAdministrador /></>} />
         <Route path="/admin/generar-nueva-password" element={<><Navbar /><ForgotAdministrador /></>} />
-        <Route path="/api/confirmar/:token" element={<RedirigirConfirmacion />} />
-        
-
 
 
         {/* Rutas SIN Navbar */}
