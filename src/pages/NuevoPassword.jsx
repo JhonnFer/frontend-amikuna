@@ -43,12 +43,12 @@ export const NuevoPassword = () => {
   }
 
   return (
-    <div  className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 py-10 text-white"
-          style={{
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+      style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${fondo1})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-          }}>
+          }}
       <ToastContainer />
       <h1 className="text-3xl font-semibold mb-6">Crear nueva contraseña</h1>
       <form onSubmit={handleSubmit} className="w-full max-w-sm bg-white p-6 rounded shadow-md">
