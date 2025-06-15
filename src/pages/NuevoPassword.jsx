@@ -72,21 +72,21 @@ export const NuevoPassword = () => {
           className="w-full p-2 mb-4 border rounded"
           required
         />
-        <div className="w-full gap-2 p-1 mb-4 border border-gray-300 rounded bg-white bg-opacity-80 text-black">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 disabled:opacity-50"
-        >
-          {loading ? 'Actualizando...' : 'Actualizar contraseña'}
-        </button>
-        <button
-          type="submit"
-          className="w-full bg-gray-300 text-black p-2 rounded hover:bg-red-500 disabled:opacity-50"
-        >
-          Regresar
-        </button>
-        </div>
+       <div className="w-full space-y-2 p-1 mb-4 border border-gray-300 rounded bg-white bg-opacity-80 text-black">
+  <button
+    type="submit"
+    disabled={loading}
+    className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 disabled:opacity-50"
+  >
+    {loading ? 'Actualizando...' : 'Actualizar contraseña'}
+  </button>
+  <button
+    type="submit"
+    className="w-full bg-gray-300 text-black p-2 rounded hover:bg-blue-500 disabled:opacity-50"
+  >
+    Regresar
+  </button>
+</div>
         
       </form>
     </div>
