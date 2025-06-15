@@ -1,0 +1,35 @@
+
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .bg-tinder-gradient {
+    background: linear-gradient(135deg, #ff9770 0%, #fb6f92 100%);
+  }
+  .bg-color-black_pur{
+    background: linear-gradient(135deg,  #7371fc      0%,   #0a100d         100%);
+  }
+}
+
+@layer components {
+  .bg-color-black_pur {
+    @apply bg-gradient-to-r from-[#7371fc] to-[#0a100d];
+  }
+  .hover-bg-color-black_pur {
+    @apply hover:bg-gradient-to-r hover:from-[#7371fc] hover:to-[#0a100d];
+  }
+  .hover-bg-tinder-gradient {
+    @apply hover:bg-gradient-to-r hover:from-[#ff9770] hover:to-[#fb6f92];
+  }
+}
+
+
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+
