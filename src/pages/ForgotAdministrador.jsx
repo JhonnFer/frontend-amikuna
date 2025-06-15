@@ -22,7 +22,7 @@ const [semestre, setSemestre] = useState('')
 
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')}/api/recuperarpasswordadmin`  // ruta para el admin
+      const url = `${import.meta.env.VITE_BACKEND_URL}/recuperarpasswordadmin`  // ruta para el admin
       const response = await axios.post(url, { email })
       toast.success(response?.data?.msg || 'Revisa tu correo para recuperar tu contraseña')
       setEmail('')
@@ -97,7 +97,7 @@ const [semestre, setSemestre] = useState('')
         </form>
       </main>
 
-      <Link to="/login" className="block text-white-600 hover:underline text-2xl text-center mt-3">
+      <Link to="/" className="block text-white-600 hover:underline text-2xl text-center mt-3">
 
         Regresar
       </Link>

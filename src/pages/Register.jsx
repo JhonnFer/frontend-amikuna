@@ -27,9 +27,7 @@ const Register = () => {
   // Esta función solo se encarga de hacer la petición, no muestra mensajes
   const registerUser = async (data) => {
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')}/registro`;
-;
-
+      const url = `${import.meta.env.VITE_BACKEND_URL}/registro`;
       const response = await axios.post(url, data);
       return response.data; // solo retorna la respuesta
     } catch (error) {

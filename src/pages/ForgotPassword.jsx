@@ -20,7 +20,8 @@ export const ForgotPassword = () => {
 
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')}/recuperarpassword`
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/recuperarpassword`
+
       const response = await axios.post(url, { email })
       toast.success(response?.data?.msg || 'Revisa tu correo para recuperar tu contraseña')
       setEmail('')
@@ -68,7 +69,7 @@ className="w-full p-1 mb-4 border border-gray-300 rounded bg-white bg-opacity-80
           
         </form>
       </main>
-      <Link to="/login" className="block text-white-600 hover:underline text-sm text-center mt-3">
+      <Link to="/" className="block text-white-600 hover:underline text-sm text-center mt-3">
   Regresar
 </Link>
 

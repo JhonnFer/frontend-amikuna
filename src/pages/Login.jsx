@@ -16,7 +16,7 @@ const Login = () => {
     const { fetchDataBackend } = useFetch()
 
     const loginUser = async(data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}login`
+        const url = `${import.meta.env.VITE_BACKEND_URL}/api/login`
         const response = await fetchDataBackend(url, data,'POST')
         if(response){
             navigate('/dashboard')
@@ -36,7 +36,7 @@ const Login = () => {
         </div>
 
         {/* ✅ handleSubmit recibe la función loginUser */}
-        <form onSubmit={handleSubmit(loginUser)} className="flex flex-col justify-center gap-2 w-full max-w-sm">
+        <form onSubmit={handleSubmit(loginUser)} className="flex flex-col justify-center gap-6 w-full max-w-sm">
           <h2 className="text-lg md:text-xl font-bold text-center mb-1 mt-29">Inicia sesión</h2>
 
           <input

@@ -28,7 +28,7 @@ export const NuevoPassword = () => {
     }
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')}/nuevopassword/${token}`
+      const url = `${import.meta.env.VITE_BACKEND_URL}/nuevopassword/${token}`
       const respuesta = await axios.post(url, { password, confirmpassword: confirmPassword })
 
       toast.success(respuesta?.data?.msg || "Contraseña actualizada, ya puedes iniciar sesión")

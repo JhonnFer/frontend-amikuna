@@ -15,7 +15,7 @@ export const RecuperarPassword = () => {
     }
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')}/api/recuperarpassword`
+      const url = `${import.meta.env.VITE_BACKEND_URL}/recuperarpassword`
       const respuesta = await axios.post(url, { email })
       toast.success(respuesta?.data?.msg || "Revisa tu correo para continuar")
     } catch (error) {
