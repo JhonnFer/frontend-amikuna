@@ -4,6 +4,7 @@ import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import fondo1 from "../assets/fondo1.webp";
+import { Link } from 'react-router-dom';
 
 export const NuevoPassword = () => {
   const { token } = useParams()
@@ -80,14 +81,14 @@ export const NuevoPassword = () => {
   >
     {loading ? 'Actualizando...' : 'Actualizar contraseña'}
   </button>
-  <button
-    type="submit"
-    className="w-full bg-gray-300 text-black p-2 rounded hover:bg-blue-500 disabled:opacity-50"
+
+  <Link
+    to="/login"
+    className="block w-full text-center bg-gray-300 text-black p-2 rounded hover:bg-blue-500 transition"
   >
     Regresar
-  </button>
-</div>
-        
+  </Link>
+</div> 
       </form>
     </div>
   )
