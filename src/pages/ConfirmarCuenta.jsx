@@ -4,18 +4,19 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
+
 const ConfirmarCuenta = () => {
   const { token } = useParams();
   const navigate = useNavigate();
-  const ejecutado = useRef(false); // 👉 bandera para evitar doble ejecución
+  const ejecutado = useRef(false); // bandera para evitar doble ejecución
 
   useEffect(() => {
-    if (ejecutado.current) return; // 🚫 si ya se ejecutó, no lo hace de nuevo
+    if (ejecutado.current) return; // si ya se ejecutó, no vuelve a ejecutar
     ejecutado.current = true;
 
     const confirmarCuenta = async () => {
       try {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/confirmar/${token}`;
+        const url = `${import.meta.env.VITE_BACKEND_URL}/api/confirmar/${token}`; // Revisa si tu ruta backend tiene prefijo /api
         const { data } = await axios.get(url);
 
         if (data.msg.includes("ya ha sido confirmada")) {
