@@ -22,7 +22,7 @@ const [semestre, setSemestre] = useState('')
 
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/recuperarpasswordadmin`  // ruta para el admin
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/recuperarpasswordadmin`  // ruta para el admin
       const response = await axios.post(url, { email })
       toast.success(response?.data?.msg || 'Revisa tu correo para recuperar tu contraseña')
       setEmail('')

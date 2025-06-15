@@ -16,7 +16,7 @@ export const Confirm = () => {
     }
 
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/confirmar/${token}`
+      const url = `${import.meta.env.VITE_BACKEND_URL}/api/confirmar/${token}`
       const respuesta = await axios.get(url)
       toast.success(respuesta?.data?.msg || 'Cuenta confirmada con éxito')
 
