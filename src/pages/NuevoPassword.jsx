@@ -84,7 +84,7 @@ export const NuevoPassword = () => {
 
   <Link
     to="/login"
-    className="block w-full text-center bg-gray-300 text-black p-2 rounded hover:bg-blue-500 transition"
+    className="block w-full text-center bg-gray-300 text-red-600 hover:underline text-sm  mt-5 p-2 rounded hover:bg-blue-500 transition"
   >
     Regresar
   </Link>
