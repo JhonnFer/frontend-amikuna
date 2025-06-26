@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
 
 const Dashboard = () => {
+  // Si no usas clearToken, simplemente elimínalo
+  // const clearToken = () => { ... } // Puedes agregar lógica si lo necesitas
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center p-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-4">Bienvenido</h1>
