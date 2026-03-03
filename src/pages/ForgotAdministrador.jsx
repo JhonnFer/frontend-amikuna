@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import logoAmikuna from "../assets/admi.jpg";
 import { Link } from 'react-router-dom';
 
-export const ForgotAdministrador = () => {
+const ForgotAdministrador = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [masterKey, setMasterKey] = useState('')
@@ -24,7 +24,7 @@ export const ForgotAdministrador = () => {
 
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/admin/generar-nueva-password`
+      const url = `${import.meta.env.VITE_BACKEND_URL}admin/generar-nueva-password`
       const response = await axios.post(url, {
         email,
         masterKey,
@@ -52,7 +52,7 @@ export const ForgotAdministrador = () => {
 
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/admin/cambiar-password`
+      const url = `${import.meta.env.VITE_BACKEND_URL}admin/cambiar-password`
       const response = await axios.put(url, {
         email,
         masterKey,
@@ -100,7 +100,7 @@ export const ForgotAdministrador = () => {
             id="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="w-full p-1 mb-4 border border-gray-300 rounded bg-white bg-opacity-80 text-black"
+            className="w-full p-1 mb-4 border border-gray-300 rounded bg-white bg-opacity-80 text-black "
             required
           />
 

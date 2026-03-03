@@ -1,28 +1,76 @@
-import axios from 'axios'
-import { toast } from 'react-toastify'
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useCallback } from "react";
+
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api";
+
+let errorToastId = null;
 
 function useFetch() {
+  const fetchDataBackend = useCallback(
+    async (endpoint, data, method = "GET", showToast = true) => {
+      // Ajuste para evitar dobles o faltantes de slash
+      const url = `${API_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
 
-    const fetchDataBackend = async (url, form = null, method = 'POST') => {
+      const showLoadingToast = showToast && method.toUpperCase() !== "GET";
+      const loadingToast = showLoadingToast ? toast.loading("Procesando solicitud...") : null;
 
-        try {
-            let respuesta
-            if (method === 'POST') {
-                respuesta = await axios.post(url, form)
-            } else if (method === 'GET') {
-                respuesta = await axios.get(url)
-            }
-            toast.success(respuesta?.data?.msg)
-            return respuesta?.data
-            
-        } catch (error) {
-            toast.error(error.response?.data?.msg)
-            const errorMsg = error.response?.data?.msg || 'Error desconocido';
-            throw new Error(errorMsg);
+      try {
+        const token = localStorage.getItem("token");
+        const isFormData = data instanceof FormData;
+
+        const combinedHeaders = {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(!isFormData && { "Content-Type": "application/json" }),
+        };
+
+        const options = {
+          method: method.toUpperCase(),
+          url,
+          headers: combinedHeaders,
+          ...(method.toUpperCase() !== "GET" && data ? { data } : {}),
+        };
+
+        const response = await axios(options);
+
+        if (loadingToast) toast.dismiss(loadingToast);
+        if (response?.data?.msg && showToast && method !== "GET") {
+          toast.success(response.data.msg);
         }
-    }
 
-    return { fetchDataBackend }
+        return response.data;
+      } catch (error) {
+        if (loadingToast) toast.dismiss(loadingToast);
+        const errorMsg =
+          error?.response?.data?.msg ||
+          error?.response?.data?.error ||
+          error?.message ||
+          "Error desconocido";
+
+        if (errorMsg.toLowerCase().includes("token expired")) {
+          localStorage.removeItem("token");
+          toast.error("Sesión expirada. Por favor inicia sesión nuevamente.");
+          window.location.href = "/login";
+          return;
+        }
+
+        if (showToast) {
+          if (!errorToastId) {
+            errorToastId = toast.error(errorMsg, {
+              onClose: () => {
+                errorToastId = null;
+              },
+              autoClose: 3000,
+            });
+          }
+        }
+        throw new Error(errorMsg);
+      }
+    },
+    []
+  );
+
+  return { fetchDataBackend };
 }
 
-export default useFetch
+export default useFetch;

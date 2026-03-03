@@ -1,7 +1,7 @@
 import logoDog from '../assets/doglost.jpg';
 import { Link } from 'react-router';
 
-export const NotFound = () => {
+const NotFound = () => {
     return (
         <div className="flex flex-col items-center justify-center h-screen">
             <img

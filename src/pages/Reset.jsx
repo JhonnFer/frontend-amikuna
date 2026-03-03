@@ -3,7 +3,7 @@ import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-export const RecuperarPassword = () => {
+const RecuperarPassword = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -15,7 +15,7 @@ export const RecuperarPassword = () => {
     }
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/recuperarpassword`
+      const url = `${import.meta.env.VITE_BACKEND_URL}recuperarpassword`
       const respuesta = await axios.post(url, { email })
       toast.success(respuesta?.data?.msg || "Revisa tu correo para continuar")
     } catch (error) {

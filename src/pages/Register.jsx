@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 import logoAmikuna from "../assets/Logo.png";
-import loginImage from "../assets/reegistro1.avif";
+import loginImage from "../assets/Registro.png";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const Register = () => {
   // Esta función solo se encarga de hacer la petición, no muestra mensajes
   const registerUser = async (data) => {
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/registro`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}registro`;
       const response = await axios.post(url, data);
       return response.data; // solo retorna la respuesta
     } catch (error) {
@@ -59,7 +59,7 @@ const Register = () => {
     try {
       const res = await registerUser(formData);
       toast.success(res.msg || "Registro exitoso. Revisa tu correo para confirmar.");
-      setTimeout(() => navigate('/login'), 2000);
+      setTimeout(() => navigate('/login'), 50);
     } catch (errorMsg) {
       toast.error(errorMsg);
     }
@@ -92,7 +92,7 @@ return (
               name="nombre"
               value={formData.nombre}
               onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm"
+              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
               required
             />
 
@@ -102,7 +102,7 @@ return (
               name="apellido"
               value={formData.apellido}
               onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm"
+              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
               required
             />
 
@@ -112,7 +112,7 @@ return (
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm"
+              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
               required
             />
 
@@ -122,7 +122,7 @@ return (
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm"
+              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
               required
             />
 
@@ -132,7 +132,7 @@ return (
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm"
+              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
               required
             />
           </div>
@@ -158,7 +158,7 @@ return (
       </div>
 
       {/* Columna derecha - Imagen decorativa */}
-      <div className="w-full md:w-2xl h-full hidden md:flex ml-auto">
+      <div className="items-stretch w-full h-full md:w-[950px]  hidden md:flex">
 
         <img src={loginImage} alt="Decoración" className="object-cover w-full h-full" />
       </div>

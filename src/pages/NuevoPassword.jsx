@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import fondo1 from "../assets/fondo1.webp";
 import { Link } from 'react-router-dom';
 
-export const NuevoPassword = () => {
+const NuevoPassword = () => {
   const { token } = useParams()
   const navigate = useNavigate()
   const [password, setPassword] = useState('')
@@ -30,12 +30,12 @@ export const NuevoPassword = () => {
     }
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/nuevopassword/${token}`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}nuevopassword/${token}`;
 
       const respuesta = await axios.post(url, { password, confirmpassword: confirmPassword })
 
       toast.success(respuesta?.data?.msg || "Contraseña actualizada, ya puedes iniciar sesión")
-      setTimeout(() => navigate('/login'), 3000)
+      setTimeout(() => navigate('/login'), 50)
     } catch (error) {
       toast.error(error?.response?.data?.msg || "Error al actualizar la contraseña")
     } finally {

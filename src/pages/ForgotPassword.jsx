@@ -2,11 +2,11 @@ import { useState } from 'react'
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import logoAmikuna from "../assets/forgot.webp";
+import logoAmikuna from "../assets/forgot.jpg";
 import { Link } from 'react-router-dom';
 
 
-export const ForgotPassword = () => {
+const ForgotPassword = () => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -20,7 +20,7 @@ export const ForgotPassword = () => {
 
     setLoading(true)
     try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/api/recuperarpassword`
+      const url = `${import.meta.env.VITE_BACKEND_URL}recuperarpassword`
 
       const response = await axios.post(url, { email })
       toast.success(response?.data?.msg || 'Revisa tu correo para recuperar tu contraseña')
@@ -56,7 +56,7 @@ export const ForgotPassword = () => {
             placeholder="Tu correo electrónico"
             value={email}
             onChange={e => setEmail(e.target.value)}
-className="w-full p-1 mb-4 border border-gray-300 rounded bg-white bg-opacity-80 text-black"            required
+className="w-full p-1 mb-4 border border-gray-300 rounded bg-white bg-opacity-80 text-black bg-gray-100 "            required
           />
 
           <button
