@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import {
   Elements,
   CardElement,
@@ -110,17 +110,16 @@ function ModalPayment({ onClose, onPaymentSuccess }) {
   }
   return (
     <div
-  className="fixed inset-0 flex items-center justify-center z-50 bg-cover bg-center"
-  style={{ backgroundImage: `url(${perfil1})` }}
+  className="bg-[#9B2C2C] rounded-lg shadow-lg p-6 w-full border border-white"
+  style={{ backgroundImage: `url(${perfil1})`, backgroundSize: "cover" }}
 >
-      <div className="bg-[#9B2C2C] rounded-lg shadow-lg overflow-y-auto p-6 max-w-2xl w-full border border-white relative">
         <p className="text-white font-bold text-5xl mb-4 text-center">Realizar Aporte</p>
 <p className="text-white italic text-2xl text-center mb-6">Tu ayuda hoy puede cambiar una vida mañana. Estas donaciones serán utilizadas para mejorar nuestro sistema y así más jóvenes podrán beneficiarse de este nuevo sistema de comunicacion social universitario.🥰</p>
         <Elements stripe={stripePromise}>
           <PaymentForm onClose={onClose} onPaymentSuccess={onPaymentSuccess} />
         </Elements>
       </div>
-    </div>
+    
     
   );
 }

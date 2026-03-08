@@ -4,31 +4,30 @@ const Modal = ({ isOpen, onClose, title, children, showCloseButton = true }) => 
   if (!isOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-300"
-      onClick={showCloseButton ? onClose : null} // Solo cierra al clic fuera si se permite cerrar
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn"
+      onClick={showCloseButton ? onClose : undefined}
     >
-      <div 
-        className="bg-white rounded-2xl shadow-2xl w-[800px] h-[700px] overflow-y-auto relative animate-in zoom-in duration-200"
-        onClick={(e) => e.stopPropagation()} 
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col animate-scaleIn"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Cabecera */}
-        <div className="sticky top-0 flex justify-between items-center p-6 border-b bg-white z-20">
-          <h2 className="text-2xl font-bold text-[#B5651D]">{title}</h2>
-          
-          {/* Mostramos la X solo si showCloseButton es true */}
+        {/* Header */}
+        <div className="flex justify-between items-center p-5 border-b">
+          <h2 className="text-xl font-bold text-[#B5651D]">{title}</h2>
+
           {showCloseButton && (
-            <button 
+            <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 text-xl hover:text-red-500"
+              className="text-gray-400 hover:text-red-500 text-xl transition"
             >
               ✕
             </button>
           )}
         </div>
 
-        {/* Contenido */}
-        <div className="p-6">
+        {/* Content */}
+        <div className="p-6 overflow-y-auto">
           {children}
         </div>
       </div>
@@ -41,7 +40,7 @@ Modal.propTypes = {
   onClose: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
-  showCloseButton: PropTypes.bool, // Nueva prop opcional
+  showCloseButton: PropTypes.bool,
 };
 
 export default Modal;

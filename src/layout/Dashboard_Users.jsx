@@ -500,12 +500,18 @@ if (perfilIncompleto) {
       )}
 
       {mostrarModalAporte && aporteSeleccionado && (
-        <ModalPayment
-          aporte={aporteSeleccionado}
-          onClose={() => setMostrarModalAporte(false)}
-          onPaymentSuccess={handleAporteSuccess}
-        />
-      )}
+          <Modal
+    isOpen={mostrarModalAporte}
+    onClose={() => setMostrarModalAporte(false)}
+    title="Realizar aporte"
+  >
+    <ModalPayment
+      aporte={aporteSeleccionado}
+      onClose={() => setMostrarModalAporte(false)}
+      onPaymentSuccess={handleAporteSuccess}
+    />
+  </Modal>
+)}
 
       <Modal
         isOpen={mostrarEditarPerfil}

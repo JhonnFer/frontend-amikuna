@@ -145,11 +145,11 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
   return (
     <div
       className="h-screen flex items-center justify-center bg-cover bg-center relative"
-      style={{ backgroundImage: `url(${perfil1})` }}
+       style={{ backgroundImage: `url(${perfil1})` }}
     >
       <div className="absolute inset-0 bg-black opacity-40"></div>
 
-      <div className="relative w-full max-w-2xl p-6 bg-white rounded-lg shadow-md max-h-screen overflow-auto">
+      <div className="relative w-full max-w-2xl p-6 bg-white rounded-lg shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-center">
           Completa tu perfil
         </h2>
