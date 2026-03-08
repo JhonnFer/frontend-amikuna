@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useCallback } from "react";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_BACKEND_URL;
 
 let errorToastId = null;
 
@@ -13,7 +13,9 @@ function useFetch() {
       const url = `${API_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
 
       const showLoadingToast = showToast && method.toUpperCase() !== "GET";
-      const loadingToast = showLoadingToast ? toast.loading("Procesando solicitud...") : null;
+      const loadingToast = showLoadingToast
+        ? toast.loading("Procesando solicitud...")
+        : null;
 
       try {
         const token = localStorage.getItem("token");
@@ -41,11 +43,25 @@ function useFetch() {
         return response.data;
       } catch (error) {
         if (loadingToast) toast.dismiss(loadingToast);
+        const status = error?.response?.status;
         const errorMsg =
           error?.response?.data?.msg ||
           error?.response?.data?.error ||
           error?.message ||
           "Error desconocido";
+
+        // Manejar error 403 (Forbidden)
+        if (status === 403) {
+          console.error("403 Forbidden:", errorMsg);
+          if (showToast) {
+            toast.error(
+              "No tienes permisos para acceder a este recurso. Por favor, completa tu perfil.",
+            );
+          }
+          throw new Error(
+            "Acceso denegado. Completa tu perfil para continuar.",
+          );
+        }
 
         if (errorMsg.toLowerCase().includes("token expired")) {
           localStorage.removeItem("token");
@@ -67,7 +83,7 @@ function useFetch() {
         throw new Error(errorMsg);
       }
     },
-    []
+    [],
   );
 
   return { fetchDataBackend };

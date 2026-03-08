@@ -3,160 +3,265 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
 import useFetch from "../hooks/useFetch";
 import storeAuth from "../context/storeAuth";
+import usePerfilUsuarioAutenticado from "../hooks/usePerfilUsuarioAutenticado";
+
+import Modal from "../components/modal/modal";
+import PerfilUsuario from "../components/Dashboard_User/PerfilUsuario";
 
 import logoAmikuna from "../assets/Logo.png";
 import loginImage from "../assets/prueba1.jpg";
 import logingogle from "../assets/gogle.png";
 
 const Login = () => {
+
   const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [tempUserData, setTempUserData] = useState(null);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { fetchDataBackend } = useFetch();
-  const setUser = storeAuth((state) => state.setUser);
 
-   // Aquí sacamos la base backend sin el /api final
-  const backendBase = (import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api").replace(/\/api\/?$/, '');
+  const { fetchDataBackend } = useFetch();
+  const { cargarPerfil } = usePerfilUsuarioAutenticado();
+
+  const setAuth = storeAuth((state) => state.setAuth);
+
+  const backendBase = (
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api"
+  ).replace(/\/api\/?$/, "");
 
   const loginUser = async (data) => {
+
     try {
-      // PASA SOLO LA RUTA RELATIVA
+
       const response = await fetchDataBackend("login", data, "POST");
 
-      if (response) {
-        const { user, token } = response;
+      if (!response || !response.token) {
+        toast.error("Credenciales incorrectas o cuenta no confirmada");
+        return;
+      }
 
-        if (user && token) {
-          setUser({ ...user, token }); // Guarda en Zustand y localStorage
+      const { user, token } = response;
 
-          if (user.rol === "admin") {
-            navigate("/admin/dashboard");
-          } else if (user.rol === "estudiante") {
-            navigate("/user/dashboard");
-          } else {
-            navigate("/forbidden");
-          }
+      const userRole = user.rol?.toLowerCase().trim();
+
+      // guardar sesión
+      setAuth({
+  user,
+  token
+});
+
+      // ADMIN
+      if (userRole === "admin") {
+
+        navigate("/admin/dashboard");
+        return;
+
+      }
+
+      // ESTUDIANTE
+      if (userRole === "estudiante") {
+
+        const perfil = await cargarPerfil();
+
+        const perfilCompleto =
+          perfil?.imagenPerfil &&
+          perfil?.genero &&
+          perfil?.biografia &&
+          perfil?.intereses?.length &&
+          perfil?.ubicacion?.ciudad;
+
+        if (perfilCompleto) {
+
+          navigate("/user/dashboard");
+
         } else {
-          toast.error("Credenciales incorrectas o cuenta no confirmada");
+
+          setTempUserData({ ...user, token });
+          setShowProfileModal(true);
+
         }
       }
+
     } catch (error) {
+
+      console.error("Error en loginUser:", error);
       toast.error("Error al iniciar sesión");
+
     }
+
+  };
+
+  const handleProfileCompleted = (success) => {
+
+    if (success) {
+
+      setShowProfileModal(false);
+      navigate("/user/dashboard");
+
+    }
+
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-screen">
+    <div className="flex flex-col md:flex-row w-full h-screen overflow-hidden">
+
       <ToastContainer />
 
-      {/* Columna izquierda - Login */}
-      <div className="md:w-1/2 h-full flex flex-col justify-self-center items-center p-10 bg-white">
-        <div className="flex items-center mb-4">
-          <div className="w-[60px] h-[60px] md:w-[80px] md:h-[80px]">
-            <img
-              src={logoAmikuna}
-              alt="Logo"
-              className="w-full h-full object-contain"
-            />
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold ml-2 font-serif">AMIKUNA</h1>
+      {/* FORMULARIO */}
+      <div className="md:w-1/2 h-full flex flex-col justify-center items-center p-10 bg-white">
+
+        <div className="flex items-center mb-6">
+
+          <img
+            src={logoAmikuna}
+            alt="Logo"
+            className="w-16 h-16 object-contain"
+          />
+
+          <h1 className="text-3xl font-bold ml-2 font-serif text-[#B5651D]">
+            AMIKUNA
+          </h1>
+
         </div>
 
         <form
           onSubmit={handleSubmit(loginUser)}
-          className="flex flex-col justify-center gap-5 w-full max-w-sm"
+          className="flex flex-col gap-4 w-full max-w-sm"
         >
-          <h2 className="text-lg md:text-xl font-bold text-center mb-1 mt-4">
-            Inicia sesión
+
+          <h2 className="text-xl font-bold text-center text-gray-700">
+            Inicia Sesión
           </h2>
 
-          <input
-            type="email"
-            placeholder="Correo electrónico"
-            {...register("email", { required: "El correo es obligatorio" })}
-            className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5651D] text-sm bg-gray-100"
-          />
-          {errors.email && (
-            <p className="text-red-800 text-sm">{errors.email.message}</p>
-          )}
+          <div className="space-y-1">
 
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Contraseña"
-            {...register("password", {
-              required: "La contraseña es obligatoria",
-            })}
-            className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#B5651D] text-sm bg-gray-100"
-          />
-          {errors.password && (
-            <p className="text-red-800 text-sm">{errors.password.message}</p>
-          )}
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              {...register("email", { required: "El correo es obligatorio" })}
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
+            />
 
-          <div className="flex items-center mb-2 text-sm">
+            {errors.email && (
+              <p className="text-red-500 text-xs">
+                {errors.email.message}
+              </p>
+            )}
+
+          </div>
+
+          <div className="space-y-1">
+
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Contraseña"
+              {...register("password", {
+                required: "La contraseña es obligatoria",
+              })}
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
+            />
+
+            {errors.password && (
+              <p className="text-red-500 text-xs">
+                {errors.password.message}
+              </p>
+            )}
+
+          </div>
+
+          <label className="flex items-center text-sm text-gray-600 cursor-pointer">
+
             <input
               type="checkbox"
-              onChange={() => setShowPassword(!showPassword)}
               className="mr-2"
+              onChange={() => setShowPassword(!showPassword)}
             />
+
             Mostrar contraseña
-          </div>
+
+          </label>
 
           <button
             type="submit"
-            className="text-sm font-semibold px-4 py-2 rounded-full bg-white text-black border border-gray-400 hover:bg-gray-100 transition-all"
+            className="w-full bg-[#B5651D] text-white py-3 rounded-full font-bold hover:bg-[#8d4e16]"
           >
             Ingresar
           </button>
 
-          <div className="flex flex-col mt-2">
+          <div className="flex flex-col gap-3 mt-4">
+
             <a
               href={`${backendBase}/auth/google`}
-              className="text-sm font-semibold px-6 py-2 rounded-full bg-white text-black border border-gray-400 hover:bg-gray-100 transition-all flex items-center justify-center gap-3"
+              className="flex items-center justify-center gap-2 border p-2 rounded-full hover:bg-gray-50"
             >
-              <img src={logingogle} alt="Icono Ingresar" className="w-5 h-5" />
-              <span>Ingresar con Google</span>
+
+              <img
+                src={logingogle}
+                alt="Google"
+                className="w-5 h-5"
+              />
+
+              <span className="text-sm font-medium">
+                Ingresar con Google
+              </span>
+
             </a>
 
             <Link
               to="/forgot"
-              className="text-blue-600 hover:underline text-sm text-center mt-6"
+              className="text-sm text-blue-600 text-center hover:underline"
             >
               ¿Olvidaste tu contraseña?
-            </Link>
-            <Link
-              to="/forgot2"
-              className="text-blue-600 hover:underline text-sm text-center mt-3"
-            >
-              ¿Administrador olvidó su contraseña?
             </Link>
 
             <Link
               to="/register"
-              className="text-blue-600 hover:underline text-sm text-center mt-3"
+              className="text-sm text-[#B5651D] text-center font-bold hover:underline"
             >
-              ¿No tienes cuenta? Regístrate aquí
+              ¿No tienes cuenta? Regístrate
             </Link>
 
-            <Link
-              to="/"
-              className="text-red-600 hover:underline text-sm text-center mt-3"
-            >
-              Regresar
-            </Link>
           </div>
+
         </form>
+
       </div>
 
-      {/* Columna derecha - Imagen */}
-      <div className="items-stretch w-full h-full md:w-[950px]  hidden md:flex ">
-        <img src={loginImage} alt="Decoración" className="object-cover w-full " />
+      {/* IMAGEN */}
+      <div className="hidden md:block md:w-1/2 h-full">
+
+        <img
+          src={loginImage}
+          alt="Login"
+          className="w-full h-full object-cover"
+        />
+
       </div>
+
+      {/* MODAL COMPLETAR PERFIL */}
+      <Modal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        title="¡Bienvenido a AmiKuna!"
+        showCloseButton={false}
+      >
+
+        <PerfilUsuario
+          perfil={tempUserData}
+          onFinished={handleProfileCompleted}
+        />
+
+      </Modal>
+
     </div>
   );
 };

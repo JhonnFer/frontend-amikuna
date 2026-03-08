@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import storeAuth from "../context/storeAuth";
+import useAuth from "../context/storeAuth";
 
 const backendUrl = (import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api").replace(/\/api\/?$/, "");
 
@@ -15,7 +15,7 @@ const isPerfilCompleto = (user) => {
 
 const GoogleSuccess = () => {
   const navigate = useNavigate();
-  const setUser = storeAuth((state) => state.setUser);
+  const setUser = useAuth((state) => state.setUser);
 
   useEffect(() => {
     const fetchUser = async () => {

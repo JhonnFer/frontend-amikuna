@@ -1,7 +1,7 @@
 // src/layout/Dashboard_Admin.jsx (completo con MisStrikes integrado)
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import storeAuth from "../context/storeAuth";
+import useAuth from "../context/storeAuth";
 
 import PerfilAdmin from "../components/Dashboard_Admin/PerfilAdmin";
 import CambiarPasswordAdmin from "../components/Dashboard_Admin/CambiarPasswordAdmin";
@@ -11,8 +11,8 @@ import UserList from "../components/Dashboard_Admin/UserList";
 import MisStrikes from "../components/Dashboard_Admin/MisStrikes";
 
 const Dashboard_Admin = () => {
-  const logout = storeAuth((state) => state.logout);
-  const user = storeAuth((state) => state.user);
+  const logout = useAuth((state) => state.logout);
+  const user = useAuth((state) => state.user);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("perfil");
 

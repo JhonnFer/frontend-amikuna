@@ -4,21 +4,30 @@ const storeAuth = create((set) => ({
   user: JSON.parse(localStorage.getItem("user")) || null,
   token: localStorage.getItem("token") || null,
 
-  setUser: (userData) => {
-    if (!userData || !userData.token) {
-      console.error("setUser requiere un objeto con token válido");
+  setAuth: ({ user, token }) => {
+    if (!token) {
+      console.error("Token requerido");
       return;
     }
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", userData.token);
-    set({ user: userData, token: userData.token });
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    set({
+      user,
+      token
+    });
   },
 
   logout: () => {
-    localStorage.removeItem("user");
     localStorage.removeItem("token");
-    set({ user: null, token: null });
-  },
+    localStorage.removeItem("user");
+
+    set({
+      user: null,
+      token: null
+    });
+  }
 }));
 
 export default storeAuth;

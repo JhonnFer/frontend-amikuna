@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api"; // ya termina en /api/
+const API_URL = import.meta.env.VITE_BACKEND_URL; // ya termina en /api/
 
 const fetchDataBackend = async (endpoint, token) => {
   // Evitamos barra inicial para no generar doble slash:

@@ -29,9 +29,12 @@ function App() {
   const loadProfile = storeProfile(state => state.loadProfile);
   const token = storeAuth(state => state.token);
 
-useEffect(() => {
-  if (token) loadProfile();
-}, [token, loadProfile]);
+  const profile = storeProfile((state) => state.profile);
+  useEffect(() => {
+  if (token && !profile) {
+    loadProfile();
+  }
+}, [token]);
 
   return (
     <BrowserRouter>

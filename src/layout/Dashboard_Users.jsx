@@ -1,10 +1,9 @@
-// src/components/Dashboard_User/Dashboard_Users.jsx
-
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import storeAuth from "../context/storeAuth";
 import { FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
+import Modal from "../components/modal/modal";
 import ModalTreatments from "../components/treatments/Modal";
 
 import { io } from "socket.io-client";
@@ -24,20 +23,46 @@ import useNotificaciones from "../hooks/useNotificaciones";
 import useChat from "../hooks/useChat";
 import useAsistenciaEvento from "../hooks/useAsistenciaEvento";
 import useSeguirUsuario from "../hooks/useSeguirUsuario";
-
+import FormularioCompletarPerfil from "../components/Dashboard_User/FormularioCompletarPerfil";
 const socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:3000");
 
 const Dashboard_Users = () => {
   const navigate = useNavigate();
-  const { perfil: profile, loadingPerfil } = usePerfilUsuarioAutenticado();
+  
+  // console.log("[Dashboard_Users] perfilCompleto:", perfilCompleto);
+  const {
+    perfil: profile,
+    loadingPerfil,
+    cargarPerfil,
+  } = usePerfilUsuarioAutenticado();
   const { matches, loading: loadingMatches } = useMatches();
   const usuarios = matches;
+  const [mostrarEditarPerfil, setMostrarEditarPerfil] = useState(false);
+
+  // 🔒 GUARDIA: Si no hay usuario autenticado, redirigir al login
+  useEffect(() => {
+    const user = storeAuth.getState().user;
+    if (!user) {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
+
+  // Si el perfil está incompleto, mostrar formulario de completar perfil
+  // (Ahora manejado en el return principal arriba)
+  // useEffect removido porque se maneja en el return
+
+  // Cargar el perfil cuando el Dashboard se monta
+  useEffect(() => {
+    if (!loadingPerfil && !profile) {
+      cargarPerfil();
+    }
+    // Solo depende de loadingPerfil y cargarPerfil para evitar bucles
+  }, [loadingPerfil, profile, cargarPerfil]);
 
   // Usamos tu hook que obtiene eventos y la función para recargarlos
   const {
     eventos,
     loading: loadingEventos,
-    error: errorEventos,
     obtenerEventos,
   } = useEventosEstudiante();
 
@@ -121,7 +146,7 @@ const Dashboard_Users = () => {
           setChatIdsCache((prev) => ({ ...prev, [sortedIds]: chatIdToUse }));
         } else {
           console.error(
-            "Error al abrir el chat: La respuesta de la API no contiene un chatId válido."
+            "Error al abrir el chat: La respuesta de la API no contiene un chatId válido.",
           );
           return;
         }
@@ -140,7 +165,7 @@ const Dashboard_Users = () => {
         };
       });
     },
-    [abrirChat, chatIdsCache, profile]
+    [abrirChat, chatIdsCache, profile],
   );
 
   const handleCerrarChat = useCallback(() => {
@@ -165,7 +190,7 @@ const Dashboard_Users = () => {
 
       await enviarMensajeApi(chatInfo.chatId, contenido);
     },
-    [enviarMensajeApi, chatInfo, profile]
+    [enviarMensajeApi, chatInfo, profile],
   );
 
   const handleOpenAporteModal = useCallback((monto, concepto, descripcion) => {
@@ -187,7 +212,7 @@ const Dashboard_Users = () => {
 
     return matches.filter(
       (match) =>
-        misSeguidores.has(match._id) && miListaDeSeguidos.has(match._id)
+        misSeguidores.has(match._id) && miListaDeSeguidos.has(match._id),
     );
   }, [matches, profile]);
 
@@ -207,11 +232,39 @@ const Dashboard_Users = () => {
     });
   }, [eventos, profile]);
 
-  if (loadingPerfil) return <div>Cargando perfil...</div>;
-  if (!profile) return <div>No se encontró el perfil</div>;
-  if (errorEventos) return <div>Error al cargar eventos: {errorEventos}</div>;
+  if (loadingPerfil || !profile || !profile._id) {
+    return <div>Cargando perfil...</div>;
+  }
 
-return (
+  // Si el perfil no está completo, SOLO mostrar el modal de completar perfil
+  const perfilIncompleto =
+  !profile?.genero ||
+  !profile?.orientacion ||
+  !profile?.ubicacion?.ciudad;
+
+if (perfilIncompleto) {
+  return (
+    <Modal
+      isOpen={true}
+      title="Completa tu perfil"
+      showCloseButton={false}
+      onClose={() => {}}
+    >
+      <p className="text-center text-gray-600 mb-4">
+        Necesitamos que completes tu perfil para acceder al dashboard
+      </p>
+
+      <FormularioCompletarPerfil
+        initialData={profile}
+        onSuccess={async () => {
+          await cargarPerfil();
+        }}
+      />
+    </Modal>
+  );
+}
+
+  return (
     <div className="flex flex-col h-screen w-full bg-gray-100">
       <div className="flex flex-1 overflow-hidden">
         {/* Estilos del perfil de tu compañero */}
@@ -222,39 +275,57 @@ return (
             </h1>
           </header>
           <>
-            <img
-              src={profile.imagenPerfil || "https://placehold.co/150x150"}
-              alt="Tu foto de perfil"
-              className="rounded-full w-32 h-32 object-cover mx-auto mb-4"
-            />
-            <h3 className="text-xl font-bold text-center mt-4 text-gray-800">
-              {profile.nombre}
-            </h3>
-
-            <p className="text-center text-gray-500 italic mb-4">
-              {profile.biografia || "Sin biografía definida"}
-            </p>
-
-            <div className="bg-gray-50 rounded-xl p-4 shadow-sm space-y-2">
-              <p>
-                <strong className="text-rose-800">Género:</strong>{" "}
-                {profile.genero || "No definido"}
-              </p>
-              <p>
-                <strong className="text-rose-800">Orientación:</strong>{" "}
-                {profile.orientacion || "No definida"}
-              </p>
-              <p>
-                <strong className="text-rose-800">Intereses:</strong>{" "}
-                {profile.intereses?.join(", ") || "No definidos"}
-              </p>
-              <p>
-                <strong className="text-rose-800">Fecha de nacimiento:</strong>{" "}
-                {profile.fechaNacimiento
-                  ? profile.fechaNacimiento.split("T")[0]
-                  : "No definida"}
-              </p>
-            </div>
+            {profile && (
+              <>
+                <img
+                  src={
+                    profile.imagenPerfil && profile.imagenPerfil !== ""
+                      ? profile.imagenPerfil
+                      : "https://placehold.co/150x150"
+                  }
+                  alt="Tu foto de perfil"
+                  className="rounded-full w-32 h-32 object-cover mx-auto mb-4"
+                />
+                <h3 className="text-xl font-bold text-center mt-4 text-gray-800">
+                  {profile.nombre || "Sin nombre"}
+                </h3>
+                <p className="text-center text-gray-500 italic mb-4">
+                  {profile.biografia && profile.biografia !== ""
+                    ? profile.biografia
+                    : "Sin biografía definida"}
+                </p>
+                <div className="bg-gray-50 rounded-xl p-4 shadow-sm space-y-2">
+                  <p>
+                    <strong className="text-rose-800">Género:</strong>{" "}
+                    {profile.genero && profile.genero !== ""
+                      ? profile.genero
+                      : "No definido"}
+                  </p>
+                  <p>
+                    <strong className="text-rose-800">Orientación:</strong>{" "}
+                    {profile.orientacion && profile.orientacion !== ""
+                      ? profile.orientacion
+                      : "No definida"}
+                  </p>
+                  <p>
+                    <strong className="text-rose-800">Intereses:</strong>{" "}
+                    {Array.isArray(profile.intereses) &&
+                    profile.intereses.length > 0
+                      ? profile.intereses.join(", ")
+                      : "No definidos"}
+                  </p>
+                  <p>
+                    <strong className="text-rose-800">
+                      Fecha de nacimiento:
+                    </strong>{" "}
+                    {profile.fechaNacimiento &&
+                    typeof profile.fechaNacimiento === "string"
+                      ? profile.fechaNacimiento.split("T")[0]
+                      : "No definida"}
+                  </p>
+                </div>
+              </>
+            )}
 
             <hr className="my-6 border-gray-300" />
           </>
@@ -269,7 +340,7 @@ return (
                 handleOpenAporteModal(
                   10,
                   "Apoyo a la app",
-                  "Contribución para mejoras de la plataforma Amikuna"
+                  "Contribución para mejoras de la plataforma Amikuna",
                 )
               }
               className="bg-red-900 text-white px-2 py-1 text-sm rounded-md md:px-4 md:py-2 md:text-base"
@@ -278,7 +349,7 @@ return (
             </button>
             <div className="flex flex-col items-center">
               <button
-                onClick={() => navigate("/user/completar-perfil")}
+                onClick={() => setMostrarEditarPerfil(true)}
                 title="Editar perfil"
               >
                 <FaUser className="text-gray-600 hover:text-blue-600 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
@@ -325,7 +396,7 @@ return (
               <ChatbotEstudiante />
             </div>
           )}
-          
+
           {/* NUEVO CONTENEDOR PARA EL CONTENIDO DINÁMICO */}
           <div className="flex-1 relative">
             {loadingMatches ? (
@@ -334,7 +405,7 @@ return (
               </div>
             ) : (
               <SwipeCards
-                usuarios={usuarios}
+                usuarios={usuarios || []}
                 onFollow={seguirUsuario}
                 cargandoSeguir={cargandoSeguir}
               />
@@ -435,9 +506,23 @@ return (
           onPaymentSuccess={handleAporteSuccess}
         />
       )}
-    </div>
-);
 
+      <Modal
+        isOpen={mostrarEditarPerfil}
+        title="Editar perfil"
+        showCloseButton={true}
+        onClose={() => setMostrarEditarPerfil(false)}
+      >
+        <FormularioCompletarPerfil
+          initialData={profile}
+          onSuccess={async () => {
+            await cargarPerfil();
+            setMostrarEditarPerfil(false);
+          }}
+        />
+      </Modal>
+    </div>
+  );
 };
 
 export default Dashboard_Users;
