@@ -1,6 +1,17 @@
+import { useEffect } from "react";
 import PropTypes from "prop-types";
 
 const Modal = ({ isOpen, onClose, title, children, showCloseButton = true }) => {
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleEsc);
+
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+  
   if (!isOpen) return null;
 
   return (

@@ -1,5 +1,5 @@
 // src/components/ChatbotEstudiante.jsx
-import React, { useState } from "react";
+import  { useState } from "react";
 import useChatbot from "../../hooks/useChatbot";
 
 const ChatbotEstudiante = () => {
@@ -14,13 +14,13 @@ const ChatbotEstudiante = () => {
   };
 
   return (
-  <div className="max-w-md mx-auto p-4 bg-white rounded-xl shadow-md">
+  <div className="max-w-lg mx-auto p-4  bg-white rounded-xl shadow-md">
   <form
     onSubmit={handleSubmit}
     className="flex items-center gap-2"
   >
     <textarea
-      className="flex-1 border border-gray-300 rounded-full px-5 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-400 text-base leading-tight"
+      className="flex-1 border bg-gray-200 border-gray-950  rounded-full px-5 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-950 text-base leading-tight"
       style={{ minHeight: "50px" }}
       value={mensaje}
       onChange={(e) => setMensaje(e.target.value)}
@@ -30,7 +30,7 @@ const ChatbotEstudiante = () => {
     <button
       type="submit"
       disabled={loading}
-      className="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition disabled:opacity-50 text-sm font-medium"
+      className="px-6 py-3 border-white border-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition disabled:opacity-50 text-sm font-medium"
     >
       {loading ? "Enviando..." : "Enviar"}
     </button>

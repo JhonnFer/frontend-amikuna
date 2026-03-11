@@ -16,7 +16,7 @@ import ModalPayment from "../components/treatments/ModalPayment";
 import StrikeForm from "../components/Dashboard_User/StrikeForm";
 import ChatbotEstudiante from "../components/Dashboard_User/ChatbotEstudiante";
 
-import useEventosEstudiante from "../hooks/useEventosEstudiante"; // Usamos tu hook
+import useEventosEstudiante from "../hooks/useEventosEstudiante"; 
 import usePerfilUsuarioAutenticado from "../hooks/usePerfilUsuarioAutenticado";
 import useMatches from "../hooks/useMatches";
 import useNotificaciones from "../hooks/useNotificaciones";
@@ -334,7 +334,7 @@ if (perfilIncompleto) {
 
         <main className="flex flex-col flex-1 min-w-0 p-4 gap-4 overflow-y-auto max-w-full md:max-w-3xl mx-auto">
           {/* Estilos de botones de tu compañero */}
-          <div className="flex flex-wrap justify-start rounded-lg items-center md:gap-10 gap-14 mb-6 bg-[#D19AA5] max-w-full">
+          <div className="flex flex-wrap justify-start border rounded-lg items-center md:gap-10 gap-14 mb-6 bg-[#FF7979] max-w-full">
             <button
               onClick={() =>
                 handleOpenAporteModal(
@@ -343,7 +343,7 @@ if (perfilIncompleto) {
                   "Contribución para mejoras de la plataforma Amikuna",
                 )
               }
-              className="bg-red-900 text-white px-2 py-1 text-sm rounded-md md:px-4 md:py-2 md:text-base"
+              className="bg-red-800 mx-2 text-white px-2 py-1 text-sm rounded-full md:px-4 md:py-2 md:text-base"
             >
               Realizar Aporte
             </button>
@@ -352,19 +352,19 @@ if (perfilIncompleto) {
                 onClick={() => setMostrarEditarPerfil(true)}
                 title="Editar perfil"
               >
-                <FaUser className="text-gray-600 hover:text-blue-600 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+                <FaUser className="text-gray-600 hover:text-gray-200 w-4 h-4 sm:w-4 sm:h-4 md:w-6 md:h-6 lg:w-6 lg:h-6" />
               </button>
-              <span className="text-xs text-gray-600 mt-1 text-center block">
+              <span className="text-xs text-gray-800 mt-1 text-center block">
                 Editar perfil
               </span>
             </div>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center py-1 text-gray-600 hover:text-gray-200">
               <BotonNotificaciones
                 solicitudes={solicitudes}
                 loading={loadingSolicitudes}
                 onFollow={seguirUsuario}
               />
-              <span className="text-xs text-gray-600 mt-1">Notificaciones</span>
+              <span className="text-xs text-gray-800 py-1">Notificaciones</span>
             </div>
             <button
               onClick={() => setMostrarChatbot(!mostrarChatbot)}
@@ -372,26 +372,26 @@ if (perfilIncompleto) {
             >
               <div className="flex flex-col items-center">
                 <span className="text-lg">💬</span>
-                <span className="text-xs text-gray-700">Chat Bot</span>
+                <span className="text-xs text-gray-800 p-0.5">Chat Bot</span>
               </div>
             </button>
             <button onClick={handleLogout} title="Cerrar sesión">
               <div className="flex flex-col items-center">
-                <FiLogOut className="text-gray-600 hover:text-red-600 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
-                <span className="text-xs text-gray-700">Cerrar sesión</span>
+                <FiLogOut className="text-[#51040492] hover:text-red-200 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
+                <span className="text-xs text-gray-800">Cerrar sesión</span>
               </div>
             </button>
           </div>
 
           {mostrarChatbot && (
-            <div className="fixed bottom-4 right-4 w-80 p-4 bg-white rounded shadow-lg z-50">
+            <div className="fixed bottom-5 border border-gray-500 rounded-2xl  right-2 w-auto p-4 bg-white shadow-lg z-50">
               {/* Estilo del botón de cerrar chatbot de tu compañero */}
               <button
                 onClick={() => setMostrarChatbot(false)}
-                className="mb-2 text-red-600 font-bold flex items-center gap-2"
+                className="mb-2 text-red-500 font-bold flex items-center gap-2"
               >
                 ❌{" "}
-                <span className="text-gray-800 font-semibold">Chat Bot 😎</span>
+                <span className="text-gray-800 font-sans">Chat Bot 😎</span>
               </button>
               <ChatbotEstudiante />
             </div>

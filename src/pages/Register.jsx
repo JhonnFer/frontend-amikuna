@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { FaHome } from "react-icons/fa";
 
 import logoAmikuna from "../assets/Logo.png";
 import loginImage from "../assets/Registro.png";
@@ -59,7 +60,7 @@ const Register = () => {
     try {
       const res = await registerUser(formData);
       toast.success(res.msg || "Registro exitoso. Revisa tu correo para confirmar.");
-      setTimeout(() => navigate('/login'), 50);
+      setTimeout(() => navigate('/login'), 1000);
     } catch (errorMsg) {
       toast.error(errorMsg);
     }
@@ -69,9 +70,15 @@ const Register = () => {
 
 
 return (
-    <div className="flex w-full h-screen items-stretch">
+    <div className="flex w-full h-screen items-stretch relative">
 
       <ToastContainer />
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-6 left-6 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
+      >
+        <FaHome size={50} />
+      </button>
 
       {/* Columna izquierda - Formulario */}
       <div className="md:w-1/2 w-full h-full flex flex-col justify-center items-center p-6 bg-white">
@@ -79,11 +86,11 @@ return (
           <div className="w-[60px] h-[60px] md:w-[80px] md:h-[80px]">
             <img src={logoAmikuna} alt="Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold ml-2 font-serif">AMIKUNA</h1>
+          <h1 className="text-2xl md:text-3xl font-bold ml-2 font-serif text-[#FF4E4E]">AMIKUNA</h1>
         </div>
 
         <form onSubmit={handleSubmitForm} className="flex flex-col justify-center gap-6 w-full max-w-sm">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-1 mt-10">¡Únete ahora!</h2>
+          <h2 className="text-3xl md:text-4xl font-bold  text-[#c4481b] text-center mb-1 mt-10">¡Únete ahora!</h2>
 
           <div className="flex flex-col gap-4">
             <label className="text-sm font-medium">Nombre</label>
@@ -137,22 +144,24 @@ return (
             />
           </div>
 
-          <div className="mt-4 flex justify-between">
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="text-sm font-semibold px-4 py-2 rounded-full bg-white text-black border border-gray-400 hover-bg-color-black_pur transition-all"
-            >
-              Regresar
-            </button>
-
+          <div className="mt-4 flex justify-around">
             <button
               type="submit"
-              className="text-sm font-semibold px-4 py-2 rounded-full bg-white text-black border border-gray-400 hover-bg-tinder-gradient transition-all"
+              className="text-sm font-semibold px-10 py-2 rounded-full bg-white text-black border border-gray-400 hover-bg-tinder-gradient hover:text-white transition-all"
               disabled={loading}
             >
               {loading ? "Registrando..." : " Enviar "}
             </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="text-sm font-semibold px-10 py-2 rounded-full bg-white text-black border border-gray-400 hover-bg-color-black_pur hover:text-white  transition-all"
+            >
+              Regresar
+            </button>
+
+            
           </div>
         </form>
       </div>

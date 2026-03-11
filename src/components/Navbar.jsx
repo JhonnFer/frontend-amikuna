@@ -26,36 +26,36 @@ const Navbar = () => {
         </div>
 
         {/* Enlaces para desktop */}
-        <div className="hidden md:flex gap-4 ml-4">
+        <div className="hidden font-semibold md:flex gap-4 ml-4 ">
           <NavLink
             to="/"
-            className={({ isActive }) => `${isActive ? activeClass : baseClass} text-xs md:text-sm whitespace-nowrap select-none`}
+            className={({ isActive }) => `${isActive ? activeClass : baseClass} text-gray-500 text-xs md:text-lg whitespace-nowrap select-none`}
           >
-            Inicio
+            Home
           </NavLink>
           <NavLink
             to="/download"
-            className={({ isActive }) => `${isActive ? activeClass : baseClass} text-xs md:text-sm whitespace-nowrap select-none`}
+            className={({ isActive }) => `${isActive ? activeClass : baseClass} text-gray-500 text-xs md:text-lg whitespace-nowrap select-none`}
           >
             Descarga
           </NavLink>
           <NavLink
             to="/about"
-            className={({ isActive }) => `${isActive ? activeClass : baseClass} text-xs md:text-sm whitespace-nowrap select-none`}
+            className={({ isActive }) => `${isActive ? activeClass : baseClass} text-gray-500 text-xs md:text-lg whitespace-nowrap select-none`}
           >
             ¿Quiénes somos?
           </NavLink>
         </div>
 
         {/* Botones para desktop */}
-        <div className="hidden md:flex gap-4">
+        <div className="hidden md:flex gap-10">
           <NavLink to="/login">
-            <button className="px-4 py-2 rounded-full bg-white text-black font-semibold border border-black hover:text-pink-600 active:text-pink-600 focus:outline-none text-xs md:text-sm whitespace-nowrap select-none transition-colors duration-300">
+            <button className="px-4 py-2 rounded-full bg-gray-100 text-black font-semibold border border-gray-500 hover:bg-gray-200 hover:text-pink-600 active:text-pink-600 focus:outline-none text-xs md:text-lg whitespace-nowrap select-none transition-colors duration-300">
               Iniciar sesión
             </button>
           </NavLink>
           <NavLink to="/register">
-            <button className="px-4 py-2 rounded-full bg-white text-black font-semibold border border-black hover:text-pink-600 active:text-pink-600 focus:outline-none text-xs md:text-sm whitespace-nowrap select-none transition-colors duration-300">
+            <button className="px-4 py-2 rounded-full bg-gray-100 text-black font-semibold border border-gray-500 hover:bg-gray-200 hover:text-pink-600 active:text-pink-600 focus:outline-none text-xs md:text-lg whitespace-nowrap select-none transition-colors duration-300">
               Registrate
             </button>
           </NavLink>
