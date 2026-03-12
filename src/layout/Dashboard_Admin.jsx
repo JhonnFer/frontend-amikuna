@@ -1,5 +1,5 @@
 // src/layout/Dashboard_Admin.jsx (completo con MisStrikes integrado)
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../context/storeAuth";
 
@@ -22,7 +22,7 @@ const Dashboard_Admin = () => {
   };
 
   // Estado local para alternar dentro del tab 'perfil' entre vista perfil y cambiar contraseña
-  const [perfilSubTab, setPerfilSubTab] = useState("editar"); // 'editar' o 'password'
+  //const [perfilSubTab, setPerfilSubTab] = useState("editar"); // 'editar' o 'password'
 
 return (
   <div className="bg-gray-100 min-h-screen px-4 py-8 md:px-12 lg:px-20">

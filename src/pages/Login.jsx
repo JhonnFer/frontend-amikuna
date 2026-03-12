@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FaHome } from "react-icons/fa";
+import { FiArrowLeft } from "react-icons/fi";
 
 import useFetch from "../hooks/useFetch";
 import storeAuth from "../context/storeAuth";
@@ -21,7 +21,7 @@ const Login = () => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [tempUserData, setTempUserData] = useState(null);
+
 
   const {
     register,
@@ -42,16 +42,16 @@ const Login = () => {
     try {
       const response = await fetchDataBackend("login", data, "POST");
 
-      if (!response || !response.token) {
-        toast.error("Credenciales incorrectas o cuenta no confirmada");
+      if (!response?.token) {
+        toast.error("No se pudo iniciar sesión");
         return;
       }
 
       const { user, token } = response;
 
-      const userRole = user.rol?.toLowerCase().trim();
+      const userRole = user?.rol?.toLowerCase()?.trim();
 
-      // guardar sesión
+      // Guardar en store
       setAuth({
         user,
         token,
@@ -65,25 +65,33 @@ const Login = () => {
 
       // ESTUDIANTE
       if (userRole === "estudiante") {
-        const perfil = await cargarPerfil();
+        try {
+          const perfil = await cargarPerfil();
 
-        const perfilCompleto =
-          perfil?.imagenPerfil &&
-          perfil?.genero &&
-          perfil?.biografia &&
-          perfil?.intereses?.length &&
-          perfil?.ubicacion?.ciudad;
+          const perfilCompleto =
+            perfil?.imagenPerfil &&
+            perfil?.genero &&
+            perfil?.biografia &&
+            perfil?.intereses?.length > 0 &&
+            perfil?.ubicacion?.ciudad;
 
-        if (perfilCompleto) {
-          navigate("/user/dashboard");
-        } else {
-          setTempUserData({ ...user, token });
-          setShowProfileModal(true);
+          if (perfilCompleto) {
+            navigate("/user/dashboard");
+          } else {
+            navigate("/user/completar-perfil");
+          }
+
+        } catch (errorPerfil) {
+          console.error("Error cargando perfil:", errorPerfil);
+          navigate("/user/completar-perfil");
         }
       }
+
     } catch (error) {
       console.error("Error en loginUser:", error);
-      toast.error("Error al iniciar sesión");
+
+      // 👇 MUESTRA MENSAJE DEL BACKEND
+      toast.error(error.message || "Error al iniciar sesión");
     }
   };
 
@@ -95,17 +103,18 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-screen overflow-hidden relative">
+    <div className="flex flex-col md:flex-row w-full min-h-screen relative">
       <ToastContainer />
+
       <button
         onClick={() => navigate("/")}
         className="absolute top-6 left-6 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
       >
-        <FaHome size={50} />
+        <FiArrowLeft className="text-3xl md:text-5xl" />
       </button>
 
       {/* FORMULARIO */}
-      <div className="md:w-1/2 h-full flex flex-col justify-center items-center p-10 bg-white">
+      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white">
         <div className="flex items-center mb-6">
           <img
             src={logoAmikuna}
@@ -176,8 +185,9 @@ const Login = () => {
               className="flex items-center justify-center gap-2 border p-2 rounded-full hover:bg-gray-50"
             >
               <img src={logingogle} alt="Google" className="w-5 h-5" />
-
-              <span className="text-sm font-medium">Ingresar con Google</span>
+              <span className="text-sm font-medium">
+                Ingresar con Google
+              </span>
             </a>
 
             <Link
@@ -198,7 +208,7 @@ const Login = () => {
       </div>
 
       {/* IMAGEN */}
-      <div className="hidden md:block md:w-1/2 h-full">
+      <div className="hidden md:block md:w-1/2 rounded-3xl overflow-hidden md:mr-9">
         <img
           src={loginImage}
           alt="Login"
@@ -214,7 +224,7 @@ const Login = () => {
         showCloseButton={false}
       >
         <PerfilUsuario
-          perfil={tempUserData}
+          
           onFinished={handleProfileCompleted}
         />
       </Modal>

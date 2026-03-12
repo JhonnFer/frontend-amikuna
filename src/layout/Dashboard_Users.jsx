@@ -5,6 +5,7 @@ import { FaUser } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import Modal from "../components/modal/modal";
 import ModalTreatments from "../components/treatments/Modal";
+import { FaImages } from "react-icons/fa";
 
 import { io } from "socket.io-client";
 
@@ -38,7 +39,47 @@ const Dashboard_Users = () => {
   const { matches, loading: loadingMatches } = useMatches();
   const usuarios = matches;
   const [mostrarEditarPerfil, setMostrarEditarPerfil] = useState(false);
+  const [mostrarGaleriaFotos, setMostrarGaleriaFotos] = useState(false);
+  const [fotosSeleccionadas, setFotosSeleccionadas] = useState([]);
+  // galeria de fotos
+  const subirFotosGaleria = async () => {
+  try {
 
+    if (fotosSeleccionadas.length === 0) {
+      alert("Selecciona al menos una foto");
+      return;
+    }
+
+    const formData = new FormData();
+
+    fotosSeleccionadas.forEach((foto) => {
+      formData.append("imagenesGaleria", foto);
+    });
+
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}estudiantes/galeria`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${storeAuth.getState().token}`,
+        },
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.msg);
+
+    await cargarPerfil(); // refresca perfil
+    setFotosSeleccionadas([]);
+    alert("Fotos subidas correctamente");
+
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
+};
   // 🔒 GUARDIA: Si no hay usuario autenticado, redirigir al login
   useEffect(() => {
     const user = storeAuth.getState().user;
@@ -265,10 +306,10 @@ if (perfilIncompleto) {
 }
 
   return (
-    <div className="flex flex-col h-screen w-full bg-gray-100">
+    <div className="flex flex-col min-h-screen w-full bg-gray-100">
       <div className="flex flex-1 overflow-hidden">
         {/* Estilos del perfil de tu compañero */}
-        <aside className="hidden md:block w-[300px] xl:w-[400px] bg-white p-4 overflow-y-auto shadow">
+        <aside className="hidden md:flex flex-col w-[280px] xl:w-[350px] bg-white p-4 overflow-y-auto shadow">
           <header className="mb-6 text-center">
             <h1 className="text-2xl font-bold text-rose-800 border-b-2 border-bg-red-900 pb-2">
               Tu Perfil
@@ -332,7 +373,7 @@ if (perfilIncompleto) {
           <StrikeForm />
         </aside>
 
-        <main className="flex flex-col flex-1 min-w-0 p-4 gap-4 overflow-y-auto max-w-full md:max-w-3xl mx-auto">
+        <main className="flex flex-col flex-1 w-full p-3 sm:p-4 md:p-6 gap-4 overflow-y-auto max-w-5xl mx-auto">
           {/* Estilos de botones de tu compañero */}
           <div className="flex flex-wrap justify-start border rounded-lg items-center md:gap-10 gap-14 mb-6 bg-[#FF7979] max-w-full">
             <button
@@ -358,6 +399,17 @@ if (perfilIncompleto) {
                 Editar perfil
               </span>
             </div>
+            <div className="flex flex-col items-center">
+  <button
+    onClick={() => setMostrarGaleriaFotos(true)}
+    title="Agregar fotos"
+  >
+    <FaImages className="text-gray-600 hover:text-gray-200 w-5 h-5 md:w-6 md:h-6" />
+  </button>
+  <span className="text-xs text-gray-800 mt-1 text-center">
+    Mis Fotos
+  </span>
+</div>
             <div className="flex flex-col items-center py-1 text-gray-600 hover:text-gray-200">
               <BotonNotificaciones
                 solicitudes={solicitudes}
@@ -413,7 +465,7 @@ if (perfilIncompleto) {
           </div>
         </main>
 
-        <aside className="hidden lg:block w-[400px] bg-white p-4 overflow-y-auto shadow">
+        <aside className="hidden lg:flex flex-col w-[350px] xl:w-[400px] bg-white p-4 overflow-y-auto shadow">
           {/* Aquí usamos tu lógica de eventos */}
           <EventosPublicados
             eventos={eventosDisponibles} // Usamos tu lista filtrada
@@ -527,6 +579,45 @@ if (perfilIncompleto) {
           }}
         />
       </Modal>
+      <Modal
+  isOpen={mostrarGaleriaFotos}
+  title="Agregar fotos a tu galería"
+  showCloseButton={true}
+  onClose={() => setMostrarGaleriaFotos(false)}
+>
+
+  <div className="flex flex-col gap-4">
+
+    <input
+  type="file"
+  multiple
+  accept="image/*"
+  className="border p-2 rounded"
+  onChange={(e) => setFotosSeleccionadas(Array.from(e.target.files))}
+/>
+
+    <button
+  onClick={subirFotosGaleria}
+  className="bg-rose-600 text-white py-2 rounded hover:bg-rose-700 transition"
+>
+  Subir Fotos
+</button>
+
+    {profile?.imagenesGaleria?.length > 0 && (
+      <div className="grid grid-cols-3 gap-2 mt-4">
+        {profile.imagenesGaleria.map((foto, i) => (
+          <img
+            key={i}
+            src={foto}
+            className="w-full h-24 object-cover rounded"
+          />
+        ))}
+      </div>
+    )}
+
+  </div>
+
+</Modal>
     </div>
   );
 };

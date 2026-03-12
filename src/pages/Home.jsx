@@ -11,10 +11,11 @@ const images = [segundaImagen, Somos1, Somos2];
 
 const Home = () => {
   return (
-    <div className="flex flex-col bg-gray-100">
+    <div className="flex flex-col mx-4 md:mx-16 pt-8 ">
+
       {/* Sección con fondo */}
       <div
-        className="relative w-auto   top-2 flex-col items-center justify-center px-4 py-10 text-white"
+        className="relative w-auto top-2 flex-col items-center justify-center px-4 py-10 text-white rounded-3xl overflow-hidden"
         style={{
           backgroundImage: `url(${fondo})`,
           backgroundSize: "1500px",
@@ -53,7 +54,8 @@ const Home = () => {
       </div>
 
       {/* Segunda imagen debajo */}
-      <div className="w-full h-[600px] relative mt-3">
+      
+      <div className="w-full h-[350px] md:h-[500px] lg:h-[600px] relative mt-3 rounded-3xl overflow-hidden">
         <div className="absolute inset-0 flex items-start justify-center pt-3 text-white text-5xl font-serif z-20">
   Conecta con estudiantes de tu universidad
 </div>

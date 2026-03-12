@@ -1,9 +1,10 @@
-import  { useState } from "react";
+
+import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
-import { FaHome } from "react-icons/fa";
+import "react-toastify/dist/ReactToastify.css";
+import { FiArrowLeft } from "react-icons/fi";
 
 import logoAmikuna from "../assets/Logo.png";
 import loginImage from "../assets/Registro.png";
@@ -16,7 +17,7 @@ const Register = () => {
     apellido: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -25,14 +26,15 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Esta función solo se encarga de hacer la petición, no muestra mensajes
   const registerUser = async (data) => {
     try {
       const url = `${import.meta.env.VITE_BACKEND_URL}registro`;
       const response = await axios.post(url, data);
-      return response.data; // solo retorna la respuesta
+      return response.data;
     } catch (error) {
-      return Promise.reject(error?.response?.data?.msg || "Error al registrar usuario.");
+      return Promise.reject(
+        error?.response?.data?.msg || "Error al registrar usuario."
+      );
     }
   };
 
@@ -59,8 +61,10 @@ const Register = () => {
 
     try {
       const res = await registerUser(formData);
-      toast.success(res.msg || "Registro exitoso. Revisa tu correo para confirmar.");
-      setTimeout(() => navigate('/login'), 1000);
+      toast.success(
+        res.msg || "Registro exitoso. Revisa tu correo para confirmar."
+      );
+      setTimeout(() => navigate("/login"), 1000);
     } catch (errorMsg) {
       toast.error(errorMsg);
     }
@@ -68,31 +72,43 @@ const Register = () => {
     setLoading(false);
   };
 
-
-return (
-    <div className="flex w-full h-screen items-stretch relative">
-
+  return (
+    <div className="flex flex-col md:flex-row w-full min-h-screen relative">
       <ToastContainer />
+
+      {/* Botón regresar */}
       <button
         onClick={() => navigate("/")}
         className="absolute top-6 left-6 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
       >
-        <FaHome size={50} />
+        <FiArrowLeft className="text-3xl md:text-5xl" />
       </button>
 
-      {/* Columna izquierda - Formulario */}
-      <div className="md:w-1/2 w-full h-full flex flex-col justify-center items-center p-6 bg-white">
-        <div className="flex items-center mb-4">
+      {/* FORMULARIO */}
+      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white">
+        <div className="flex items-center mb-6">
           <div className="w-[60px] h-[60px] md:w-[80px] md:h-[80px]">
-            <img src={logoAmikuna} alt="Logo" className="w-full h-full object-contain" />
+            <img
+              src={logoAmikuna}
+              alt="Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold ml-2 font-serif text-[#FF4E4E]">AMIKUNA</h1>
+
+          <h1 className="text-2xl md:text-3xl font-bold ml-2 font-serif text-[#FF4E4E]">
+            AMIKUNA
+          </h1>
         </div>
 
-        <form onSubmit={handleSubmitForm} className="flex flex-col justify-center gap-6 w-full max-w-sm">
-          <h2 className="text-3xl md:text-4xl font-bold  text-[#c4481b] text-center mb-1 mt-10">¡Únete ahora!</h2>
+        <form
+          onSubmit={handleSubmitForm}
+          className="flex flex-col gap-5 w-full max-w-sm"
+        >
+          <h2 className="text-2xl md:text-4xl font-bold text-[#c4481b] text-center">
+            ¡Únete ahora!
+          </h2>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             <label className="text-sm font-medium">Nombre</label>
             <input
               type="text"
@@ -133,7 +149,9 @@ return (
               required
             />
 
-            <label className="text-sm font-medium">Confirma la Contraseña</label>
+            <label className="text-sm font-medium">
+              Confirma la Contraseña
+            </label>
             <input
               type="password"
               name="confirmPassword"
@@ -144,34 +162,34 @@ return (
             />
           </div>
 
-          <div className="mt-4 flex justify-around">
+          <div className="mt-4 flex flex-col sm:flex-row gap-4 justify-center">
             <button
               type="submit"
-              className="text-sm font-semibold px-10 py-2 rounded-full bg-white text-black border border-gray-400 hover-bg-tinder-gradient hover:text-white transition-all"
+              className="text-sm font-semibold px-8 py-2 rounded-full bg-white text-black border border-gray-400 hover:bg-gray-900 hover:text-white transition-all"
               disabled={loading}
             >
-              {loading ? "Registrando..." : " Enviar "}
+              {loading ? "Registrando..." : "Enviar"}
             </button>
 
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="text-sm font-semibold px-10 py-2 rounded-full bg-white text-black border border-gray-400 hover-bg-color-black_pur hover:text-white  transition-all"
+              className="text-sm font-semibold px-8 py-2 rounded-full bg-white text-black border border-gray-400 hover:bg-black hover:text-white transition-all"
             >
               Regresar
             </button>
-
-            
           </div>
         </form>
       </div>
 
-      {/* Columna derecha - Imagen decorativa */}
-      <div className="items-stretch w-full h-full md:w-[950px]  hidden md:flex">
-
-        <img src={loginImage} alt="Decoración" className="object-cover w-full h-full" />
+      {/* IMAGEN */}
+      <div className="hidden md:block md:w-1/2 rounded-3xl overflow-hidden md:mr-9">
+        <img
+          src={loginImage}
+          alt="Decoración"
+          className="w-full h-full object-cover"
+        />
       </div>
-      
     </div>
   );
 };
