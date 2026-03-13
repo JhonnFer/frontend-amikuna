@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import storeProfile from "./storeProfile";
 
 const storeAuth = create((set) => ({
   user: JSON.parse(localStorage.getItem("user")) || null,
@@ -13,20 +14,18 @@ const storeAuth = create((set) => ({
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
 
-    set({
-      user,
-      token
-    });
+    set({ user, token });
   },
 
   logout: () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    set({
-      user: null,
-      token: null
-    });
+    // Limpiar storeAuth
+    set({ user: null, token: null });
+
+    // 🔹 Limpiar storeProfile también
+    storeProfile.getState().clearProfile();
   }
 }));
 

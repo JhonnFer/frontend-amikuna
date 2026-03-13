@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import useFetch from "./useFetch";
 
-const isPerfilCompleto = (perfil) => {
+// Función para verificar si el perfil está completo
+export const isPerfilCompleto = (perfil) => {
   if (!perfil) return false;
 
   const tieneFoto = !!perfil.imagenPerfil;
@@ -16,57 +16,33 @@ const isPerfilCompleto = (perfil) => {
 
 function usePerfilUsuarioAutenticado() {
   const { fetchDataBackend } = useFetch();
-  const navigate = useNavigate();
-
   const [perfil, setPerfil] = useState(null);
   const [loadingPerfil, setLoadingPerfil] = useState(true);
 
   const cargarPerfil = async () => {
     setLoadingPerfil(true);
-
     try {
-      // 🔹 OBTENER TOKEN
       const token = localStorage.getItem("token");
+      if (!token) return null;
 
-      if (!token) {
-        navigate("/login", { replace: true });
-        return;
-      }
-
-      const headers = {
-        Authorization: `Bearer ${token}`,
-      };
-
-      const data = await fetchDataBackend(
-        "estudiantes/perfil",
-        null,
-        "GET",
-        headers,
-        false
-      );
+      const headers = { Authorization: `Bearer ${token}` };
+      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", headers, false);
 
       setPerfil(data);
-
-      if (data && !isPerfilCompleto(data)) {
-        console.log("Perfil incompleto, redirigiendo...");
-        navigate("/user/completar-perfil", { replace: true });
-      }
+      return data; // 🔹 Retorna para login
     } catch (error) {
       console.error("Error cargando perfil:", error);
       setPerfil(null);
-      navigate("/login", { replace: true });
+      return null;
+    } finally {
+      setLoadingPerfil(false);
     }
-
-    setLoadingPerfil(false);
   };
 
   const actualizarPerfil = async (formData) => {
     try {
       const token = localStorage.getItem("token");
-
-      const headers = token
-        ? { Authorization: `Bearer ${token}` }
-        : {};
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
       const response = await fetchDataBackend(
         "estudiantes/completarPerfil",
@@ -77,7 +53,6 @@ function usePerfilUsuarioAutenticado() {
       );
 
       setPerfil(response.perfilActualizado || response);
-
       return response;
     } catch (error) {
       console.error("Error actualizando perfil:", error);

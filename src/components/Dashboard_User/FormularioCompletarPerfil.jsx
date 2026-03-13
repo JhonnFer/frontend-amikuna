@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import perfil1 from "../../assets/poli.jpg";
+import storeAuth from "../../context/storeAuth";
+
 
 import { useNavigate } from "react-router-dom";
 import storeProfile from "../../context/storeProfile";
@@ -8,6 +10,7 @@ import storeProfile from "../../context/storeProfile";
 const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
   const { updateProfile, loadProfile } = storeProfile();
   const navigate = useNavigate();
+  const logout = storeAuth((state) => state.logout);
 
   const [formData, setFormData] = useState({
     nombre: "",
@@ -70,6 +73,11 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
     setImagenArchivo(file);
     setImagenPreview(URL.createObjectURL(file));
   };
+  //funcion para cerrar sesion
+  const handleCerrarSesion = () => {
+  logout();          // Limpia token y usuario
+  navigate("/login"); // Redirige a login
+};
 
   const validarFormulario = () => {
     if (!formData.nombre.trim()) return "El nombre es obligatorio";
@@ -272,16 +280,24 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
             >
               {guardando ? "Guardando..." : "Guardar Perfil"}
             </button>
+<button
+    type="button"
+    onClick={handleCerrarSesion}
+    className="bg-gray-700 text-white px-6 py-2 rounded hover:bg-gray-900 transition"
+  >
+    Cerrar sesión
+  </button>
 
-            {onCancel && (
-              <button
-                type="button"
-                onClick={onCancel}
-                className="bg-red-500 text-white px-6 py-2 rounded"
-              >
-                Cancelar
-              </button>
-            )}
+  {onCancel && (
+    <button
+      type="button"
+      onClick={onCancel}
+      className="bg-red-500 text-white px-6 py-2 rounded"
+    >
+      Cancelar
+    </button>
+  )}
+
           </div>
         </form>
       </div>

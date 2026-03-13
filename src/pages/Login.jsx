@@ -5,9 +5,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FiArrowLeft } from "react-icons/fi";
 
+import usePerfilUsuarioAutenticado, { isPerfilCompleto } from "../hooks/usePerfilUsuarioAutenticado";
 import useFetch from "../hooks/useFetch";
 import storeAuth from "../context/storeAuth";
-import usePerfilUsuarioAutenticado from "../hooks/usePerfilUsuarioAutenticado";
+
 
 import Modal from "../components/modal/modal";
 import PerfilUsuario from "../components/Dashboard_User/PerfilUsuario";
@@ -39,44 +40,46 @@ const Login = () => {
   ).replace(/\/api\/?$/, "");
 
   const loginUser = async (data) => {
-    try {
-      const response = await fetchDataBackend("login", data, "POST");
+  try {
+    const response = await fetchDataBackend("login", data, "POST");
 
-      if (!response?.token) {
-        toast.error("No se pudo iniciar sesión");
-        return;
-      }
-
-      const { user, token } = response;
-
-      const userRole = user?.rol?.toLowerCase()?.trim();
-
-      // Guardar en store
-      setAuth({
-        user,
-        token,
-      });
-
-      // ADMIN
-      if (userRole === "admin") {
-        navigate("/admin/dashboard");
-        return;
-      }
-
-      // ESTUDIANTE
-      if (userRole === "estudiante") {
-  await cargarPerfil();
-  navigate("/user/dashboard");
-}
-
-    } catch (error) {
-      console.error("Error en loginUser:", error);
-
-      // 👇 MUESTRA MENSAJE DEL BACKEND
-      toast.error(error.message || "Error al iniciar sesión");
+    if (!response?.token) {
+      toast.error("No se pudo iniciar sesión");
+      return;
     }
-  };
 
+    const { user, token } = response;
+    const userRole = user?.rol?.toLowerCase()?.trim();
+
+    // Guardar en store
+    setAuth({ user, token });
+
+    // ADMIN
+    if (userRole === "admin") {
+      navigate("/admin/dashboard");
+      return;
+    }
+
+    // ESTUDIANTE
+    if (userRole === "estudiante") {
+      // 🔹 Cargar perfil
+      const perfil = await cargarPerfil();
+
+      // 🔹 Validar si el perfil está completo
+      const perfilOk = isPerfilCompleto(perfil);
+
+      if (perfilOk) {
+        navigate("/user/dashboard");
+      } else {
+        navigate("/user/completar-perfil");
+      }
+    }
+
+  } catch (error) {
+    console.error("Error en loginUser:", error);
+    toast.error(error.message || "Error al iniciar sesión");
+  }
+};
   const handleProfileCompleted = (success) => {
     if (success) {
       setShowProfileModal(false);
