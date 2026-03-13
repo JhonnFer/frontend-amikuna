@@ -65,27 +65,9 @@ const Login = () => {
 
       // ESTUDIANTE
       if (userRole === "estudiante") {
-        try {
-          const perfil = await cargarPerfil();
-
-          const perfilCompleto =
-            perfil?.imagenPerfil &&
-            perfil?.genero &&
-            perfil?.biografia &&
-            perfil?.intereses?.length > 0 &&
-            perfil?.ubicacion?.ciudad;
-
-          if (perfilCompleto) {
-            navigate("/user/dashboard");
-          } else {
-            navigate("/user/completar-perfil");
-          }
-
-        } catch (errorPerfil) {
-          console.error("Error cargando perfil:", errorPerfil);
-          navigate("/user/completar-perfil");
-        }
-      }
+  await cargarPerfil();
+  navigate("/user/dashboard");
+}
 
     } catch (error) {
       console.error("Error en loginUser:", error);

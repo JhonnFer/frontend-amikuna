@@ -278,12 +278,13 @@ const Dashboard_Users = () => {
   }
 
   // Si el perfil no está completo, SOLO mostrar el modal de completar perfil
-  const perfilIncompleto =
-  !profile?.genero ||
-  !profile?.orientacion ||
-  !profile?.ubicacion?.ciudad;
+const perfilIncompleto =
+  profile &&
+  (!profile.genero ||
+    !profile.orientacion ||
+    !profile.ubicacion?.ciudad);
 
-if (perfilIncompleto) {
+if (!loadingPerfil && perfilIncompleto) {
   return (
     <Modal
       isOpen={true}

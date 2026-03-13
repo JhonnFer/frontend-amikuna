@@ -59,7 +59,7 @@ function useFetch() {
             );
           }
           throw new Error(
-            "Acceso denegado. Completa tu perfil para continuar.",
+            "Acceso denegado. Confirma tu cuenta en tu correo electrónico y completa tu perfil para acceder a esta sección.",
           );
         }
 
