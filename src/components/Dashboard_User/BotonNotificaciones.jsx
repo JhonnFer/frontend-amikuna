@@ -1,6 +1,6 @@
 // src/components/Dashboard_User/BotonNotificaciones.jsx (Versión corregida)
 
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import useSeguirUsuario from '../../hooks/useSeguirUsuario'; // Reutiliza el hook
 import { FaBell } from 'react-icons/fa'; // Icono de campana
 import { toast } from 'react-toastify';

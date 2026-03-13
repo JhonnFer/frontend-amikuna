@@ -1,11 +1,11 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import storeAuth from "../context/storeAuth";
-import { FaUser } from "react-icons/fa";
+import { FaUser, FaImages } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import Modal from "../components/modal/modal";
 import ModalTreatments from "../components/treatments/Modal";
-import { FaImages } from "react-icons/fa";
+
 
 import { io } from "socket.io-client";
 
@@ -17,7 +17,7 @@ import ModalPayment from "../components/treatments/ModalPayment";
 import StrikeForm from "../components/Dashboard_User/StrikeForm";
 import ChatbotEstudiante from "../components/Dashboard_User/ChatbotEstudiante";
 
-import useEventosEstudiante from "../hooks/useEventosEstudiante"; 
+import useEventosEstudiante from "../hooks/useEventosEstudiante";
 import usePerfilUsuarioAutenticado from "../hooks/usePerfilUsuarioAutenticado";
 import useMatches from "../hooks/useMatches";
 import useNotificaciones from "../hooks/useNotificaciones";
@@ -25,11 +25,12 @@ import useChat from "../hooks/useChat";
 import useAsistenciaEvento from "../hooks/useAsistenciaEvento";
 import useSeguirUsuario from "../hooks/useSeguirUsuario";
 import FormularioCompletarPerfil from "../components/Dashboard_User/FormularioCompletarPerfil";
+
 const socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:3000");
 
 const Dashboard_Users = () => {
   const navigate = useNavigate();
-  
+
   // console.log("[Dashboard_Users] perfilCompleto:", perfilCompleto);
   const {
     perfil: profile,
@@ -41,45 +42,45 @@ const Dashboard_Users = () => {
   const [mostrarEditarPerfil, setMostrarEditarPerfil] = useState(false);
   const [mostrarGaleriaFotos, setMostrarGaleriaFotos] = useState(false);
   const [fotosSeleccionadas, setFotosSeleccionadas] = useState([]);
+  const [mostrarModalStrike, setMostrarModalStrike] = useState(false);
+ 
   // galeria de fotos
   const subirFotosGaleria = async () => {
-  try {
-
-    if (fotosSeleccionadas.length === 0) {
-      alert("Selecciona al menos una foto");
-      return;
-    }
-
-    const formData = new FormData();
-
-    fotosSeleccionadas.forEach((foto) => {
-      formData.append("imagenesGaleria", foto);
-    });
-
-    const res = await fetch(
-      `${import.meta.env.VITE_BACKEND_URL}estudiantes/galeria`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${storeAuth.getState().token}`,
-        },
-        body: formData,
+    try {
+      if (fotosSeleccionadas.length === 0) {
+        alert("Selecciona al menos una foto");
+        return;
       }
-    );
 
-    const data = await res.json();
+      const formData = new FormData();
 
-    if (!res.ok) throw new Error(data.msg);
+      fotosSeleccionadas.forEach((foto) => {
+        formData.append("imagenesGaleria", foto);
+      });
 
-    await cargarPerfil(); // refresca perfil
-    setFotosSeleccionadas([]);
-    alert("Fotos subidas correctamente");
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}estudiantes/galeria`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${storeAuth.getState().token}`,
+          },
+          body: formData,
+        },
+      );
 
-  } catch (error) {
-    console.error(error);
-    alert(error.message);
-  }
-};
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.msg);
+
+      await cargarPerfil(); // refresca perfil
+      setFotosSeleccionadas([]);
+      alert("Fotos subidas correctamente");
+    } catch (error) {
+      console.error(error);
+      alert(error.message);
+    }
+  };
   // 🔒 GUARDIA: Si no hay usuario autenticado, redirigir al login
   useEffect(() => {
     const user = storeAuth.getState().user;
@@ -278,103 +279,99 @@ const Dashboard_Users = () => {
   }
 
   // Si el perfil no está completo, SOLO mostrar el modal de completar perfil
-const perfilIncompleto =
-  profile &&
-  (!profile.genero ||
-    !profile.orientacion ||
-    !profile.ubicacion?.ciudad);
+  const perfilIncompleto =
+    profile &&
+    (!profile.genero || !profile.orientacion || !profile.ubicacion?.ciudad);
 
-if (!loadingPerfil && perfilIncompleto) {
-  return (
-    <Modal
-      isOpen={true}
-      title="Completa tu perfil"
-      showCloseButton={false}
-      onClose={() => {}}
-    >
-      <p className="text-center text-gray-600 mb-4">
-        Necesitamos que completes tu perfil para acceder al dashboard
-      </p>
+  if (!loadingPerfil && perfilIncompleto) {
+    return (
+      <Modal
+        isOpen={true}
+        title="Completa tu perfil"
+        showCloseButton={false}
+        onClose={() => {}}
+      >
+        <p className="text-center text-gray-600 mb-4">
+          Necesitamos que completes tu perfil para acceder al dashboard
+        </p>
 
-      <FormularioCompletarPerfil
-        initialData={profile}
-        onSuccess={async () => {
-          await cargarPerfil();
-        }}
-      />
-    </Modal>
-  );
-}
+        <FormularioCompletarPerfil
+          initialData={profile}
+          onSuccess={async () => {
+            await cargarPerfil();
+          }}
+        />
+      </Modal>
+    );
+  }
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-gray-100">
-      <div className="flex flex-1 overflow-hidden">
-        {/* Estilos del perfil de tu compañero */}
-        <aside className="hidden md:flex flex-col w-[280px] xl:w-[350px] bg-white p-4 overflow-y-auto shadow">
+    <div className="flex  min-h-screen w-full bg-gray-100">
+      <div className="flex min-h-screen w-full bg-gray-100">
+      {/* ASIDE IZQUIERDO */}
+      <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-white p-4 shadow flex-shrink-0 h-screen">
+        <div className="flex flex-col h-full overflow-y-auto scrollbar-hide" style={{ scrollBehavior: "smooth" }}>
           <header className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-rose-800 border-b-2 border-bg-red-900 pb-2">
-              Tu Perfil
-            </h1>
+            <h1 className="text-2xl font-bold text-rose-800 border-b-2 border-bg-red-900 pb-2">Tu Perfil</h1>
           </header>
-          <>
-            {profile && (
-              <>
-                <img
-                  src={
-                    profile.imagenPerfil && profile.imagenPerfil !== ""
-                      ? profile.imagenPerfil
-                      : "https://placehold.co/150x150"
-                  }
-                  alt="Tu foto de perfil"
-                  className="rounded-full w-32 h-32 object-cover mx-auto mb-4"
-                />
-                <h3 className="text-xl font-bold text-center mt-4 text-gray-800">
-                  {profile.nombre || "Sin nombre"}
-                </h3>
-                <p className="text-center text-gray-500 italic mb-4">
-                  {profile.biografia && profile.biografia !== ""
-                    ? profile.biografia
-                    : "Sin biografía definida"}
-                </p>
-                <div className="bg-gray-50 rounded-xl p-4 shadow-sm space-y-2">
-                  <p>
-                    <strong className="text-rose-800">Género:</strong>{" "}
-                    {profile.genero && profile.genero !== ""
-                      ? profile.genero
-                      : "No definido"}
-                  </p>
-                  <p>
-                    <strong className="text-rose-800">Orientación:</strong>{" "}
-                    {profile.orientacion && profile.orientacion !== ""
-                      ? profile.orientacion
-                      : "No definida"}
-                  </p>
-                  <p>
-                    <strong className="text-rose-800">Intereses:</strong>{" "}
-                    {Array.isArray(profile.intereses) &&
-                    profile.intereses.length > 0
-                      ? profile.intereses.join(", ")
-                      : "No definidos"}
-                  </p>
-                  <p>
-                    <strong className="text-rose-800">
-                      Fecha de nacimiento:
-                    </strong>{" "}
-                    {profile.fechaNacimiento &&
-                    typeof profile.fechaNacimiento === "string"
-                      ? profile.fechaNacimiento.split("T")[0]
-                      : "No definida"}
-                  </p>
-                </div>
-              </>
-            )}
 
-            <hr className="my-6 border-gray-300" />
-          </>
-          <StrikeForm />
-        </aside>
+          {/* PERFIL */}
+          <div className="flex flex-col items-center mb-4">
+            <img
+              src={profile.imagenPerfil || "https://placehold.co/150x150"}
+              alt="Tu foto de perfil"
+              className="rounded-full w-32 h-32 object-cover mb-2"
+            />
+            <h3 className="text-xl font-bold text-gray-800">{profile.nombre || "Sin nombre"}</h3>
+            <p className="text-center text-gray-500 italic">{profile.biografia || "Sin biografía definida"}</p>
+          </div>
 
-        <main className="flex flex-col flex-1 w-full p-3 sm:p-4 md:p-6 gap-4 overflow-y-auto max-w-5xl mx-auto">
+          {/* DATOS PERSONALES */}
+          <div className="bg-gray-50 rounded-xl p-4 shadow-sm space-y-2 mb-4 w-full">
+            <p>
+              <strong className="text-rose-800">Género:</strong> {profile.genero || "No definido"}
+            </p>
+            <p>
+              <strong className="text-rose-800">Orientación:</strong> {profile.orientacion || "No definida"}
+            </p>
+            <p>
+              <strong className="text-rose-800">Intereses:</strong>{" "}
+              {Array.isArray(profile.intereses) && profile.intereses.length > 0
+                ? profile.intereses.join(", ")
+                : "No definidos"}
+            </p>
+            <p>
+              <strong className="text-rose-800">Fecha de nacimiento:</strong>{" "}
+              {profile.fechaNacimiento && typeof profile.fechaNacimiento === "string"
+                ? profile.fechaNacimiento.split("T")[0]
+                : "No definida"}
+            </p>
+          </div>
+
+          {/* PORTAFOLIO */}
+          {profile.imagenesGaleria?.length > 0 && (
+            <div className="mt-4 w-full">
+              <h4 className="text-gray-700 text-xl font-semibold mb-2">Ultimas Fotos</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {profile.imagenesGaleria.slice(-6).reverse().map((foto, i) => (
+                  <img key={i} src={foto} alt={`Foto ${i + 1}`} className="w-full h-28 object-cover rounded" />
+                ))}
+              </div>
+              {profile.imagenesGaleria.length > 6 && (
+                <button
+                  onClick={() => setMostrarGaleriaFotos(true)}
+                  className="mt-2 bg-rose-600 text-black py-1 rounded hover:bg-rose-700 transition w-full"
+                >
+                  Ver más
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </aside>
+
+       {/* MAIN CENTRAL */}
+      <main className="flex-1 flex flex-col overflow-y-auto max-w-5xl mx-auto px-4 py-2 gap-4">
           {/* Estilos de botones de tu compañero */}
           <div className="flex flex-wrap justify-start border rounded-lg items-center md:gap-10 gap-14 mb-6 bg-[#FF7979] max-w-full">
             <button
@@ -401,16 +398,16 @@ if (!loadingPerfil && perfilIncompleto) {
               </span>
             </div>
             <div className="flex flex-col items-center">
-  <button
-    onClick={() => setMostrarGaleriaFotos(true)}
-    title="Agregar fotos"
-  >
-    <FaImages className="text-gray-600 hover:text-gray-200 w-5 h-5 md:w-6 md:h-6" />
-  </button>
-  <span className="text-xs text-gray-800 mt-1 text-center">
-    Mis Fotos
-  </span>
-</div>
+              <button
+                onClick={() => setMostrarGaleriaFotos(true)}
+                title="Agregar fotos"
+              >
+                <FaImages className="text-gray-600 hover:text-gray-200 w-5 h-5 md:w-6 md:h-6" />
+              </button>
+              <span className="text-xs text-gray-800 mt-1 text-center">
+                Mis Fotos
+              </span>
+            </div>
             <div className="flex flex-col items-center py-1 text-gray-600 hover:text-gray-200">
               <BotonNotificaciones
                 solicitudes={solicitudes}
@@ -428,6 +425,14 @@ if (!loadingPerfil && perfilIncompleto) {
                 <span className="text-xs text-gray-800 p-0.5">Chat Bot</span>
               </div>
             </button>
+            <button
+  onClick={() => setMostrarModalStrike(true)}
+  title="Enviar Queja o Sugerencia"
+  className="flex flex-col items-center mx-2 p-1 hover:bg-gray-100 rounded transition"
+>
+  <span className="text-2xl">📝</span> {/* Aquí va el icono */}
+  <span className="text-xs text-gray-800 mt-1">Feedback</span>
+</button>
             <button onClick={handleLogout} title="Cerrar sesión">
               <div className="flex flex-col items-center">
                 <FiLogOut className="text-[#51040492] hover:text-red-200 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 lg:w-7 lg:h-7" />
@@ -436,54 +441,59 @@ if (!loadingPerfil && perfilIncompleto) {
             </button>
           </div>
 
-          {mostrarChatbot && (
-            <div className="fixed bottom-5 border border-gray-500 rounded-2xl  right-2 w-auto p-4 bg-white shadow-lg z-50">
-              {/* Estilo del botón de cerrar chatbot de tu compañero */}
-              <button
-                onClick={() => setMostrarChatbot(false)}
-                className="mb-2 text-red-500 font-bold flex items-center gap-2"
-              >
-                ❌{" "}
-                <span className="text-gray-800 font-sans">Chat Bot 😎</span>
-              </button>
-              <ChatbotEstudiante />
-            </div>
-          )}
 
-          {/* NUEVO CONTENEDOR PARA EL CONTENIDO DINÁMICO */}
-          <div className="flex-1 relative">
-            {loadingMatches ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p>Cargando usuarios para swipes...</p>
-              </div>
-            ) : (
-              <SwipeCards
-                usuarios={usuarios || []}
-                onFollow={seguirUsuario}
-                cargandoSeguir={cargandoSeguir}
-              />
-            )}
-          </div>
+          {/* mostrar el chat bot */}
+          {mostrarChatbot && (
+  <div
+    className="
+      fixed bottom-0 right-0 z-50 bg-white shadow-lg overflow-y-auto
+      hidden md:flex lg:flex-col
+      w-full sm:w-64 md:w-72 lg:w-80 xl:w-[400px] 
+      p-4 rounded-tl-2xl rounded-bl-2xl transition-all
+    "
+    style={{ height: "50%" }} // 👈 mitad de altura del sidebar derecho
+  >
+    {/* Botón de cerrar */}
+    <div className="flex justify-between items-center mb-2">
+      <h2 className="text-lg font-semibold">Chat Bot 😎</h2>
+      <button
+        onClick={() => setMostrarChatbot(false)}
+        className="text-red-500 font-bold text-xl"
+      >
+        ×
+      </button>
+    </div>
+
+    {/* Contenido del chatbot */}
+    <ChatbotEstudiante />
+  </div>
+)}
+
+          {/* SwipeCards */}
+        <div className="flex-1 relative">
+          {loadingMatches ? (
+            <div className="absolute inset-0 flex items-center justify-center">Cargando usuarios para swipes...</div>
+          ) : (
+            <SwipeCards usuarios={usuarios || []} onFollow={seguirUsuario} cargandoSeguir={cargandoSeguir} />
+          )}
+        </div>
         </main>
 
-        <aside className="hidden lg:flex flex-col w-[350px] xl:w-[400px] bg-white p-4 overflow-y-auto shadow">
-          {/* Aquí usamos tu lógica de eventos */}
-          <EventosPublicados
-            eventos={eventosDisponibles} // Usamos tu lista filtrada
-            loading={loadingEventos}
-            onConfirmar={confirmarAsistencia}
-            onRechazar={rechazarAsistencia}
-            cargandoAsistencia={cargandoAsistencia}
-            // Pasamos las props de expandir/colapsar
-            isExpanded={eventosExpandidos}
-            toggleExpand={() => setEventosExpandidos(!eventosExpandidos)}
-          />
-          <h2 className="text-gray-500 text-sm uppercase mb-2 mt-4">
-            Matches con quien chatear!
-          </h2>
-          <ul>
-            {Array.isArray(matchesMutuos) && matchesMutuos.length > 0 ? (
-              matchesMutuos.map((match) => (
+        {/* ASIDE DERECHO */}
+      <aside className="hidden md:flex lg:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[400px] bg-white p-4 shadow flex-shrink-0 h-screen overflow-y-auto scrollbar-hide">
+        <EventosPublicados
+          eventos={eventosDisponibles}
+          loading={loadingEventos}
+          onConfirmar={confirmarAsistencia}
+          onRechazar={rechazarAsistencia}
+          cargandoAsistencia={cargandoAsistencia}
+          isExpanded={eventosExpandidos}
+          toggleExpand={() => setEventosExpandidos(!eventosExpandidos)}
+        />
+        <h2 className="text-gray-500 text-sm uppercase mb-2 mt-4">Matches con quien chatear!</h2>
+        <ul>
+          {matchesMutuos.length > 0
+            ? matchesMutuos.map((match) => (
                 <li
                   key={match._id}
                   onClick={() => handleAbrirChat(match)}
@@ -497,11 +507,10 @@ if (!loadingPerfil && perfilIncompleto) {
                   <span>{match.nombre}</span>
                 </li>
               ))
-            ) : (
-              <li>No hay matches mutuos.</li>
-            )}
-          </ul>
-        </aside>
+            : <li>No hay matches mutuos.</li>}
+        </ul>
+      </aside>
+
       </div>
 
       {amigoSeleccionado && (
@@ -553,18 +562,18 @@ if (!loadingPerfil && perfilIncompleto) {
       )}
 
       {mostrarModalAporte && aporteSeleccionado && (
-          <Modal
-    isOpen={mostrarModalAporte}
-    onClose={() => setMostrarModalAporte(false)}
-    title="Realizar aporte"
-  >
-    <ModalPayment
-      aporte={aporteSeleccionado}
-      onClose={() => setMostrarModalAporte(false)}
-      onPaymentSuccess={handleAporteSuccess}
-    />
-  </Modal>
-)}
+        <Modal
+          isOpen={mostrarModalAporte}
+          onClose={() => setMostrarModalAporte(false)}
+          title="Realizar aporte"
+        >
+          <ModalPayment
+            aporte={aporteSeleccionado}
+            onClose={() => setMostrarModalAporte(false)}
+            onPaymentSuccess={handleAporteSuccess}
+          />
+        </Modal>
+      )}
 
       <Modal
         isOpen={mostrarEditarPerfil}
@@ -581,44 +590,49 @@ if (!loadingPerfil && perfilIncompleto) {
         />
       </Modal>
       <Modal
-  isOpen={mostrarGaleriaFotos}
-  title="Agregar fotos a tu galería"
-  showCloseButton={true}
-  onClose={() => setMostrarGaleriaFotos(false)}
->
-
-  <div className="flex flex-col gap-4">
-
-    <input
-  type="file"
-  multiple
-  accept="image/*"
-  className="border p-2 rounded"
-  onChange={(e) => setFotosSeleccionadas(Array.from(e.target.files))}
-/>
-
-    <button
-  onClick={subirFotosGaleria}
-  className="bg-rose-600 text-white py-2 rounded hover:bg-rose-700 transition"
->
-  Subir Fotos
-</button>
-
-    {profile?.imagenesGaleria?.length > 0 && (
-      <div className="grid grid-cols-3 gap-2 mt-4">
-        {profile.imagenesGaleria.map((foto, i) => (
-          <img
-            key={i}
-            src={foto}
-            className="w-full h-24 object-cover rounded"
+        isOpen={mostrarGaleriaFotos}
+        title="Agregar fotos a tu galería"
+        showCloseButton={true}
+        onClose={() => setMostrarGaleriaFotos(false)}
+      >
+        <div className="flex flex-col gap-4">
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            className="border p-2 rounded"
+            onChange={(e) => setFotosSeleccionadas(Array.from(e.target.files))}
           />
-        ))}
-      </div>
-    )}
 
-  </div>
+          <button
+            onClick={subirFotosGaleria}
+            className="bg-rose-600 text-white py-2 rounded hover:bg-rose-700 transition"
+          >
+            Subir Fotos
+          </button>
 
-</Modal>
+          {profile?.imagenesGaleria?.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+              {profile.imagenesGaleria.map((foto, i) => (
+                <img
+                  key={i}
+                  src={foto}
+                  className="w-full h-35 object-cover rounded"
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </Modal>
+      {mostrarModalStrike && (
+  <Modal
+    isOpen={mostrarModalStrike}
+    onClose={() => setMostrarModalStrike(false)}
+    title="Enviar Queja o Sugerencia"
+  >
+    <StrikeForm />
+  </Modal>
+)}
     </div>
   );
 };
