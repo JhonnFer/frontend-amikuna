@@ -410,7 +410,7 @@ const Dashboard_Users = () => {
     md:gap-4
     border
     rounded-lg
-    bg-[#FF7979]
+    bg-[#ffba79]
     px-2
     py-2
     overflow-hidden
@@ -427,7 +427,7 @@ const Dashboard_Users = () => {
         )
       }
       className="
-      bg-red-800
+      bg-[#ea454592]
       text-white
       text-[10px]
       sm:text-xs
@@ -509,7 +509,7 @@ const Dashboard_Users = () => {
   </div>
 
   {/* SWIPE CARDS 75% */}
-  <div className="flex-[3] relative overflow-hidden flex items-center justify-center">
+  <div className="flex-[6] relative overflow-hidden flex items-center justify-center">
 
     {loadingMatches ? (
       <div className="absolute inset-0 flex items-center justify-center">
