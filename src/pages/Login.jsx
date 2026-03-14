@@ -193,7 +193,7 @@ const Login = () => {
       </div>
 
       {/* IMAGEN */}
-      <div className="hidden md:block md:w-1/2 rounded-3xl overflow-hidden md:mr-9">
+      <div className="hidden md:block md:w-1/2 md:h-screen rounded-3xl overflow-hidden md:mr-9">
         <img
           src={loginImage}
           alt="Login"

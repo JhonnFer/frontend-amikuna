@@ -87,9 +87,9 @@ const SwipeCards = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-6 w-full">
+    <div className="flex flex-col items-center justify-center px-4 py-2 w-full h-full">
       {/* CARD */}
-      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-[70vh] flex items-center justify-center">
+      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-full flex items-center justify-center">
         <AnimatePresence>
           <motion.div
             key={usuarioActual._id}
@@ -101,7 +101,7 @@ const SwipeCards = () => {
             className="absolute w-full h-full bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
           >
             {/* FOTO PRINCIPAL */}
-            <div className="relative w-full h-[55%]">
+            <div className="relative w-full h-[45%] sm:h-[50%] md:h-[55%]">
               <img
                 src={usuarioActual.imagenPerfil}
                 alt="perfil"
@@ -113,56 +113,56 @@ const SwipeCards = () => {
                 onClick={() => setShowGallery(true)}
                 className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full hover:bg-black"
               >
-                <FaImages size={20} />
+                <FaImages className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
             {/* INFO */}
-            <div className="flex flex-col justify-between flex-1 p-4 text-center">
+            <div className="flex flex-col justify-between flex-1 p-3 sm:p-4 md:p-5 text-center">
               <div>
-                <h3 className="text-xl font-bold text-gray-800">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                   {usuarioActual.nombre}
                 </h3>
 
-                <p className="text-sm text-gray-500 mb-2">
+                <p className="text-xs sm:text-sm md:text-base text-gray-500 mb-2">
                   {usuarioActual.ubicacion?.ciudad},{" "}
                   {usuarioActual.ubicacion?.pais}
                 </p>
 
-                <p className="text-sm italic text-gray-600 mb-2">
+                <p className="text-xs sm:text-sm md:text-base italic text-gray-600 mb-2">
                   {usuarioActual.biografia || "Sin biografía"}
                 </p>
 
-                <p className="text-sm text-gray-700">
+                <p className="text-xs sm:text-sm md:text-base text-gray-700">
                   Género:{" "}
                   <span className="font-medium">{usuarioActual.genero}</span>
                 </p>
 
-                <p className="text-sm text-gray-700">
+                <p className="text-xs sm:text-sm md:text-base text-gray-700">
                   Orientación:{" "}
                   <span className="font-medium">
                     {usuarioActual.orientacion}
                   </span>
                 </p>
 
-                <p className="text-sm text-gray-700">
+                <p className="text-xs sm:text-sm md:text-base text-gray-700">
                   Intereses:{" "}
                   {usuarioActual.intereses?.join(", ") || "No definidos"}
                 </p>
               </div>
 
               {/* BOTONES */}
-              <div className="flex justify-center gap-8 mt-4">
+              <div className="flex justify-center gap-4 sm:gap-6 md:gap-8 mt-3 sm:mt-4">
                 <button
                   onClick={() => handleSwipe("left")}
-                  className="bg-red-500 text-white w-14 h-14 rounded-full text-xl shadow-lg hover:bg-red-600 transition"
+                  className="bg-red-500 text-white w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-xs sm:text-sm md:text-base sm:text-lg md:text-xl rounded-full shadow-lg hover:bg-red-600 transition"
                 >
                   ❌
                 </button>
 
                 <button
                   onClick={() => handleSwipe("up")}
-                  className="bg-green-500 text-white w-14 h-14 rounded-full text-xl shadow-lg hover:bg-green-600 transition"
+                  className="bg-green-500 text-white w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 text-xs sm:text-sm md:text-base sm:text-lg md:text-xl rounded-full shadow-lg hover:bg-green-600 transition"
                 >
                   ❤️
                 </button>
@@ -214,7 +214,7 @@ const SwipeCards = () => {
     setFotoSeleccionada(foto);
     setFotoIndex(i);
   }}
-  className="w-full h-40 object-cover rounded-lg cursor-pointer hover:scale-105 transition"
+  className="w-full h-24 sm:h-32 md:h-40 object-cover rounded-lg cursor-pointer hover:scale-105 transition"
 />
                 ))}
               </div>
@@ -254,7 +254,7 @@ const SwipeCards = () => {
         animate={{ scale: 1 }}
         exit={{ scale: 0.8 }}
         transition={{ duration: 0.3 }}
-        className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
+        className="max-h-full max-w-[90vw] object-contain rounded-lg"
       />
 
       {/* BOTON DERECHA */}

@@ -1,5 +1,5 @@
 // src/components/ChatbotEstudiante.jsx
-import  { useState } from "react";
+import { useState } from "react";
 import useChatbot from "../../hooks/useChatbot";
 
 const ChatbotEstudiante = () => {
@@ -14,42 +14,66 @@ const ChatbotEstudiante = () => {
   };
 
   return (
-  <div className="max-w-lg mx-auto p-4  bg-white rounded-xl shadow-md">
-  <form
-    onSubmit={handleSubmit}
-    className="flex items-center gap-2"
-  >
-    <textarea
-      className="flex-1 border bg-gray-200 border-gray-950  rounded-full px-5 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder-gray-950 text-base leading-tight"
-      style={{ minHeight: "50px" }}
-      value={mensaje}
-      onChange={(e) => setMensaje(e.target.value)}
-      placeholder="Escribe un mensaje..."
-      disabled={loading}
-    />
-    <button
-      type="submit"
-      disabled={loading}
-      className="px-6 py-3 border-white border-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition disabled:opacity-50 text-sm font-medium"
-    >
-      {loading ? "Enviando..." : "Enviar"}
-    </button>
-  </form>
+    <div className="w-full flex flex-col gap-3">
 
-  {/* Mensaje de error */}
-  {error && (
-    <p className="text-red-500 text-sm mt-2 bg-red-50 border border-red-200 rounded-md p-2">
-      {error}
-    </p>
-  )}
+      {/* RESPUESTA DEL BOT */}
+      {respuesta && (
+        <div className="bg-gray-100 text-gray-800 p-3 rounded-xl text-sm break-words">
+          {respuesta}
+        </div>
+      )}
 
-  {/* Respuesta del bot */}
-  {respuesta && (
-    <div className="mt-3 bg-gray-100 text-gray-800 p-3 rounded-2xl rounded-bl-sm shadow-sm whitespace-pre-wrap max-w-xs">
-      {respuesta}
+      {/* ERROR */}
+      {error && (
+        <p className="text-red-500 text-xs bg-red-50 border border-red-200 rounded-md p-2">
+          {error}
+        </p>
+      )}
+
+      {/* INPUT */}
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center gap-2 w-full"
+      >
+        <textarea
+          className="
+            flex-1
+            border border-gray-300
+            bg-gray-100
+            rounded-lg
+            px-3 py-2
+            resize-none
+            focus:outline-none
+            focus:ring-2 focus:ring-blue-400
+            text-sm
+          "
+          rows={1}
+          value={mensaje}
+          onChange={(e) => setMensaje(e.target.value)}
+          placeholder="Escribe un mensaje..."
+          disabled={loading}
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="
+            px-3 py-2
+            bg-blue-500
+            text-white
+            rounded-lg
+            hover:bg-blue-600
+            transition
+            disabled:opacity-50
+            text-sm
+            whitespace-nowrap
+          "
+        >
+          {loading ? "..." : "Enviar"}
+        </button>
+      </form>
+
     </div>
-  )}
-</div>
   );
 };
 
