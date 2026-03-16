@@ -1,20 +1,90 @@
-// src/components/ChatbotEstudiante.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { FiMenu } from "react-icons/fi";
 import useChatbot from "../../hooks/useChatbot";
+import fetchDataBackend from "../../helpers/fetchDataBackend";
+import storeAuth from "../../context/storeAuth";
 
 const ChatbotEstudiante = () => {
+
   const [mensaje, setMensaje] = useState("");
+  const [mostrarHistorial, setMostrarHistorial] = useState(false);
+  const [historial, setHistorial] = useState([]);
+
   const { enviarMensaje, loading, error, respuesta } = useChatbot();
+  const token = storeAuth((state) => state.token);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!mensaje.trim()) return;
+
     enviarMensaje(mensaje);
     setMensaje("");
   };
 
+  // cargar historial
+  const cargarHistorial = async () => {
+    try {
+
+      const data = await fetchDataBackend(
+        "perfil/chat/historial",
+        token
+      );
+
+      setHistorial(data);
+
+    } catch (err) {
+      console.error("Error cargando historial", err);
+    }
+  };
+
+  const toggleHistorial = () => {
+
+    const nuevoEstado = !mostrarHistorial;
+
+    setMostrarHistorial(nuevoEstado);
+
+    if (nuevoEstado) {
+      cargarHistorial();
+    }
+  };
+
   return (
-    <div className="w-full flex flex-col gap-3">
+    <div className="w-full h-full flex flex-col gap-3 relative">
+
+      {/* BOTON HAMBURGUESA */}
+      <button
+        onClick={toggleHistorial}
+        className="absolute top-2 right-2 z-10 text-gray-600 hover:text-black"
+      >
+        <FiMenu size={20} />
+      </button>
+
+      {/* PANEL HISTORIAL */}
+      {mostrarHistorial && (
+        <div className="bg-white border rounded-lg p-3 max-h-60 overflow-y-auto text-sm shadow">
+
+          <p className="font-semibold mb-2">Historial</p>
+
+          {historial.length === 0 && (
+            <p className="text-gray-400">Sin conversaciones</p>
+          )}
+
+          {historial.map((item, i) => (
+            <div key={i} className="mb-2">
+
+              <p className="text-blue-600">
+                <b>Tú:</b> {item.mensaje}
+              </p>
+
+              <p className="text-gray-700">
+                <b>Bot:</b> {item.respuesta}
+              </p>
+
+            </div>
+          ))}
+
+        </div>
+      )}
 
       {/* RESPUESTA DEL BOT */}
       {respuesta && (
