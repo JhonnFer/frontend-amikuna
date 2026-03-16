@@ -1,63 +1,56 @@
-// src/hooks/useNotificaciones.js
-
-import { useState, useEffect } from 'react';
-import usePerfilUsuarioAutenticado from "./usePerfilUsuarioAutenticado";
+import { useState, useEffect, useCallback } from "react";
 import useFetch from "./useFetch";
 
 const useNotificaciones = () => {
-    const { perfil, loadingPerfil } = usePerfilUsuarioAutenticado();
-    const { fetchDataBackend } = useFetch();
-    const [solicitudes, setSolicitudes] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [notificaciones, setNotificaciones] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { fetchDataBackend } = useFetch();
 
-    useEffect(() => {
-        const fetchSolicitudes = async () => {
-            if (loadingPerfil || !perfil) {
-                setLoading(loadingPerfil);
-                return;
-            }
+  const obtenerNotificaciones = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Llamada al endpoint
+      const response = await fetchDataBackend("estudiantes/notificaciones", null, "GET", false);
+      
+      // ✅ IMPORTANTE: Tu backend devuelve { notificaciones: [...] }
+      // Accedemos a la propiedad y nos aseguramos de que sea un array
+      if (response && response.notificaciones) {
+        setNotificaciones(response.notificaciones);
+      } else {
+        setNotificaciones([]);
+      }
+    } catch (error) {
+      console.error("Error en obtenerNotificaciones:", error);
+      setNotificaciones([]); // Reset en caso de error
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchDataBackend]);
 
-            try {
-                // Paso 1: Obtener todos los perfiles de usuarios disponibles y matches.
-                // Usamos los endpoints de tu archivo de rutas.
-                const potencialesMatches = await fetchDataBackend("estudiantes/matches");
-                const matches = await fetchDataBackend("estudiantes/listarmatches");
-                
-                // Paso 2: Unificar todos los usuarios conocidos en un mapa para búsqueda rápida.
-                const todosLosUsuarios = [...potencialesMatches, ...matches];
-                const usuariosMap = new Map();
-                todosLosUsuarios.forEach(user => {
-                    usuariosMap.set(user._id, user);
-                });
+  const marcarLeido = async (id) => {
+    try {
+      // Enviamos el PUT. El backend responde con { msg: '...' }
+      await fetchDataBackend(`estudiantes/notificaciones/${id}/leido`, {}, "PUT");
 
-                // Paso 3: Identificar las IDs de las solicitudes pendientes (tu lógica).
-                const misSeguidores = new Set(perfil.seguidores || []);
-                const aQuienSigo = new Set(perfil.siguiendo || []);
-                
-                const idsSolicitudesPendientes = Array.from(misSeguidores).filter(
-                    (seguidorId) => !aQuienSigo.has(seguidorId)
-                );
+      // Actualizamos el estado local (Optimistic Update)
+      setNotificaciones((prev) =>
+        prev.map((n) => (n._id === id ? { ...n, leido: true } : n))
+      );
+    } catch (error) {
+      console.error("Error al marcar como leído:", error);
+    }
+  };
 
-                // Paso 4: Mapear las IDs a objetos de usuario completos usando el mapa.
-                // El .filter(Boolean) elimina cualquier posible undefined si un ID no se encuentra.
-                const perfilesSolicitantes = idsSolicitudesPendientes
-                    .map(id => usuariosMap.get(id))
-                    .filter(Boolean);
+  useEffect(() => {
+    obtenerNotificaciones();
+  }, [obtenerNotificaciones]);
 
-                setSolicitudes(perfilesSolicitantes);
-
-            } catch (error) {
-                console.error("Error al obtener datos para notificaciones:", error);
-                setSolicitudes([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchSolicitudes();
-    }, [perfil, loadingPerfil, fetchDataBackend]);
-
-    return { solicitudes, loading };
+  return {
+    notificaciones,
+    loading,
+    marcarLeido,
+    obtenerNotificaciones,
+  };
 };
 
 export default useNotificaciones;

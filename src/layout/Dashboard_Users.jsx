@@ -26,6 +26,7 @@ import useAsistenciaEvento from "../hooks/useAsistenciaEvento";
 import useSeguirUsuario from "../hooks/useSeguirUsuario";
 import FormularioCompletarPerfil from "../components/Dashboard_User/FormularioCompletarPerfil";
 
+
 const socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:3000");
 
 const Dashboard_Users = () => {
@@ -318,16 +319,16 @@ const Dashboard_Users = () => {
   handleOpenAporteModal={handleOpenAporteModal}
   setMostrarEditarPerfil={setMostrarEditarPerfil}
   setMostrarGaleriaFotos={setMostrarGaleriaFotos}
-  solicitudes={solicitudes}
-  loadingSolicitudes={loadingSolicitudes}
+  solicitudes={solicitudes || []}           // ✅ default array
+  loadingSolicitudes={loadingSolicitudes || false} // ✅ default boolean
   seguirUsuario={seguirUsuario}
   setMostrarChatbot={setMostrarChatbot}
   mostrarChatbot={mostrarChatbot}
   setMostrarModalStrike={setMostrarModalStrike}
   handleLogout={handleLogout}
   loadingMatches={loadingMatches}
-  usuarios={usuarios}
-  cargandoSeguir={cargandoSeguir}
+  usuarios={usuarios || []}                 // también asegurar array
+  cargandoSeguir={cargandoSeguir || false}  // default boolean
 />
       {/* ASIDE DERECHO */}
           

@@ -1,150 +1,64 @@
-import { useState, useEffect } from "react";
-import { FiMenu } from "react-icons/fi";
-import useChatbot from "../../hooks/useChatbot";
-import fetchDataBackend from "../../helpers/fetchDataBackend";
-import storeAuth from "../../context/storeAuth";
+// src/components/Dashboard_User/ChatbotEstudiante.jsx
+import { useState } from "react";
+import PropTypes from "prop-types";
 
-const ChatbotEstudiante = () => {
-
+const ChatbotEstudiante = ({ enviarMensaje, loading, respuesta }) => {  // ← quitado historial
   const [mensaje, setMensaje] = useState("");
-  const [mostrarHistorial, setMostrarHistorial] = useState(false);
-  const [historial, setHistorial] = useState([]);
 
-  const { enviarMensaje, loading, error, respuesta } = useChatbot();
-  const token = storeAuth((state) => state.token);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!mensaje.trim()) return;
-
-    enviarMensaje(mensaje);
+  const handleEnviar = async () => {
+    if (!mensaje.trim() || loading) return;
+    const texto = mensaje;
     setMensaje("");
-  };
-
-  // cargar historial
-  const cargarHistorial = async () => {
-    try {
-
-      const data = await fetchDataBackend(
-        "perfil/chat/historial",
-        token
-      );
-
-      setHistorial(data);
-
-    } catch (err) {
-      console.error("Error cargando historial", err);
-    }
-  };
-
-  const toggleHistorial = () => {
-
-    const nuevoEstado = !mostrarHistorial;
-
-    setMostrarHistorial(nuevoEstado);
-
-    if (nuevoEstado) {
-      cargarHistorial();
-    }
+    await enviarMensaje(texto);
   };
 
   return (
-    <div className="w-full h-full flex flex-col gap-3 relative">
+    <div className="flex flex-col h-full w-full">
+      <div className="flex-1 px-2 py-2 sm:px-3 sm:py-3 overflow-y-auto ">
+        {loading ? (
+          <p className="text-gray-400 text-xs sm:text-sm animate-pulse">
+            Bot está escribiendo...
+          </p>
+        ) : respuesta ? (
+          <div className="text-xs sm:text-sm md:text-base break-words leading-relaxed">
+            <span className="font-semibold text-blue-600">Bot: </span>
+            <span className="text-gray-700">{respuesta}</span>
+          </div>
+        ) : (
+          <p className="text-gray-400 text-xs sm:text-sm text-center w-full mt-4">
+            Hazme una pregunta 👋
+          </p>
+        )}
+      </div>
 
-      {/* BOTON HAMBURGUESA */}
-      <button
-        onClick={toggleHistorial}
-        className="absolute top-2 right-2 z-10 text-gray-600 hover:text-black"
-      >
-        <FiMenu size={20} />
-      </button>
-
-      {/* PANEL HISTORIAL */}
-      {mostrarHistorial && (
-        <div className="bg-white border rounded-lg p-3 max-h-60 overflow-y-auto text-sm shadow">
-
-          <p className="font-semibold mb-2">Historial</p>
-
-          {historial.length === 0 && (
-            <p className="text-gray-400">Sin conversaciones</p>
-          )}
-
-          {historial.map((item, i) => (
-            <div key={i} className="mb-2">
-
-              <p className="text-blue-600">
-                <b>Tú:</b> {item.mensaje}
-              </p>
-
-              <p className="text-gray-700">
-                <b>Bot:</b> {item.respuesta}
-              </p>
-
-            </div>
-          ))}
-
-        </div>
-      )}
-
-      {/* RESPUESTA DEL BOT */}
-      {respuesta && (
-        <div className="bg-gray-100 text-gray-800 p-3 rounded-xl text-sm break-words">
-          {respuesta}
-        </div>
-      )}
-
-      {/* ERROR */}
-      {error && (
-        <p className="text-red-500 text-xs bg-red-50 border border-red-200 rounded-md p-2">
-          {error}
-        </p>
-      )}
-
-      {/* INPUT */}
       <form
-        onSubmit={handleSubmit}
-        className="flex items-center gap-2 w-full"
+        onSubmit={(e) => { e.preventDefault(); handleEnviar(); }}
+        className="flex items-center gap-2 border-t pt-2 w-full overflow-hidden"
       >
-        <textarea
-          className="
-            flex-1
-            border border-gray-300
-            bg-gray-100
-            rounded-lg
-            px-3 py-2
-            resize-none
-            focus:outline-none
-            focus:ring-2 focus:ring-blue-400
-            text-sm
-          "
-          rows={1}
+        <input
+          type="text"
+          placeholder="Escribe..."
           value={mensaje}
           onChange={(e) => setMensaje(e.target.value)}
-          placeholder="Escribe un mensaje..."
           disabled={loading}
+          className="flex-1 min-w-0 border rounded px-2 py-1 text-xs sm:text-sm md:text-base sm:px-3 sm:py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
         />
-
         <button
           type="submit"
           disabled={loading}
-          className="
-            px-3 py-2
-            bg-blue-500
-            text-white
-            rounded-lg
-            hover:bg-blue-600
-            transition
-            disabled:opacity-50
-            text-sm
-            whitespace-nowrap
-          "
+          className="shrink-0 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded px-2 py-1 text-xs sm:text-sm sm:px-4 sm:py-2 transition"
         >
           {loading ? "..." : "Enviar"}
         </button>
       </form>
-
     </div>
   );
+};
+
+ChatbotEstudiante.propTypes = {
+  enviarMensaje: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  respuesta: PropTypes.string,
 };
 
 export default ChatbotEstudiante;
