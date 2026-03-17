@@ -11,7 +11,7 @@ const storeProfile = create((set) => ({
   // 🔹 Cargar perfil desde backend
   loadProfile: async () => {
     try {
-      const res = await axios.get(`${baseUrl}/estudiantes/perfil`, getAuthHeaders());
+      const res = await axios.get(`${baseUrl}/estudiantes/perfil`, getAuthHeaders(true));
       set({ profile: res.data });
       return res.data;
     } catch (error) {
@@ -25,11 +25,10 @@ const storeProfile = create((set) => ({
     try {
       const res = await axios.put(
         `${baseUrl}/estudiantes/completarperfil`,
-        formData, 
+        formData,
         {
-          ...getAuthHeaders(),
           headers: {
-            ...getAuthHeaders().headers,
+            ...getAuthHeaders(true).headers,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -48,7 +47,7 @@ const storeProfile = create((set) => ({
   // 🔹 Listar posibles matches
   listarPotencialesMatches: async () => {
     try {
-      const res = await axios.get(`${baseUrl}/estudiantes/matches`, getAuthHeaders());
+      const res = await axios.get(`${baseUrl}/estudiantes/matches`, getAuthHeaders(true));
       return res.data;
     } catch (error) {
       toast.error("Error al listar matches");
@@ -56,7 +55,7 @@ const storeProfile = create((set) => ({
     }
   },
 
-  // 🔹 NUEVA FUNCIONALIDAD: limpiar perfil al hacer logout
+  // 🔹 limpiar perfil al hacer logout
   clearProfile: () => set({ profile: null }),
 }));
 

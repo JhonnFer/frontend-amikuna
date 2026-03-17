@@ -1,9 +1,17 @@
-const getAuthHeaders = () => {
+// helpers/getAuthHeaders.js
+const getAuthHeaders = (forAxios = false) => {
   const token = localStorage.getItem("token");
+  
+  if (forAxios) {
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+  }
+
   return {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    Authorization: `Bearer ${token}`,
   };
 };
 

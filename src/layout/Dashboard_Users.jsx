@@ -14,6 +14,7 @@ import StrikeForm from "../components/Dashboard_User/StrikeForm";
 import SidebarIzquierdo from "../components/Dashboard_User/SidebarIzquierdo";
 import MainCentral from "../components/Dashboard_User/MainCentral";
 import SidebarDerecho from "../components/Dashboard_User/SidebarDerecho";
+import FormularioCompletarPerfil from "../components/Dashboard_User/FormularioCompletarPerfil";
 
 import useEventosEstudiante from "../hooks/useEventosEstudiante";
 import usePerfilUsuarioAutenticado from "../hooks/usePerfilUsuarioAutenticado";
@@ -22,7 +23,7 @@ import useNotificaciones from "../hooks/useNotificaciones";
 import useChat from "../hooks/useChat";
 import useAsistenciaEvento from "../hooks/useAsistenciaEvento";
 import useSeguirUsuario from "../hooks/useSeguirUsuario";
-import FormularioCompletarPerfil from "../components/Dashboard_User/FormularioCompletarPerfil";
+import useGaleriaFotos from "../hooks/useGaleriaFotos";
 
 const socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:3000");
 
@@ -39,46 +40,14 @@ const Dashboard_Users = () => {
   const usuarios = matches;
   const [mostrarEditarPerfil, setMostrarEditarPerfil] = useState(false);
   const [mostrarGaleriaFotos, setMostrarGaleriaFotos] = useState(false);
-  const [fotosSeleccionadas, setFotosSeleccionadas] = useState([]);
   const [mostrarModalStrike, setMostrarModalStrike] = useState(false);
 
-  // galeria de fotos
-  const subirFotosGaleria = async () => {
-    try {
-      if (fotosSeleccionadas.length === 0) {
-        alert("Selecciona al menos una foto");
-        return;
-      }
-
-      const formData = new FormData();
-
-      fotosSeleccionadas.forEach((foto) => {
-        formData.append("imagenesGaleria", foto);
-      });
-
-      const res = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}estudiantes/galeria`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${storeAuth.getState().token}`,
-          },
-          body: formData,
-        },
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.msg);
-
-      await cargarPerfil(); // refresca perfil
-      setFotosSeleccionadas([]);
-      alert("Fotos subidas correctamente");
-    } catch (error) {
-      console.error(error);
-      alert(error.message);
-    }
-  };
+  const {
+    setFotosSeleccionadas,
+    subirFotos,
+    eliminarFoto,
+    loading: loadingFotos,
+  } = useGaleriaFotos(cargarPerfil);
   // 🔒 GUARDIA: Si no hay usuario autenticado, redirigir al login
   useEffect(() => {
     const user = storeAuth.getState().user;
@@ -421,6 +390,7 @@ const Dashboard_Users = () => {
           }}
         />
       </Modal>
+      {/* Modal para galería de fotos */}
       <Modal
         isOpen={mostrarGaleriaFotos}
         title="Agregar fotos a tu galería"
@@ -437,20 +407,34 @@ const Dashboard_Users = () => {
           />
 
           <button
-            onClick={subirFotosGaleria}
+            onClick={async () => {
+              const res = await subirFotos();
+              if (!res.ok) alert(res.msg);
+            }}
+            disabled={loadingFotos}
             className="bg-rose-600 text-white py-2 rounded hover:bg-rose-700 transition"
           >
-            Subir Fotos
+            {loadingFotos ? "Subiendo..." : "Subir Fotos"}
           </button>
 
           {profile?.imagenesGaleria?.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4">
               {profile.imagenesGaleria.map((foto, i) => (
-                <img
-                  key={i}
-                  src={foto}
-                  className="w-full h-35 object-cover rounded"
-                />
+                <div key={i} className="relative">
+                  <img
+                    src={foto}
+                    className="w-full h-35 object-cover rounded"
+                  />
+                  <button
+                    onClick={async () => {
+                      const res = await eliminarFoto(foto);
+                      if (!res.ok) alert(res.msg);
+                    }}
+                    className="absolute top-1 right-1 bg-gray-800 hover:bg-gray-500 text-[#fff] text-0.50 px-2 rounded transition"
+                  >
+                    X
+                  </button>
+                </div>
               ))}
             </div>
           )}
