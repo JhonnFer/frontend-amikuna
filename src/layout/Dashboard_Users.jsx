@@ -25,22 +25,28 @@ import useAsistenciaEvento from "../hooks/useAsistenciaEvento";
 import useSeguirUsuario from "../hooks/useSeguirUsuario";
 import useGaleriaFotos from "../hooks/useGaleriaFotos";
 
+import VisorFotos from "../components/UI/VisorFotos";
+
 const socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:3000");
 
 const Dashboard_Users = () => {
   const navigate = useNavigate();
 
   // console.log("[Dashboard_Users] perfilCompleto:", perfilCompleto);
+  // const de perfil
   const {
     perfil: profile,
     loadingPerfil,
     cargarPerfil,
   } = usePerfilUsuarioAutenticado();
+
   const { matches, loading: loadingMatches } = useMatches();
   const usuarios = matches;
   const [mostrarEditarPerfil, setMostrarEditarPerfil] = useState(false);
   const [mostrarGaleriaFotos, setMostrarGaleriaFotos] = useState(false);
   const [mostrarModalStrike, setMostrarModalStrike] = useState(false);
+  const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
+  const [fotoIndex, setFotoIndex] = useState(0);
 
   const {
     setFotosSeleccionadas,
@@ -48,17 +54,14 @@ const Dashboard_Users = () => {
     eliminarFoto,
     loading: loadingFotos,
   } = useGaleriaFotos(cargarPerfil);
-  // 🔒 GUARDIA: Si no hay usuario autenticado, redirigir al login
+
+  // Si no hay usuario autenticado, redirigir al login
   useEffect(() => {
     const user = storeAuth.getState().user;
     if (!user) {
       navigate("/login", { replace: true });
     }
   }, [navigate]);
-
-  // Si el perfil está incompleto, mostrar formulario de completar perfil
-  // (Ahora manejado en el return principal arriba)
-  // useEffect removido porque se maneja en el return
 
   // Cargar el perfil cuando el Dashboard se monta
   useEffect(() => {
@@ -68,14 +71,12 @@ const Dashboard_Users = () => {
     // Solo depende de loadingPerfil y cargarPerfil para evitar bucles
   }, [loadingPerfil, profile, cargarPerfil]);
 
-  // Usamos tu hook que obtiene eventos y la función para recargarlos
+  // Usamos el hook de eventos para obtener la lista de eventos disponibles
   const {
     eventos,
     loading: loadingEventos,
     obtenerEventos,
   } = useEventosEstudiante();
-
-  const { solicitudes, loading: loadingSolicitudes } = useNotificaciones();
 
   // Pasamos 'obtenerEventos' al hook de asistencia para que recargue la lista
   const {
@@ -84,13 +85,23 @@ const Dashboard_Users = () => {
     cargando: cargandoAsistencia,
   } = useAsistenciaEvento(obtenerEventos);
 
+  //usamos el hook de notificaciones para obtener las solicitudes de amistad
+
+  const { solicitudes, loading: loadingSolicitudes } = useNotificaciones();
+
+  // Hook para manejar el chat entre usuarios
+
   const {
     abrirChat,
     obtenerMensajes,
     enviarMensaje: enviarMensajeApi,
   } = useChat();
 
+  // Hook para seguir usuarios
+
   const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario();
+
+  // Estados para controlar modales y vistas
 
   const [amigoSeleccionado, setAmigoSeleccionado] = useState(null);
   const [mostrarModalTratamiento, setMostrarModalTratamiento] = useState(false);
@@ -104,6 +115,7 @@ const Dashboard_Users = () => {
   // Tu estado para controlar la vista de eventos
   const [eventosExpandidos, setEventosExpandidos] = useState(false);
 
+  // useEffect para depurar cambios en chatInfo
   useEffect(() => {
     console.log("Estado de chatInfo actualizado:", chatInfo);
   }, [chatInfo]);
@@ -132,11 +144,14 @@ const Dashboard_Users = () => {
     };
   }, [chatInfo?.chatId, obtenerMensajes]);
 
+  // Función para manejar el logout
+
   const handleLogout = useCallback(() => {
     storeAuth.getState().logout();
     window.location.href = "/login";
   }, []);
 
+  // Función para abrir el chat con un match específico
   const handleAbrirChat = useCallback(
     async (match) => {
       if (!profile?._id) return;
@@ -202,6 +217,7 @@ const Dashboard_Users = () => {
     [enviarMensajeApi, chatInfo, profile],
   );
 
+  // Función para abrir el modal de aporte con la información del aporte seleccionado
   const handleOpenAporteModal = useCallback((monto, concepto, descripcion) => {
     setAporteSeleccionado({ monto, concepto, descripcion });
     setMostrarModalAporte(true);
@@ -211,7 +227,7 @@ const Dashboard_Users = () => {
     setMostrarModalAporte(false);
     setAporteSeleccionado(null);
   }, []);
-
+  // funcion para carga de los matches mutuos, es decir, aquellos usuarios que me siguen y yo sigo a la vez
   const matchesMutuos = useMemo(() => {
     if (!profile?.seguidores || !profile?.siguiendo || !matches) {
       return [];
@@ -241,7 +257,7 @@ const Dashboard_Users = () => {
     });
   }, [eventos, profile]);
 
-  if (loadingPerfil || !profile || !profile._id) {
+  if (!profile || !profile._id) {
     return <div>Cargando perfil...</div>;
   }
 
@@ -397,6 +413,16 @@ const Dashboard_Users = () => {
         showCloseButton={true}
         onClose={() => setMostrarGaleriaFotos(false)}
       >
+        {/* Overlay de carga */}
+        {loadingFotos && (
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-lg">
+            <div className="w-14 h-14 border-4 border-rose-200 border-t-rose-600 rounded-full animate-spin" />
+            <p className="mt-4 text-sm text-rose-600 font-semibold animate-pulse tracking-wide">
+              Procesando...
+            </p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-4">
           <input
             type="file"
@@ -412,7 +438,7 @@ const Dashboard_Users = () => {
               if (!res.ok) alert(res.msg);
             }}
             disabled={loadingFotos}
-            className="bg-rose-600 text-white py-2 rounded hover:bg-rose-700 transition"
+            className="bg-rose-600 text-white py-2 rounded hover:bg-rose-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loadingFotos ? "Subiendo..." : "Subir Fotos"}
           </button>
@@ -420,17 +446,22 @@ const Dashboard_Users = () => {
           {profile?.imagenesGaleria?.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4">
               {profile.imagenesGaleria.map((foto, i) => (
-                <div key={i} className="relative">
+                <div key={i} className="relative overflow-hidden rounded">
                   <img
                     src={foto}
-                    className="w-full h-35 object-cover rounded"
+                    onClick={() => {
+                      setFotoSeleccionada(foto);
+                      setFotoIndex(i);
+                    }}
+                    className="w-full h-35 object-cover rounded cursor-pointer hover:scale-105 transition duration-300"
                   />
                   <button
                     onClick={async () => {
                       const res = await eliminarFoto(foto);
                       if (!res.ok) alert(res.msg);
                     }}
-                    className="absolute top-1 right-1 bg-gray-800 hover:bg-gray-500 text-[#fff] text-0.50 px-2 rounded transition"
+                    disabled={loadingFotos}
+                    className="absolute top-1 right-1 bg-red-500 text-white text-xs px-2 rounded disabled:opacity-50"
                   >
                     X
                   </button>
@@ -440,6 +471,7 @@ const Dashboard_Users = () => {
           )}
         </div>
       </Modal>
+
       {mostrarModalStrike && (
         <Modal
           isOpen={mostrarModalStrike}
@@ -449,8 +481,18 @@ const Dashboard_Users = () => {
           <StrikeForm />
         </Modal>
       )}
+
+      <VisorFotos
+  fotos={profile.imagenesGaleria}
+  fotoSeleccionada={fotoSeleccionada}
+  fotoIndex={fotoIndex}
+  setFotoSeleccionada={setFotoSeleccionada}
+  setFotoIndex={setFotoIndex}
+/>
     </div>
   );
+  
 };
+
 
 export default Dashboard_Users;

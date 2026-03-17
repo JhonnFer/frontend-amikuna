@@ -7,6 +7,7 @@ import useFetch from "../../hooks/useFetch";
 import useSeguirUsuario from "../../hooks/useSeguirUsuario";
 import { toast } from "react-toastify";
 import { FaImages } from "react-icons/fa";
+import VisorFotos from "../UI/VisorFotos";
 
 const SwipeCards = () => {
   const { fetchDataBackend } = useFetch();
@@ -222,66 +223,13 @@ const SwipeCards = () => {
           </motion.div>
         )}
       </AnimatePresence>
-      {/* VISOR FOTO GRANDE */}
-<AnimatePresence>
-  {fotoSeleccionada && (
-    <motion.div
-      className="fixed inset-0 bg-black/95 flex items-center justify-center z-[60]"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={() => setFotoSeleccionada(null)}
-    >
-
-      {/* BOTON IZQUIERDA */}
-      {fotoIndex > 0 && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setFotoIndex((prev) => prev - 1);
-            setFotoSeleccionada(fotosUsuario[fotoIndex - 1]);
-          }}
-          className="absolute left-6 text-white text-4xl"
-        >
-          ←
-        </button>
-      )}
-
-      {/* IMAGEN GRANDE */}
-      <motion.img
-        src={fotoSeleccionada}
-        initial={{ scale: 0.8 }}
-        animate={{ scale: 1 }}
-        exit={{ scale: 0.8 }}
-        transition={{ duration: 0.3 }}
-        className="max-h-full max-w-[90vw] object-contain rounded-lg"
-      />
-
-      {/* BOTON DERECHA */}
-      {fotoIndex < fotosUsuario.length - 1 && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setFotoIndex((prev) => prev + 1);
-            setFotoSeleccionada(fotosUsuario[fotoIndex + 1]);
-          }}
-          className="absolute right-6 text-white text-4xl"
-        >
-          →
-        </button>
-      )}
-
-      {/* BOTON CERRAR */}
-      <button
-        onClick={() => setFotoSeleccionada(null)}
-        className="absolute top-6 right-6 text-white text-2xl"
-      >
-        ✕
-      </button>
-
-    </motion.div>
-  )}
-</AnimatePresence>
+        <VisorFotos
+  fotos={fotosUsuario}
+  fotoSeleccionada={fotoSeleccionada}
+  fotoIndex={fotoIndex}
+  setFotoSeleccionada={setFotoSeleccionada}
+  setFotoIndex={setFotoIndex}
+/>
     </div>
   );
 };
