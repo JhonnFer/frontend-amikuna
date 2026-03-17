@@ -7,8 +7,6 @@ import ModalTreatments from "../components/treatments/Modal";
 
 import { io } from "socket.io-client";
 
-
-
 import ChatConversacion from "../components/Dashboard_User/ChatConversacion";
 import ModalPayment from "../components/treatments/ModalPayment";
 import StrikeForm from "../components/Dashboard_User/StrikeForm";
@@ -25,7 +23,6 @@ import useChat from "../hooks/useChat";
 import useAsistenciaEvento from "../hooks/useAsistenciaEvento";
 import useSeguirUsuario from "../hooks/useSeguirUsuario";
 import FormularioCompletarPerfil from "../components/Dashboard_User/FormularioCompletarPerfil";
-
 
 const socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:3000");
 
@@ -313,40 +310,40 @@ const Dashboard_Users = () => {
         profile={profile}
         setMostrarGaleriaFotos={setMostrarGaleriaFotos}
       />
-      
-{/* MAIN CENTRAL */}
-<MainCentral
-  handleOpenAporteModal={handleOpenAporteModal}
-  setMostrarEditarPerfil={setMostrarEditarPerfil}
-  setMostrarGaleriaFotos={setMostrarGaleriaFotos}
-  solicitudes={solicitudes || []}           // ✅ default array
-  loadingSolicitudes={loadingSolicitudes || false} // ✅ default boolean
-  seguirUsuario={seguirUsuario}
-  setMostrarChatbot={setMostrarChatbot}
-  mostrarChatbot={mostrarChatbot}
-  setMostrarModalStrike={setMostrarModalStrike}
-  handleLogout={handleLogout}
-  loadingMatches={loadingMatches}
-  usuarios={usuarios || []}                 // también asegurar array
-  cargandoSeguir={cargandoSeguir || false}  // default boolean
-/>
-      {/* ASIDE DERECHO */}
-          
-<SidebarDerecho
-  eventosDisponibles={eventosDisponibles}
-  loadingEventos={loadingEventos}
-  confirmarAsistencia={confirmarAsistencia}
-  rechazarAsistencia={rechazarAsistencia}
-  cargandoAsistencia={cargandoAsistencia}
-  eventosExpandidos={eventosExpandidos}
-  setEventosExpandidos={setEventosExpandidos}
-  matchesMutuos={matchesMutuos}
-  handleAbrirChat={handleAbrirChat}
-  mostrarChatbot={mostrarChatbot}
-  setMostrarChatbot={setMostrarChatbot}
-/>
 
-{/*fin de ASIDE DERECHO */}
+      {/* MAIN CENTRAL */}
+      <MainCentral
+        handleOpenAporteModal={handleOpenAporteModal}
+        setMostrarEditarPerfil={setMostrarEditarPerfil}
+        setMostrarGaleriaFotos={setMostrarGaleriaFotos}
+        solicitudes={solicitudes || []} // ✅ default array
+        loadingSolicitudes={loadingSolicitudes || false} // ✅ default boolean
+        seguirUsuario={seguirUsuario}
+        setMostrarChatbot={setMostrarChatbot}
+        mostrarChatbot={mostrarChatbot}
+        setMostrarModalStrike={setMostrarModalStrike}
+        handleLogout={handleLogout}
+        loadingMatches={loadingMatches}
+        usuarios={usuarios || []} // también asegurar array
+        cargandoSeguir={cargandoSeguir || false} // default boolean
+      />
+      {/* ASIDE DERECHO */}
+
+      <SidebarDerecho
+        eventosDisponibles={eventosDisponibles}
+        loadingEventos={loadingEventos}
+        confirmarAsistencia={confirmarAsistencia}
+        rechazarAsistencia={rechazarAsistencia}
+        cargandoAsistencia={cargandoAsistencia}
+        eventosExpandidos={eventosExpandidos}
+        setEventosExpandidos={setEventosExpandidos}
+        matchesMutuos={matchesMutuos}
+        handleAbrirChat={handleAbrirChat}
+        mostrarChatbot={mostrarChatbot}
+        setMostrarChatbot={setMostrarChatbot}
+      />
+
+      {/*fin de ASIDE DERECHO */}
 
       {amigoSeleccionado && (
         <div className="fixed right-0 top-0 w-80 h-full bg-white shadow-lg z-50 p-4 overflow-y-auto">

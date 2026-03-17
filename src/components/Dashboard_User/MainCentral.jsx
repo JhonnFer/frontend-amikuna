@@ -41,7 +41,7 @@ const MainCentral = ({
         bg-[#ffba79]
         px-2
         py-2
-        overflow-hidden
+        overflow-visible 
       "
       >
 
