@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +32,7 @@ const Register = () => {
       return response.data;
     } catch (error) {
       return Promise.reject(
-        error?.response?.data?.msg || "Error al registrar usuario."
+        error?.response?.data?.msg || "Error al registrar usuario.",
       );
     }
   };
@@ -62,7 +61,7 @@ const Register = () => {
     try {
       const res = await registerUser(formData);
       toast.success(
-        res.msg || "Registro exitoso. Revisa tu correo para confirmar."
+        res.msg || "Registro exitoso. Revisa tu correo para confirmar.",
       );
       setTimeout(() => navigate("/login"), 1000);
     } catch (errorMsg) {
@@ -73,7 +72,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row w-full min-h-screen relative">
+    <div className="flex flex-col md:flex-row w-full h-screen overflow-hidden relative">
       <ToastContainer />
 
       {/* Botón regresar */}
@@ -85,7 +84,7 @@ const Register = () => {
       </button>
 
       {/* FORMULARIO */}
-      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white">
+      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white overflow-y-auto">
         <div className="flex items-center mb-6">
           <div className="w-[60px] h-[60px] md:w-[80px] md:h-[80px]">
             <img
@@ -183,7 +182,7 @@ const Register = () => {
       </div>
 
       {/* IMAGEN */}
-      <div className="hidden md:block md:w-1/2 md:h-screen rounded-3xl overflow-visible md:mr-9">
+      <div className="hidden md:block md:w-1/2 h-full rounded-3xl overflow-hidden md:mr-9">
         <img
           src={loginImage}
           alt="Decoración"
@@ -195,4 +194,3 @@ const Register = () => {
 };
 
 export default Register;
-
