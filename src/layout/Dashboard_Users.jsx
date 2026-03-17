@@ -52,6 +52,7 @@ const Dashboard_Users = () => {
     setFotosSeleccionadas,
     subirFotos,
     eliminarFoto,
+    reemplazarFoto,
     loading: loadingFotos,
   } = useGaleriaFotos(cargarPerfil);
 
@@ -488,6 +489,7 @@ const Dashboard_Users = () => {
   fotoIndex={fotoIndex}
   setFotoSeleccionada={setFotoSeleccionada}
   setFotoIndex={setFotoIndex}
+  onReemplazar={reemplazarFoto} 
 />
     </div>
   );

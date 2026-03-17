@@ -1,7 +1,11 @@
-//src/components/Dashboard_User/SidebarIzquierdo.jsx
 import PropTypes from "prop-types";
+import { useState } from "react";
+import VisorFotos from "../UI/VisorFotos";
 
 const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
+  const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
+  const [fotoIndex, setFotoIndex] = useState(0);
+
   return (
     <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-white p-4 shadow flex-shrink-0 h-screen">
 
@@ -24,11 +28,9 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
             alt="Tu foto de perfil"
             className="rounded-full w-32 h-32 object-cover mb-2"
           />
-
           <h3 className="text-xl font-bold text-gray-800">
             {profile?.nombre || "Sin nombre"}
           </h3>
-
           <p className="text-center text-gray-500 italic">
             {profile?.biografia || "Sin biografía definida"}
           </p>
@@ -40,23 +42,19 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
             <strong className="text-rose-800">Género:</strong>{" "}
             {profile?.genero || "No definido"}
           </p>
-
           <p>
             <strong className="text-rose-800">Orientación:</strong>{" "}
             {profile?.orientacion || "No definida"}
           </p>
-
           <p>
             <strong className="text-rose-800">Intereses:</strong>{" "}
             {Array.isArray(profile?.intereses) && profile.intereses.length > 0
               ? profile.intereses.join(", ")
               : "No definidos"}
           </p>
-
           <p>
             <strong className="text-rose-800">Fecha de nacimiento:</strong>{" "}
-            {profile?.fechaNacimiento &&
-            typeof profile.fechaNacimiento === "string"
+            {profile?.fechaNacimiento && typeof profile.fechaNacimiento === "string"
               ? profile.fechaNacimiento.split("T")[0]
               : "No definida"}
           </p>
@@ -73,14 +71,22 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
               {profile.imagenesGaleria
                 .slice(-6)
                 .reverse()
-                .map((foto, i) => (
-                  <img
-                    key={i}
-                    src={foto}
-                    alt={`Foto ${i + 1}`}
-                    className="w-full h-28 object-cover rounded"
-                  />
-                ))}
+                .map((foto, i) => {
+                  const indexReal = profile.imagenesGaleria.length - 1 - i;
+                  return (
+                    <div key={i} className="overflow-hidden rounded cursor-pointer">
+                      <img
+                        src={foto}
+                        alt={`Foto ${i + 1}`}
+                        onClick={() => {
+                          setFotoSeleccionada(foto);
+                          setFotoIndex(indexReal);
+                        }}
+                        className="w-full h-28 object-cover rounded hover:scale-105 transition duration-300 cursor-pointer"
+                      />
+                    </div>
+                  );
+                })}
             </div>
 
             {profile.imagenesGaleria.length > 6 && (
@@ -96,14 +102,22 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
 
       </div>
 
+      {/* VISOR */}
+      <VisorFotos
+        fotos={profile?.imagenesGaleria || []}
+        fotoSeleccionada={fotoSeleccionada}
+        fotoIndex={fotoIndex}
+        setFotoSeleccionada={setFotoSeleccionada}
+        setFotoIndex={setFotoIndex}
+      />
+
     </aside>
   );
 };
 
 SidebarIzquierdo.propTypes = {
   profile: PropTypes.object,
-  setMostrarGaleriaFotos: PropTypes.func
+  setMostrarGaleriaFotos: PropTypes.func,
 };
 
 export default SidebarIzquierdo;
-

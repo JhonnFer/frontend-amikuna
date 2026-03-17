@@ -91,7 +91,7 @@ const useGaleriaFotos = (cargarPerfil) => {
     }
   };
 
-  // ⚠️ OPCIONAL (si usas PUT)
+  //  OPCIONAL (si usas PUT)
   const reemplazarFoto = async (index, nuevaFoto) => {
     try {
       setLoading(true);
