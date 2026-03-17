@@ -84,7 +84,7 @@ const Register = () => {
       </button>
 
       {/* FORMULARIO */}
-      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white overflow-y-auto">
+      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white ">
         <div className="flex items-center mb-6">
           <div className="w-[60px] h-[60px] md:w-[80px] md:h-[80px]">
             <img
