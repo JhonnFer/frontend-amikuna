@@ -58,15 +58,17 @@ const Register = () => {
       return toast.error("Las contraseñas no coinciden.");
     }
 
+    
     try {
-      const res = await registerUser(formData);
-      toast.success(
+    const res = await registerUser(formData);
+    toast.success(
         res.msg || "Registro exitoso. Revisa tu correo para confirmar.",
-      );
-      setTimeout(() => navigate("/login"), 1000);
-    } catch (errorMsg) {
-      toast.error(errorMsg);
-    }
+        { autoClose: 4000 }  // dale 4 segundos para leerlo
+    );
+    setTimeout(() => navigate("/login"), 4500); // redirige después del toast
+} catch (errorMsg) {
+    toast.error(errorMsg);
+}
 
     setLoading(false);
   };
