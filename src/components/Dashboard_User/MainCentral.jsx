@@ -20,13 +20,12 @@ const MainCentral = ({
   cargandoSeguir
 }) => {
   return (
-    <main className="flex-1 flex flex-col overflow-hidden min-h-0 max-w-5xl mx-auto px-4 py-2">
+    <main className="flex-1 flex flex-col overflow-hidden min-h-0 max-w-5xl mx-auto px-4 py-2 h-full">
 
       {/* NAVBAR */}
       <div
         className="
-        flex-[1]
-        min-h-[80px]
+        shrink-0
         grid
         grid-cols-4
         sm:grid-cols-5
@@ -120,7 +119,7 @@ const MainCentral = ({
       </div>
 
       {/* SWIPE CARDS */}
-      <div className="flex-[6] relative overflow-hidden flex items-center justify-center">
+      <div className="flex-1 min-h-0 relative overflow-hidden flex items-center justify-center">
 
         {loadingMatches ? (
           <div className="absolute inset-0 flex items-center justify-center">
