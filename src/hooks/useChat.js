@@ -29,6 +29,7 @@ const useChat = () => {
       try {
         const respuesta = await fetchDataBackend(
           `estudiantes/chats/${chatId}/ver-mensajes`,
+          {},
           "GET"
         );
         return respuesta || [];
