@@ -12,7 +12,11 @@ const useSocket = (chatId, onNuevoMensaje) => {
     useEffect(() => {
         const authHeaders = getAuthHeaders();
         const fullToken = authHeaders?.headers?.Authorization;
-        const token = fullToken?.startsWith('Bearer ') ? fullToken.split(' ')[1] : fullToken;
+        const tokenFromHeaders = fullToken?.startsWith("Bearer ")
+            ? fullToken.split(" ")[1]
+            : fullToken;
+
+        const token = tokenFromHeaders || localStorage.getItem("token");
 
         if (!token) {
             console.error("No se encontró token de autenticación para el socket.");
