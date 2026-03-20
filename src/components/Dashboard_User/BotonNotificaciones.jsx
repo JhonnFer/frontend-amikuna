@@ -37,21 +37,34 @@ const BotonNotificaciones = () => {
     return () => window.removeEventListener("resize", calcularPosicion);
   }, [mostrarMenu]);
 
-  const handleAceptarSolicitud = async (notificacion) => {
-    try {
-      const idSolicitante = notificacion.usuario?._id || notificacion.usuario;
-      const data = await seguirUsuario(idSolicitante);
-      if (data?.huboMatch) {
-        toast.success("¡Match confirmado!");
-      } else {
-        toast.info("Ahora sigues a este usuario.");
-      }
-      await marcarLeido(notificacion._id);
-    } catch (error) {
-      console.error("Error al aceptar:", error);
-    }
-  };
+const handleAceptarSolicitud = async (notificacion) => {
+  try {
+    const idSolicitante = notificacion.fromUser?._id || notificacion.fromUser;
+    
+    // 👇 Agrega esto temporalmente
+    console.log("Notificación completa:", JSON.stringify(notificacion, null, 2));
+    console.log("ID a seguir:", idSolicitante);
+    console.log("URL que se llamará:", `estudiantes/seguir/${idSolicitante}`);
 
+    if (!idSolicitante) {
+      toast.error("No se pudo identificar al usuario.");
+      return;
+    }
+
+    const data = await seguirUsuario(idSolicitante);
+    console.log("Respuesta del backend:", data); // 👈 Y esto
+
+    if (data?.huboMatch) {
+      toast.success("¡Match confirmado! 🎉");
+    } else {
+      toast.info("Ahora sigues a este usuario.");
+    }
+
+    await marcarLeido(notificacion._id);
+  } catch (error) {
+    console.error("Error al aceptar:", error);
+  }
+};
   return (
     <div className="relative inline-block text-left">
       <button

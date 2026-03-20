@@ -42,11 +42,11 @@ const useSocket = (chatId, onNuevoMensaje) => {
 
         // <<-- CAMBIO CLAVE AQUÍ -->>
         // Escuchamos el evento correcto que tu backend envía
-        socket.current.on('chat:mensaje', onNuevoMensaje);
+        socket.current.on('mensaje:nuevo', (data) => onNuevoMensaje(data.mensaje));
 
         return () => {
             if (socket.current) {
-                socket.current.off('chat:mensaje', onNuevoMensaje);
+                socket.current.off('mensaje:nuevo', onNuevoMensaje);
                 socket.current.disconnect();
             }
         };
