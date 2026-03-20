@@ -29,12 +29,22 @@ const useSocket = (chatId, onNuevoMensaje) => {
         });
 
         socket.current.on('connect', () => {
+            console.log("✓ Socket conectado, uniéndose a sala:", chatId);
             setIsConnected(true);
             if (chatId) {
                 // Esto envía el evento al backend para unirse a la sala
                 socket.current.emit('join:chat', chatId); 
             }
         });
+
+        socket.current.on("connect_error", (err) => {
+  console.error("✗ Error conectando socket:", err.message); // ← clave
+});
+
+socket.current.on("disconnect", (reason) => {
+  console.log("Socket desconectado, razón:", reason); // ← clave
+  setIsConnected(false);
+});
 
         socket.current.on('disconnect', () => {
             setIsConnected(false);
