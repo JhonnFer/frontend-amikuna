@@ -10,7 +10,7 @@ import useFetch from "../hooks/useFetch";
 import storeAuth from "../context/storeAuth";
 
 
-import Modal from "../components/modal/modal";
+import Modal from "../components/Modals_Dashboards/modal";
 import PerfilUsuario from "../components/Dashboard_User/PerfilUsuario";
 
 import logoAmikuna from "../assets/Logo.png";

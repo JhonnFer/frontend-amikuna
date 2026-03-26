@@ -41,10 +41,7 @@ const handleAceptarSolicitud = async (notificacion) => {
   try {
     const idSolicitante = notificacion.fromUser?._id || notificacion.fromUser;
     
-    // 👇 Agrega esto temporalmente
-    console.log("Notificación completa:", JSON.stringify(notificacion, null, 2));
-    console.log("ID a seguir:", idSolicitante);
-    console.log("URL que se llamará:", `estudiantes/seguir/${idSolicitante}`);
+    
 
     if (!idSolicitante) {
       toast.error("No se pudo identificar al usuario.");

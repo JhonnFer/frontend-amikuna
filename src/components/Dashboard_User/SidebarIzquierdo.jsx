@@ -60,7 +60,25 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
           </p>
         </div>
 
-        {/* GALERÍA */}
+        {/* GALERÍA - placeholder si no hay fotos */}
+        {(!profile?.imagenesGaleria || profile.imagenesGaleria.length === 0) && (
+          <div className="mt-4 w-full">
+            <h4 className="text-gray-700 text-xl font-semibold mb-2">
+              Últimas Fotos
+            </h4>
+            <div
+              onClick={() => setMostrarGaleriaFotos(true)}
+              className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-rose-300 rounded-xl cursor-pointer hover:bg-rose-50 transition"
+            >
+              <span className="text-5xl text-rose-300 mb-2 select-none">+</span>
+              <p className="text-rose-400 text-sm font-medium text-center px-4 select-none">
+                Agrega tus fotos aquí
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* GALERÍA - con fotos */}
         {profile?.imagenesGaleria?.length > 0 && (
           <div className="mt-4 w-full">
             <h4 className="text-gray-700 text-xl font-semibold mb-2">

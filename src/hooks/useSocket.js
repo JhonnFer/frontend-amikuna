@@ -10,6 +10,9 @@ const useSocket = (chatId, onNuevoMensaje) => {
     const socket = useRef(null);
 
     useEffect(() => {
+        
+        if (!chatId) return;
+
         const authHeaders = getAuthHeaders();
         const fullToken = authHeaders?.headers?.Authorization;
         const tokenFromHeaders = fullToken?.startsWith("Bearer ")
@@ -17,6 +20,7 @@ const useSocket = (chatId, onNuevoMensaje) => {
             : fullToken;
 
         const token = tokenFromHeaders || localStorage.getItem("token");
+        
 
         if (!token) {
             console.error("No se encontró token de autenticación para el socket.");
@@ -29,13 +33,13 @@ const useSocket = (chatId, onNuevoMensaje) => {
         });
 
         socket.current.on('connect', () => {
-            console.log("✓ Socket conectado, uniéndose a sala:", chatId);
             setIsConnected(true);
             if (chatId) {
                 // Esto envía el evento al backend para unirse a la sala
                 socket.current.emit('join:chat', chatId); 
             }
         });
+        
 
         socket.current.on("connect_error", (err) => {
   console.error("✗ Error conectando socket:", err.message); // ← clave
