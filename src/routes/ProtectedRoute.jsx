@@ -7,12 +7,13 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
   const token = storeAuth((state) => state.token);
   const logout = storeAuth((state) => state.logout);
+  const user = storeAuth((state) => state.user);
   const profile = storeProfile((state) => state.profile);
 
-  // 1️⃣ Sin token
+  //  Sin token
   if (!token) return <Navigate to="/login" replace />;
 
-  // 2️⃣ Verificar expiración del token
+  //  Verificar expiración del token
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
 
@@ -26,26 +27,27 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // 3️⃣ Esperar perfil
-  if (!profile) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-lg">Cargando perfil...</p>
-      </div>
-    );
-  }
+  //  Esperar perfil
+if (requiredRole === "estudiante" && !profile) {
+  return (
+    <div className="flex justify-center items-center h-screen">
+      <p className="text-lg">Cargando perfil...</p>
+    </div>
+  );
+}
+  //  Validar rol
+  if (requiredRole && user?.rol !== requiredRole) {
+  return <Navigate to="/forbidden" replace />;
+}
 
-  // 4️⃣ Validar rol
-  if (requiredRole && profile.rol !== requiredRole) {
-    return <Navigate to="/forbidden" replace />;
-  }
-
-  // 5️⃣ Perfil completo
+  //  Perfil completo
+  if (requiredRole === "estudiante") {
   const perfilOk = isPerfilCompleto(profile);
 
   if (!perfilOk && window.location.pathname !== "/user/completar-perfil") {
     return <Navigate to="/user/completar-perfil" replace />;
   }
+}
 
   return children;
 };

@@ -5,14 +5,18 @@ const PublicRoute = () => {
   const token = storeAuth((state) => state.token);
   const user = storeAuth((state) => state.user);
 
-  if (token && user) {
-    // Redirige según rol
-    if (user.rol === "admin") {
-      return <Navigate to="/admin/dashboard" replace />;
-    }
-    if (user.rol === "estudiante") {
-      return <Navigate to="/user/dashboard" replace />;
-    }
+  // ⏳ Esperar a que user exista
+  if (!token || !user) {
+    return <Outlet />;
+  }
+
+  // 🔥 Redirección segura
+  if (user.rol === "admin") {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  if (user.rol === "estudiante") {
+    return <Navigate to="/user/dashboard" replace />;
   }
 
   return <Outlet />;
