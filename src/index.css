@@ -11,7 +11,21 @@
   }
   .bg-color-black_pur{
     background: linear-gradient(135deg,  #7371fc      0%,   #0a100d         100%);
+
   }
+  
+  .text-outline {
+  -webkit-text-stroke: 2px gainsboro;
+}
+  .text-metal-white {
+    color: white;
+    text-shadow:
+      0 1px 2px rgba(0,0,0,0.8),   /* sombra base */
+      0 0 4px rgba(96, 228, 222, 0.892), /* brillo cercano */
+      0 0 10px rgba(255, 255, 255, 0.874), /* glow */
+      0 0 18px rgba(255, 255, 255, 0.347); /* difusión */
+  }
+
 }
 
 @layer components {

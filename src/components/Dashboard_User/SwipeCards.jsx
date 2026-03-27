@@ -116,7 +116,7 @@ const SwipeCards = () => {
               <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
 
               {/* nombre sobre la foto */}
-              <h2 className="absolute bottom-3 left-3 text-white text-xl font-medium">
+              <h2 className="absolute bottom-3 left-3 text-metal-white text-[28px] font-bold">
                 {usuarioActual.nombre}
               </h2>
 
