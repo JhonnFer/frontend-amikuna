@@ -101,13 +101,18 @@ const SwipeCards = () => {
             transition={{ duration: 0.4 }}
             className="absolute inset-0 bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
           >
-            {/* FOTO PRINCIPAL */}
-            <div className="relative w-full h-[55%] sm:h-[60%] bg-gray-300">
-              <img
-                src={usuarioActual.imagenPerfil}
-                alt="perfil"
-                className=" w-full h-full object-scale-down baground-size-cover overflow-clip rounded-t-2xl"
-              />
+            {/* FOTO PRINCIPAL — técnica Tinder */}
+            <div
+              className="relative w-full overflow-hidden shrink-0"
+              style={{
+                aspectRatio: "3/4",
+                maxHeight: "60%",
+                backgroundImage: `url(${usuarioActual.imagenPerfil})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center top",
+              }}
+            >
+              <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
               <button
                 onClick={() => setShowGallery(true)}
                 className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full hover:bg-black"
@@ -228,6 +233,7 @@ const SwipeCards = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
       <VisorFotos
         fotos={fotosUsuario}
         fotoSeleccionada={fotoSeleccionada}
