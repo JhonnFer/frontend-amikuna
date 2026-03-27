@@ -21,7 +21,7 @@ import Dashboard_Admin from './layout/Dashboard_Admin';
 import Dashboard_Users from './layout/Dashboard_Users';
 import Forbidden from './pages/Forbidden';
 import FormularioCompletarPerfil from './components/Dashboard_User/FormularioCompletarPerfil';
-import Download from './pages/Download';
+import Download from './pages/Community';
 import About from './pages/About';
 import GoogleSuccess from "./pages/GoogleSuccess";
 

@@ -37,7 +37,7 @@ const Navbar = () => {
             to="/download"
             className={({ isActive }) => `${isActive ? activeClass : baseClass} text-gray-500 text-xs md:text-lg whitespace-nowrap select-none`}
           >
-            Descarga
+            Comunidad
           </NavLink>
           <NavLink
             to="/about"
@@ -58,6 +58,7 @@ const Navbar = () => {
             <button className="px-4 py-2 rounded-full bg-gray-100 text-black font-semibold border border-gray-500 hover:bg-gray-200 hover:text-pink-600 active:text-pink-600 focus:outline-none text-xs md:text-lg whitespace-nowrap select-none transition-colors duration-300">
               Registrate
             </button>
+            
           </NavLink>
   
         </div>
