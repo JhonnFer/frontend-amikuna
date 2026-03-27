@@ -102,11 +102,11 @@ const SwipeCards = () => {
             className="absolute inset-0 bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
           >
             {/* FOTO PRINCIPAL */}
-            <div className="relative w-full h-[55%] sm:h-[60%] bg-gray-200">
+            <div className="relative w-full h-[55%] sm:h-[60%] bg-gray-300">
               <img
                 src={usuarioActual.imagenPerfil}
                 alt="perfil"
-                className=" w-full h-full object-fit-cover object-position-center "
+                className=" w-full h-full object-scale-down baground-size-cover overflow-clip rounded-t-2xl"
               />
               <button
                 onClick={() => setShowGallery(true)}
