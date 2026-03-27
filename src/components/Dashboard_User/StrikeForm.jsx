@@ -1,5 +1,5 @@
 // src/components/StrikeForm.jsx
-import React, { useState } from "react";
+import  { useState } from "react";
 import useStrike from "../../hooks/useStrike";
 
 const StrikeForm = () => {

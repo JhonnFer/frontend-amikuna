@@ -54,13 +54,9 @@ function useFetch() {
         if (status === 403) {
           console.error("403 Forbidden:", errorMsg);
           if (showToast) {
-            toast.error(
-              "No tienes permisos para acceder a este recurso. Por favor, completa tu perfil.",
-            );
+            toast.error(errorMsg); // ← usa el mensaje real del backend
           }
-          throw new Error(
-            "Acceso denegado. Confirma tu cuenta en tu correo electrónico y completa tu perfil para acceder a esta sección.",
-          );
+          throw new Error(errorMsg); // ← lanza el mensaje real
         }
 
         if (errorMsg.toLowerCase().includes("token expired")) {

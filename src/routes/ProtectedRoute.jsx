@@ -10,6 +10,9 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   const user = storeAuth((state) => state.user);
   const profile = storeProfile((state) => state.profile);
 
+  // control de espera en el renderizado
+  if (!user) return null;
+
   //  Sin token
   if (!token) return <Navigate to="/login" replace />;
 

@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import PropTypes from "prop-types";
 import { FaUser, FaImages } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
@@ -19,11 +20,14 @@ const MainCentral = ({
   usuarios,
   cargandoSeguir
 }) => {
+  const navbarRef = useRef(null);
+
   return (
     <main className="flex-1 flex flex-col overflow-hidden min-h-0 max-w-5xl mx-auto px-4 py-2 h-full">
 
       {/* NAVBAR */}
       <div
+        ref={navbarRef}
         className="
         shrink-0
         grid
@@ -43,7 +47,6 @@ const MainCentral = ({
         overflow-visible 
       "
       >
-
         <button
           onClick={() =>
             handleOpenAporteModal(
@@ -61,29 +64,24 @@ const MainCentral = ({
           <button onClick={() => setMostrarEditarPerfil(true)}>
             <FaUser className="text-gray-600 hover:text-gray-200 w-5 h-5 md:w-6 md:h-6" />
           </button>
-          <span className="text-[10px] sm:text-xs text-gray-800">
-            Perfil
-          </span>
+          <span className="text-[10px] sm:text-xs text-gray-800">Perfil</span>
         </div>
 
         <div className="flex flex-col items-center text-center w-full">
           <button onClick={() => setMostrarGaleriaFotos(true)}>
             <FaImages className="text-gray-600 hover:text-gray-200 w-5 h-5 md:w-6 md:h-6" />
           </button>
-          <span className="text-[10px] sm:text-xs text-gray-800">
-            Fotos
-          </span>
+          <span className="text-[10px] sm:text-xs text-gray-800">Fotos</span>
         </div>
 
         <div className="flex flex-col items-center text-center w-full">
           <BotonNotificaciones
+            navbarRef={navbarRef}
             solicitudes={solicitudes}
             loading={loadingSolicitudes}
             onFollow={seguirUsuario}
           />
-          <span className="text-[10px] sm:text-xs text-gray-800">
-            Notif
-          </span>
+          <span className="text-[10px] sm:text-xs text-gray-800">Notif</span>
         </div>
 
         <button
@@ -91,9 +89,7 @@ const MainCentral = ({
           className="flex flex-col items-center text-center"
         >
           <span className="text-base md:text-lg">💬</span>
-          <span className="text-[10px] sm:text-xs text-gray-800">
-            Chat
-          </span>
+          <span className="text-[10px] sm:text-xs text-gray-800">Chat</span>
         </button>
 
         <button
@@ -101,9 +97,7 @@ const MainCentral = ({
           className="flex flex-col items-center text-center hover:bg-gray-100 rounded p-1 transition"
         >
           <span className="text-lg md:text-xl">📝</span>
-          <span className="text-[10px] sm:text-xs text-gray-800">
-            Feedback
-          </span>
+          <span className="text-[10px] sm:text-xs text-gray-800">Feedback</span>
         </button>
 
         <button
@@ -111,16 +105,12 @@ const MainCentral = ({
           className="flex flex-col items-center text-center"
         >
           <FiLogOut className="text-[#51040492] hover:text-red-200 w-5 h-5 md:w-6 md:h-6" />
-          <span className="text-[10px] sm:text-xs text-gray-800">
-            Salir
-          </span>
+          <span className="text-[10px] sm:text-xs text-gray-800">Salir</span>
         </button>
-
       </div>
 
       {/* SWIPE CARDS */}
       <div className="flex-1 min-h-0 relative overflow-hidden flex items-center justify-center">
-
         {loadingMatches ? (
           <div className="absolute inset-0 flex items-center justify-center">
             Cargando usuarios para swipes...
@@ -132,7 +122,6 @@ const MainCentral = ({
             cargandoSeguir={cargandoSeguir}
           />
         )}
-
       </div>
 
     </main>
@@ -156,4 +145,3 @@ MainCentral.propTypes = {
 };
 
 export default MainCentral;
-

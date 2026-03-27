@@ -1,11 +1,13 @@
+// src/components/Dashboard_User/BotonNotificaciones.jsx
 import { useState, useEffect } from "react";
 import { FaBell, FaCheck } from "react-icons/fa";
+import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import useNotificaciones from "../../hooks/useNotificaciones";
 import useSeguirUsuario from "../../hooks/useSeguirUsuario";
 
-const BotonNotificaciones = () => {
+const BotonNotificaciones = ({ navbarRef }) => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [menuStyle, setMenuStyle] = useState({});
 
@@ -17,51 +19,55 @@ const BotonNotificaciones = () => {
     : 0;
 
   useEffect(() => {
-    if (!mostrarMenu) return;
+  if (!mostrarMenu || !navbarRef?.current) return;
 
-    const calcularPosicion = () => {
-      const navbar = document.querySelector(".bg-\\[\\#ffba79\\]");
-      if (!navbar) return;
-      const rect = navbar.getBoundingClientRect();
-      setMenuStyle({
-        position: "fixed",
-        top: rect.bottom + 8,
-        left: rect.left,
-        width: rect.width / 1.25,
-        zIndex: 999,
-      });
-    };
+  const updatePosition = () => {
+    const rect = navbarRef.current.getBoundingClientRect();
 
-    calcularPosicion();
-    window.addEventListener("resize", calcularPosicion);
-    return () => window.removeEventListener("resize", calcularPosicion);
-  }, [mostrarMenu]);
+    setMenuStyle({
+      position: "fixed",
+      top: rect.bottom + 8,
+      left: rect.left,
+      width: rect.width / 1.25,
+      zIndex: 999,
+    });
+  };
 
-const handleAceptarSolicitud = async (notificacion) => {
-  try {
-    const idSolicitante = notificacion.fromUser?._id || notificacion.fromUser;
-    
-    
+  // 🔥 cálculo inicial
+  updatePosition();
 
-    if (!idSolicitante) {
-      toast.error("No se pudo identificar al usuario.");
-      return;
+  // 🔥 escucha cambios reales del layout
+  const observer = new ResizeObserver(updatePosition);
+  observer.observe(navbarRef.current);
+
+  // 🔥 opcional pero recomendado: scroll también
+  window.addEventListener("scroll", updatePosition);
+
+  return () => {
+    observer.disconnect();
+    window.removeEventListener("scroll", updatePosition);
+  };
+}, [mostrarMenu, navbarRef]);
+
+  const handleAceptarSolicitud = async (notificacion) => {
+    try {
+      const idSolicitante = notificacion.fromUser?._id || notificacion.fromUser;
+      if (!idSolicitante) {
+        toast.error("No se pudo identificar al usuario.");
+        return;
+      }
+      const data = await seguirUsuario(idSolicitante);
+      if (data?.huboMatch) {
+        toast.success("¡Match confirmado! 🎉");
+      } else {
+        toast.info("Ahora sigues a este usuario.");
+      }
+      await marcarLeido(notificacion._id);
+    } catch (error) {
+      console.error("Error al aceptar:", error);
     }
+  };
 
-    const data = await seguirUsuario(idSolicitante);
-    console.log("Respuesta del backend:", data); // 👈 Y esto
-
-    if (data?.huboMatch) {
-      toast.success("¡Match confirmado! 🎉");
-    } else {
-      toast.info("Ahora sigues a este usuario.");
-    }
-
-    await marcarLeido(notificacion._id);
-  } catch (error) {
-    console.error("Error al aceptar:", error);
-  }
-};
   return (
     <div className="relative inline-block text-left">
       <button
@@ -82,7 +88,6 @@ const handleAceptarSolicitud = async (notificacion) => {
       <AnimatePresence>
         {mostrarMenu && (
           <>
-            {/* Overlay */}
             <motion.div
               className="fixed inset-0 z-[998] bg-black/40"
               initial={{ opacity: 0 }}
@@ -91,16 +96,15 @@ const handleAceptarSolicitud = async (notificacion) => {
               onClick={() => setMostrarMenu(false)}
             />
 
-            {/* Dropdown — mismo efecto que modal galería */}
             <motion.div
               style={menuStyle}
               initial={{ scale: 0.8, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 50 }}
               transition={{ duration: 0.3 }}
-              className="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden"
+              className="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             >
-              <div className="p-4 border-b bg-gray-50/50 flex justify-between items-center">
+              <div className="p-4 border-b bg-gray-50/50 flex justify-between items-center shrink-0">
                 <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
                   Notificaciones
                 </h3>
@@ -178,6 +182,12 @@ const handleAceptarSolicitud = async (notificacion) => {
       </AnimatePresence>
     </div>
   );
+};
+
+BotonNotificaciones.propTypes = {
+  navbarRef: PropTypes.shape({
+    current: PropTypes.instanceOf(Element),
+  }),
 };
 
 export default BotonNotificaciones;
