@@ -103,16 +103,23 @@ const SwipeCards = () => {
           >
             {/* FOTO PRINCIPAL — técnica Tinder */}
             <div
-              className="relative w-full overflow-hidden shrink-0"
+              className="relative w-full overflow-hidden shrink-0 object-fit-contain "
               style={{
-                aspectRatio: "3/4",
-                maxHeight: "60%",
+                aspectRatio: "4/3",
+                maxHeight: "80%",
                 backgroundImage: `url(${usuarioActual.imagenPerfil})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center top",
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "center",
               }}
             >
               <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+
+              {/* nombre sobre la foto */}
+              <h2 className="absolute bottom-3 left-3 text-white text-xl font-medium">
+                {usuarioActual.nombre}
+              </h2>
+
               <button
                 onClick={() => setShowGallery(true)}
                 className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full hover:bg-black"
