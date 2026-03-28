@@ -7,7 +7,7 @@ const StrikeForm = () => {
   const [razon, setRazon] = useState("");
   const [misStrikes, setMisStrikes] = useState([]);
   const [vistaActiva, setVistaActiva] = useState("formulario");
-  const { enviarStrike, obtenerStrikes, loading, error, success } = useStrike();
+  const { enviarStrike, obtenerStrikes, marcarNotificacionLeidaPorStrike, loading, error, success } = useStrike();
 
   useEffect(() => {
     const cargarStrikes = async () => {
@@ -21,6 +21,17 @@ const StrikeForm = () => {
     cargarStrikes();
   }, [success]);
 
+  // ✅ Cuando el usuario abre "Mis envíos" marca automáticamente como leídas
+  useEffect(() => {
+    if (vistaActiva !== "historial") return;
+
+    misStrikes.forEach((s) => {
+      if (s.respondido && s.respuesta) {
+        marcarNotificacionLeidaPorStrike(s._id).catch(() => {});
+      }
+    });
+  }, [vistaActiva]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     await enviarStrike({ tipo, razon });
@@ -33,7 +44,15 @@ const StrikeForm = () => {
     return "bg-purple-100 text-purple-600";
   };
 
-  const statusColor = (status) => {
+  const statusLabel = (status, respondido) => {
+    if (respondido) return "✓ Respondido";
+    if (status === "resuelto") return "Resuelto";
+    if (status === "rechazado") return "Rechazado";
+    return "Pendiente";
+  };
+
+  const statusColor = (status, respondido) => {
+    if (respondido) return "bg-green-100 text-green-600";
     if (status === "resuelto") return "bg-green-100 text-green-600";
     if (status === "rechazado") return "bg-red-100 text-red-600";
     return "bg-yellow-100 text-yellow-700";
@@ -42,7 +61,7 @@ const StrikeForm = () => {
   return (
     <div className="w-full">
 
-      {/* Tabs minimalistas */}
+      {/* Tabs */}
       <div className="flex gap-2 mb-6">
         {["formulario", "historial"].map((vista) => (
           <button
@@ -54,7 +73,9 @@ const StrikeForm = () => {
                 : "text-gray-400 hover:text-gray-600"
             }`}
           >
-            {vista === "formulario" ? "Enviar" : `Mis envíos${misStrikes.length > 0 ? ` (${misStrikes.length})` : ""}`}
+            {vista === "formulario"
+              ? "Enviar"
+              : `Mis envíos${misStrikes.length > 0 ? ` (${misStrikes.length})` : ""}`}
           </button>
         ))}
       </div>
@@ -62,8 +83,6 @@ const StrikeForm = () => {
       {/* Formulario */}
       {vistaActiva === "formulario" && (
         <form onSubmit={handleSubmit} className="space-y-5">
-
-          {/* Selector tipo */}
           <div className="flex gap-2">
             {["queja", "sugerencia"].map((t) => (
               <button
@@ -76,12 +95,11 @@ const StrikeForm = () => {
                     : "bg-white text-gray-400 border-gray-200 hover:border-gray-400 hover:text-gray-600"
                 }`}
               >
-                {t === "queja" ? " Queja" : " Sugerencia"}
+                {t === "queja" ? "Queja" : "Sugerencia"}
               </button>
             ))}
           </div>
 
-          {/* Textarea */}
           <textarea
             value={razon}
             onChange={(e) => setRazon(e.target.value)}
@@ -90,15 +108,9 @@ const StrikeForm = () => {
             className="w-full p-3 border border-gray-100 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition bg-gray-50"
           />
 
-          {/* Feedback messages */}
-          {error && (
-            <p className="text-red-500 text-xs bg-red-50 px-3 py-2 rounded-lg">{error}</p>
-          )}
-          {success && (
-            <p className="text-green-600 text-xs bg-green-50 px-3 py-2 rounded-lg">✓ {success}</p>
-          )}
+          {error && <p className="text-red-500 text-xs bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+          {success && <p className="text-green-600 text-xs bg-green-50 px-3 py-2 rounded-lg">✓ {success}</p>}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading || !razon.trim()}
@@ -127,8 +139,8 @@ const StrikeForm = () => {
                   <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${badgeColor(s.tipo)}`}>
                     {s.tipo}
                   </span>
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusColor(s.status)}`}>
-                    {s.status}
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusColor(s.status, s.respondido)}`}>
+                    {statusLabel(s.status, s.respondido)}
                   </span>
                 </div>
 
@@ -141,7 +153,7 @@ const StrikeForm = () => {
                   </div>
                 )}
 
-                <p className="text-[10px] text-gray-500">
+                <p className="text-[10px] text-gray-400">
                   {new Date(s.fecha).toLocaleString()}
                 </p>
               </div>

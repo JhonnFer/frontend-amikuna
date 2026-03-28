@@ -29,7 +29,11 @@ const useStrike = () => {
     return await fetchDataBackend("estudiantes/mis-strikes", null, "GET");
   };
 
-  return { enviarStrike, obtenerStrikes, loading, error, success };
+  const marcarNotificacionLeidaPorStrike = async (strikeId) => {
+  return await fetchDataBackend(`estudiantes/notificaciones/strike/${strikeId}/leido`, {}, "PUT");
+};
+
+  return { enviarStrike, obtenerStrikes, marcarNotificacionLeidaPorStrike, loading, error, success };
 };
 
 export default useStrike;
