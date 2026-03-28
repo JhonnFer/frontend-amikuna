@@ -9,7 +9,7 @@ html {
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* =========================
@@ -35,8 +35,8 @@ body {
     color: white;
     text-shadow:
       0 1px 2px rgba(0,0,0,0.8),
-      0 0 4px rgba(96, 228, 222, 0.892),
-      0 0 10px rgba(255, 255, 255, 0.874),
+      0 0 4px rgba(106, 216, 211, 0.892),
+      0 0 10px rgba(255, 255, 255, 0.914),
       0 0 18px rgba(255, 255, 255, 0.347);
   }
 }

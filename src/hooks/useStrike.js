@@ -1,3 +1,4 @@
+//src/hooks/useStrike.js
 import { useState } from "react";
 import useFetch from "./useFetch";
 
@@ -15,7 +16,6 @@ const useStrike = () => {
 
     try {
       const res = await fetchDataBackend("estudiantes/strike", { tipo, razon }, "POST");
-      // fetchDataBackend ya lanza error si no ok, no necesitas chequear res.ok
       setSuccess(res.msg);
     } catch (err) {
       setError(err.message || "Error al enviar strike");
@@ -24,7 +24,12 @@ const useStrike = () => {
     }
   };
 
-  return { enviarStrike, loading, error, success };
+  // Ver los strikes del usuario autenticado
+  const obtenerStrikes = async () => {
+    return await fetchDataBackend("estudiantes/mis-strikes", null, "GET");
+  };
+
+  return { enviarStrike, obtenerStrikes, loading, error, success };
 };
 
 export default useStrike;
