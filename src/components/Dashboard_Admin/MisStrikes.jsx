@@ -3,6 +3,26 @@ import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import useAdminStrikes from "../../hooks/Admin/useAdminStrikes";
 
+const tipoBadge = (tipo) => {
+  if (tipo === "queja")      return "bg-orange-100 text-orange-700";
+  if (tipo === "sugerencia") return "bg-blue-100 text-blue-700";
+  if (tipo === "denuncia")   return "bg-red-100 text-red-700";
+  return "bg-gray-100 text-gray-700";
+};
+
+const tipoBorder = (tipo) => {
+  if (tipo === "queja")      return "border-orange-200";
+  if (tipo === "sugerencia") return "border-blue-200";
+  if (tipo === "denuncia")   return "border-red-200";
+  return "border-gray-200";
+};
+
+const statusBadge = (status) => {
+  if (status === "resuelto")  return "bg-green-100 text-green-700";
+  if (status === "rechazado") return "bg-red-100 text-red-700";
+  return "bg-yellow-100 text-yellow-700";
+};
+
 // --- Modal de Respuesta ---
 const ModalResponderStrike = ({ strike, onClose, onResponder }) => {
   const [mensaje, setMensaje] = useState("");
@@ -24,25 +44,30 @@ const ModalResponderStrike = ({ strike, onClose, onResponder }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 space-y-4">
-        {/* Header */}
         <div className="flex justify-between items-center border-b pb-3">
           <h3 className="text-lg font-bold text-gray-800">Responder Strike</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
         </div>
 
-        {/* Info del strike */}
         <div className="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
-          <p><span className="font-semibold text-gray-700">Tipo:</span> {strike.tipo}</p>
+          <p><span className="font-semibold text-gray-700">Tipo:</span>{" "}
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${tipoBadge(strike.tipo)}`}>
+              {strike.tipo}
+            </span>
+          </p>
           <p><span className="font-semibold text-gray-700">Razón:</span> {strike.razon}</p>
           {strike.de && (
-            <p>
-              <span className="font-semibold text-gray-700">De:</span>{" "}
-              {strike.de.nombre} {strike.de.apellido}
+            <p><span className="font-semibold text-gray-700">De:</span>{" "}
+              {strike.de.nombre} {strike.de.apellido} — {strike.de.email}
+            </p>
+          )}
+          {strike.usuarioReportado && (
+            <p><span className="font-semibold text-gray-700">Reportado:</span>{" "}
+              {strike.usuarioReportado.nombre} {strike.usuarioReportado.apellido} — {strike.usuarioReportado.email}
             </p>
           )}
         </div>
 
-        {/* Textarea */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Mensaje de respuesta
@@ -57,7 +82,6 @@ const ModalResponderStrike = ({ strike, onClose, onResponder }) => {
           {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
         </div>
 
-        {/* Botones */}
         <div className="flex justify-end gap-3 pt-1">
           <button
             onClick={onClose}
@@ -84,6 +108,7 @@ const MisStrikes = () => {
   const [strikes, setStrikes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [strikeSeleccionado, setStrikeSeleccionado] = useState(null);
+  const [filtro, setFiltro] = useState("todos");
 
   useEffect(() => {
     const fetchStrikes = async () => {
@@ -103,8 +128,6 @@ const MisStrikes = () => {
   const handleResponder = async (strikeId, datos) => {
     try {
       await responderStrike(strikeId, datos);
-
-      // Marcar como respondido en la lista sin refetch
       setStrikes((prev) =>
         prev.map((s) =>
           s._id === strikeId
@@ -117,6 +140,10 @@ const MisStrikes = () => {
     }
   };
 
+  const strikesFiltrados = filtro === "todos"
+    ? strikes
+    : strikes.filter((s) => s.tipo === filtro);
+
   if (loading) return <p className="p-6 text-gray-500">Cargando strikes...</p>;
   if (strikes.length === 0) return <p className="p-6 text-gray-400">No hay strikes para mostrar.</p>;
 
@@ -124,76 +151,111 @@ const MisStrikes = () => {
     <>
       <div className="flex flex-col h-full bg-white rounded-lg shadow-xl p-6 md:p-8">
         {/* Header */}
-        <div className="mb-6 border-b pb-4">
+        <div className="mb-4 border-b pb-4 flex justify-between items-center">
           <h2 className="text-3xl font-bold text-gray-800">Mis Strikes</h2>
+          <span className="text-sm text-gray-400">{strikes.length} total</span>
+        </div>
+
+        {/* Filtros */}
+        <div className="flex gap-2 mb-4 flex-wrap">
+          {["todos", "queja", "sugerencia", "denuncia"].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFiltro(f)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-full transition ${
+                filtro === f
+                  ? "bg-gray-800 text-white"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              {f.charAt(0).toUpperCase() + f.slice(1)}
+              {f !== "todos" && (
+                <span className="ml-1 opacity-70">
+                  ({strikes.filter((s) => s.tipo === f).length})
+                </span>
+              )}
+            </button>
+          ))}
         </div>
 
         {/* Lista con scroll */}
-        <div className="flex-grow overflow-y-auto max-h-96 -m-2 p-2">
-          <ul className="space-y-4">
-            {strikes.map((strike, i) => {
-              const { _id, tipo, razon, fecha, de, respondido, respuesta } = strike;
-              return (
-                <li
-                  key={_id || i}
-                  className="bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-                >
-                  {/* Tipo + Fecha */}
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
+        <div className="flex-grow overflow-y-auto max-h-[500px] space-y-4 pr-1">
+          {strikesFiltrados.map((strike, i) => {
+            const { _id, tipo, razon, fecha, de, usuarioReportado, chat, status, respondido, respuesta } = strike;
+            return (
+              <div
+                key={_id || i}
+                className={`bg-white border-l-4 ${tipoBorder(tipo)} border border-gray-100 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200`}
+              >
+                {/* Fila 1 — tipo + status + fecha */}
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${tipoBadge(tipo)}`}>
                       {tipo}
                     </span>
-                    <div className="flex items-center gap-2">
-                      {/* Badge respondido */}
-                      {respondido && (
-                        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-green-100 text-green-700">
-                          ✓ Respondido
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-500">
-                        {new Date(fecha).toLocaleString()}
-                      </span>
-                    </div>
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusBadge(status)}`}>
+                      {respondido ? "✓ Respondido" : status}
+                    </span>
                   </div>
+                  <span className="text-xs text-gray-400">
+                    {new Date(fecha).toLocaleString()}
+                  </span>
+                </div>
 
-                  {/* Razón */}
-                  <p className="text-sm font-medium text-gray-900 mb-1">
-                    <strong>Razón:</strong> {razon}
-                  </p>
+                {/* Razón */}
+                <p className="text-sm text-gray-700 mb-3">
+                  <strong className="text-gray-900">Razón:</strong> {razon}
+                </p>
 
-                  {/* De */}
-                  {de && (
-                    <p className="text-sm text-gray-600">
-                      <strong>De:</strong> {de.nombre} {de.apellido} ({de.correo})
-                    </p>
-                  )}
+                {/* Datos del remitente */}
+                {de && (
+                  <div className="text-xs text-gray-500 mb-1">
+                    <strong className="text-gray-700">De:</strong>{" "}
+                    {de.nombre} {de.apellido}
+                    <span className="text-gray-400"> — {de.email}</span>
+                  </div>
+                )}
 
-                  {/* Respuesta previa si ya fue respondido */}
-                  {respondido && respuesta && (
-                    <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
-                      <strong>Tu respuesta:</strong> {respuesta}
-                    </div>
-                  )}
+                {/* Usuario reportado — solo en denuncias */}
+                {usuarioReportado && (
+                  <div className="text-xs text-red-500 mb-1">
+                    <strong className="text-red-700">Reportado:</strong>{" "}
+                    {usuarioReportado.nombre} {usuarioReportado.apellido}
+                    <span className="text-red-400"> — {usuarioReportado.email}</span>
+                  </div>
+                )}
 
-                  {/* Botón responder — solo si no fue respondido */}
-                  {!respondido && (
-                    <div className="mt-3 flex justify-end">
-                      <button
-                        onClick={() => setStrikeSeleccionado(strike)}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
-                      >
-                        Responder
-                      </button>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                {/* Chat asociado — solo en denuncias */}
+                {chat && (
+                  <div className="text-xs text-gray-400 mb-1">
+                    <strong className="text-gray-600">Chat ID:</strong> {chat._id}
+                  </div>
+                )}
+
+                {/* Respuesta previa */}
+                {respondido && respuesta && (
+                  <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
+                    <strong>Tu respuesta:</strong> {respuesta}
+                  </div>
+                )}
+
+                {/* Botón responder */}
+                {!respondido && (
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      onClick={() => setStrikeSeleccionado(strike)}
+                      className="text-xs px-3 py-1.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
+                    >
+                      Responder
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Modal */}
       {strikeSeleccionado && (
         <ModalResponderStrike
           strike={strikeSeleccionado}
@@ -205,17 +267,20 @@ const MisStrikes = () => {
   );
 };
 
-
 ModalResponderStrike.propTypes = {
   strike: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     tipo: PropTypes.string.isRequired,
     razon: PropTypes.string.isRequired,
-    fecha: PropTypes.string.isRequired,
     de: PropTypes.shape({
       nombre: PropTypes.string,
       apellido: PropTypes.string,
-      correo: PropTypes.string,
+      email: PropTypes.string,
+    }),
+    usuarioReportado: PropTypes.shape({
+      nombre: PropTypes.string,
+      apellido: PropTypes.string,
+      email: PropTypes.string,
     }),
   }).isRequired,
   onClose: PropTypes.func.isRequired,

@@ -33,7 +33,11 @@ const useStrike = () => {
   return await fetchDataBackend(`estudiantes/notificaciones/strike/${strikeId}/leido`, {}, "PUT");
 };
 
-  return { enviarStrike, obtenerStrikes, marcarNotificacionLeidaPorStrike, loading, error, success };
+const reportarUsuarioChat = async (chatId, datos) => {
+  return await fetchDataBackend(`estudiantes/chats/${chatId}/report`, datos, "POST", false);
+};
+
+  return { enviarStrike, obtenerStrikes, marcarNotificacionLeidaPorStrike, reportarUsuarioChat, loading, error, success };
 };
 
 export default useStrike;
