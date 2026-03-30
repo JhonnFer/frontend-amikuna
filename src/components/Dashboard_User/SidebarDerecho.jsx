@@ -36,7 +36,7 @@ const SidebarDerecho = ({
       className="
       hidden sm:flex flex-col
       w-full sm:w-60 md:w-72 lg:w-80 xl:w-[350px]
-      bg-gradient-to-br from-pink-50 to-blue-50
+      bg-gradient-to-br from-pink-100 to-blue-50
       p-2 sm:p-3 md:p-4
       shadow
       flex-shrink-0
