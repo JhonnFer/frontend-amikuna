@@ -7,16 +7,14 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
   const [fotoIndex, setFotoIndex] = useState(0);
 
   return (
-    <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-white p-4 shadow flex-shrink-0 h-screen">
-
+    <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-gradient-to-br from-pink-50 to-blue-50 p-4 shadow flex-shrink-0 h-screen">
       <div
         className="flex flex-col h-full overflow-y-auto scrollbar-hide"
         style={{ scrollBehavior: "smooth" }}
       >
-
         {/* HEADER */}
         <header className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-rose-800 border-b-2 border-bg-red-900 pb-2">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent border-b-2 border-pink-600 pb-2">
             Tu Perfil
           </h1>
         </header>
@@ -26,8 +24,13 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
           <img
             src={profile?.imagenPerfil || "https://placehold.co/150x150"}
             alt="Tu foto de perfil"
-            className="rounded-full w-32 h-32 object-cover mb-2"
+            className="rounded-full w-32 h-32 object-cover mb-2 cursor-pointer hover:scale-105 transition"
+            onClick={() => {
+              setFotoSeleccionada(profile?.imagenPerfil);
+              setFotoIndex(0);
+            }}
           />
+
           <h3 className="text-xl font-bold text-gray-800">
             {profile?.nombre || "Sin nombre"}
           </h3>
@@ -37,33 +40,43 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
         </div>
 
         {/* DATOS PERSONALES */}
-        <div className="bg-gray-50 rounded-xl p-4 shadow-sm space-y-2 mb-4 w-full">
+        <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 shadow-sm space-y-2 mb-4 w-full">
           <p>
-            <strong className="text-rose-800">Género:</strong>{" "}
+            <strong className="bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
+              Género:
+            </strong>{" "}
             {profile?.genero || "No definido"}
           </p>
           <p>
-            <strong className="text-rose-800">Orientación:</strong>{" "}
+            <strong className="bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
+              Orientación:
+            </strong>{" "}
             {profile?.orientacion || "No definida"}
           </p>
           <p>
-            <strong className="text-rose-800">Intereses:</strong>{" "}
+            <strong className="bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
+              Intereses:
+            </strong>{" "}
             {Array.isArray(profile?.intereses) && profile.intereses.length > 0
               ? profile.intereses.join(", ")
               : "No definidos"}
           </p>
           <p>
-            <strong className="text-rose-800">Fecha de nacimiento:</strong>{" "}
-            {profile?.fechaNacimiento && typeof profile.fechaNacimiento === "string"
+            <strong className="bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
+              Fecha de nacimiento:
+            </strong>{" "}
+            {profile?.fechaNacimiento &&
+            typeof profile.fechaNacimiento === "string"
               ? profile.fechaNacimiento.split("T")[0]
               : "No definida"}
           </p>
         </div>
 
         {/* GALERÍA - placeholder si no hay fotos */}
-        {(!profile?.imagenesGaleria || profile.imagenesGaleria.length === 0) && (
+        {(!profile?.imagenesGaleria ||
+          profile.imagenesGaleria.length === 0) && (
           <div className="mt-4 w-full">
-            <h4 className="text-gray-700 text-xl font-semibold mb-2">
+            <h4 className="text-gray-700 text-xl font-semibold drop-shadow-sm mb-2">
               Últimas Fotos
             </h4>
             <div
@@ -85,14 +98,17 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
               Últimas Fotos
             </h4>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="bg-gradient-to-r from-gray-100 to-blue-100 grid grid-cols-2 gap-2">
               {profile.imagenesGaleria
                 .slice(-6)
                 .reverse()
                 .map((foto, i) => {
                   const indexReal = profile.imagenesGaleria.length - 1 - i;
                   return (
-                    <div key={i} className="overflow-hidden rounded cursor-pointer">
+                    <div
+                      key={i}
+                      className=" overflow-hidden rounded cursor-pointer"
+                    >
                       <img
                         src={foto}
                         alt={`Foto ${i + 1}`}
@@ -100,7 +116,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
                           setFotoSeleccionada(foto);
                           setFotoIndex(indexReal);
                         }}
-                        className="w-full h-28 object-cover rounded hover:scale-105 transition duration-300 cursor-pointer"
+                        className=" w-full h-28 object-cover rounded hover:scale-105 transition duration-300 cursor-pointer"
                       />
                     </div>
                   );
@@ -110,25 +126,23 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
             {profile.imagenesGaleria.length > 6 && (
               <button
                 onClick={() => setMostrarGaleriaFotos(true)}
-                className="mt-2 bg-rose-600 text-black py-1 rounded hover:bg-rose-700 transition w-full"
+                className="mt-2 bg-gradient-to-r from-pink-600 to-orange-400 text-white shadow-sm py-1 rounded-[10px] hover:from-pink-700 hover:to-orange-500 transition w-full font-semibold"
               >
                 Ver más
               </button>
             )}
           </div>
         )}
-
       </div>
 
       {/* VISOR */}
       <VisorFotos
-        fotos={profile?.imagenesGaleria || []}
+        fotos={[profile?.imagenPerfil, ... (profile?.imagenesGaleria || [])]}
         fotoSeleccionada={fotoSeleccionada}
         fotoIndex={fotoIndex}
         setFotoSeleccionada={setFotoSeleccionada}
         setFotoIndex={setFotoIndex}
       />
-
     </aside>
   );
 };

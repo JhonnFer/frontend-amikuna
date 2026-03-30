@@ -73,7 +73,7 @@ const SwipeCards = () => {
 
   if (cargando) {
     return (
-      <div className="text-center mt-16 text-lg font-semibold">
+      <div className="text-center mt-16 text-lg font-semibold bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
         Cargando candidatos...
       </div>
     );
@@ -81,7 +81,7 @@ const SwipeCards = () => {
 
   if (!usuarioActual) {
     return (
-      <div className="text-center mt-16 text-lg font-semibold">
+      <div className="text-center mt-16 text-lg font-semibold bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
         No hay más candidatos por ahora.
       </div>
     );
@@ -122,7 +122,7 @@ const SwipeCards = () => {
 
               <button
                 onClick={() => setShowGallery(true)}
-                className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full hover:bg-black"
+                className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full hover:bg-gradient-to-b from-pink-700 to-orange-500"
               >
                 <FaImages className="w-4 h-4" />
               </button>

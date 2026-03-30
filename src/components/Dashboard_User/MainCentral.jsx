@@ -41,7 +41,7 @@ const MainCentral = ({
         md:gap-4
         border
         rounded-lg
-        bg-[#ffba79]
+        bg-gradient-to-r from-pink-600 to-orange-400
         px-2
         py-2
         overflow-visible 
@@ -55,9 +55,9 @@ const MainCentral = ({
               "Contribución para mejoras de la plataforma Amikuna"
             )
           }
-          className="bg-[#ea454592] text-white text-[10px] sm:text-xs md:text-sm px-2 py-1 rounded-full whitespace-nowrap"
+          className="bg-gradient-to-r from-[#ff6e7f] to-[#bfe9ff] text-gray-800 text-[10px] sm:text-xs md:text-sm px-2 py-1 rounded-full whitespace-nowrap"
         >
-          Aporte
+          Apoyar
         </button>
 
         <div className="flex flex-col items-center text-center w-full">
@@ -112,7 +112,7 @@ const MainCentral = ({
       {/* SWIPE CARDS */}
       <div className="flex-1 min-h-0 relative overflow-hidden flex items-center justify-center">
         {loadingMatches ? (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
             Cargando usuarios para swipes...
           </div>
         ) : (
