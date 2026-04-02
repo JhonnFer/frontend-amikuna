@@ -41,7 +41,7 @@ const MainCentral = ({
         md:gap-4
         border
         rounded-lg
-        bg-gradient-to-r from-pink-600 to-orange-400
+        bg-gradient-to-r from-pink-600  to-orange-400
         px-2
         py-2
         overflow-visible 

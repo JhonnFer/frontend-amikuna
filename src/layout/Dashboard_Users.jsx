@@ -56,7 +56,7 @@ const Dashboard_Users = () => {
   }
  
   return (
-    <div className="flex h-screen w-full bg-gradient-to-br from-[#ff0000] via-[#ffff] to-[#fdcf58] overflow-hidden">
+    <div className="flex h-screen w-full bg-gradient-to-br from-[#E2E8F0] via-[#FFFFFF] to-[#E2E8F0] overflow-hidden">
  
       <SidebarIzquierdo profile={profile} setMostrarGaleriaFotos={setMostrarGaleriaFotos} />
  

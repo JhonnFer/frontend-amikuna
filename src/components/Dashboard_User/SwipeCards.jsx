@@ -90,7 +90,7 @@ const SwipeCards = () => {
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-4 py-2 w-full h-full">
       {/* CARD */}
-      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-full items-center justify-center">
+      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-full items-center justify-center border-2 border-gray-300 rounded-2xl shadow-lg bg-white">
         <AnimatePresence>
           <motion.div
             key={usuarioActual._id}
@@ -99,21 +99,21 @@ const SwipeCards = () => {
             animate={direction || "initial"}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            className="absolute inset-0 bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
+            className="absolute inset-0  rounded-2xl shadow-xl overflow-hidden flex flex-col"
           >
             {/* FOTO PRINCIPAL — técnica Tinder */}
             <div
-              className="relative w-full overflow-hidden shrink-0 object-fit-contain "
+              className=" bg-gray-100 relative w-full overflow-hidden shrink-0 object-fit-contain "
               style={{
                 aspectRatio: "4/3",
-                maxHeight: "80%",
+                maxHeight: "70%",
                 backgroundImage: `url(${usuarioActual.imagenPerfil})`,
                 backgroundSize: "contain",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
               }}
             >
-              <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t  from-black/40   to-transparent pointer-events-none" />
 
               {/* nombre sobre la foto */}
               <h2 className="absolute bottom-3 left-3 text-metal-white text-[28px] font-bold">
@@ -129,7 +129,7 @@ const SwipeCards = () => {
             </div>
 
             {/* INFO */}
-            <div className="flex flex-col flex-[4] justify-between p-3 text-center overflow-hidden">
+            <div className="flex flex-col flex-[4] justify-between p-3 text-center overflow-hidden bg-white">
               <div className="flex flex-col gap-0.5 overflow-hidden">
                 <h3 className="text-base font-bold text-gray-800 truncate">
                   {usuarioActual.nombre}

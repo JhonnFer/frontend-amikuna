@@ -7,7 +7,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
   const [fotoIndex, setFotoIndex] = useState(0);
 
   return (
-    <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-gradient-to-t from-rose-200 via-yellow-50  to-orange-200  p-4 shadow flex-shrink-0 h-screen">
+    <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-gradient-to-t from-red-200 via-orange-100  to-orange-200   p-4 shadow flex-shrink-0 h-screen border-2 border-gray-400 rounded-2xl  bg-white">
       <div
         className="flex flex-col h-full overflow-y-auto scrollbar-sidebar"
         style={{ scrollBehavior: "smooth" }}
