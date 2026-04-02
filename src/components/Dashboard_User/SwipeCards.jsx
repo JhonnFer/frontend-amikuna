@@ -88,9 +88,9 @@ const SwipeCards = () => {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-2 w-full h-full">
+    <div className="flex flex-1 flex-col items-center justify-center px-4 py-2 w-full max-w-[570px] h-full">
       {/* CARD */}
-      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-full items-center justify-center border-2 border-gray-300 rounded-2xl shadow-lg bg-white">
+      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-full  items-center justify-center border-2 border-gray-300 rounded-2xl shadow-lg bg-white ">
         <AnimatePresence>
           <motion.div
             key={usuarioActual._id}
@@ -103,35 +103,35 @@ const SwipeCards = () => {
           >
             {/* FOTO PRINCIPAL — técnica Tinder */}
             <div
-              className=" bg-gray-100 relative w-full overflow-hidden shrink-0 object-fit-contain "
+              className=" bg-gray-100 from-orange-800 to-blue-50 relative w-full overflow-hidden shrink-0 object-fit-contain h-full max-h-[55%] sm:max-h-[to-70%] "
               style={{
-                aspectRatio: "4/3",
-                maxHeight: "70%",
+                aspectRatio: "16/9",
                 backgroundImage: `url(${usuarioActual.imagenPerfil})`,
                 backgroundSize: "contain",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
+                
               }}
             >
-              <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t  from-black/40   to-transparent pointer-events-none" />
+              <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t  from-black/40   to-transparent pointer-events-none " />
 
               {/* nombre sobre la foto */}
-              <h2 className="absolute bottom-3 left-3 text-metal-white text-[28px] font-bold">
+              <h2 className="absolute bottom-3 left-3 text-metal-white max-w-full md:text-[28px] sm:text-[24px] font-bold ">
                 {usuarioActual.nombre}
               </h2>
 
               <button
                 onClick={() => setShowGallery(true)}
-                className="absolute top-3 right-3 bg-black/50 text-white p-2 rounded-full hover:bg-gradient-to-b from-pink-700 to-orange-500"
+                className="absolute top-3 right-3 bg-black/80 text-white p-2 rounded-full hover:bg-gradient-to-b from-pink-700 to-orange-500"
               >
                 <FaImages className="w-4 h-4" />
               </button>
             </div>
 
             {/* INFO */}
-            <div className="flex flex-col flex-[4] justify-between p-3 text-center overflow-hidden bg-white">
-              <div className="flex flex-col gap-0.5 overflow-hidden">
-                <h3 className="text-base font-bold text-gray-800 truncate">
+            <div className="flex flex-col flex-[4] justify-between p-4 text-center overflow-hidden bg-white sm:max-h-[45%] ">
+              <div className="flex flex-col  top-2 pt-4 gap-0.5 overflow-hidden">
+                <h3 className="text-3xl font-bold text-gray-800 truncate">
                   {usuarioActual.nombre}
                 </h3>
 

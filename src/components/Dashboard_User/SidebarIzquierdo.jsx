@@ -7,7 +7,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
   const [fotoIndex, setFotoIndex] = useState(0);
 
   return (
-    <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-gradient-to-t from-red-200 via-orange-100  to-orange-200   p-4 shadow flex-shrink-0 h-screen border-2 border-gray-400 rounded-2xl  bg-white">
+    <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-gradient-to-t from-red-200 via-orange-100  to-orange-200   p-4 shadow flex-shrink-0 h-screen border border-gray-400 rounded-2xl  bg-white">
       <div
         className="flex flex-col h-full overflow-y-auto scrollbar-sidebar"
         style={{ scrollBehavior: "smooth" }}
@@ -40,7 +40,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
         </div>
 
         {/* DATOS PERSONALES */}
-        <div className="bg-gradient-to-r from-gray-100 to-blue-50 rounded-lg shadow-md  p-4  space-y-2 mb-4 w-full">
+        <div className="bg-gradient-to-r  from-red-100 via-orange-50  to-orange-100 border-2 border-gray-300 rounded-lg shadow-md  p-4  space-y-2 mb-4 w-full">
           <p>
             <strong className="bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
               Género:
@@ -75,7 +75,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
         {/* GALERÍA - placeholder si no hay fotos */}
         {(!profile?.imagenesGaleria ||
           profile.imagenesGaleria.length === 0) && (
-          <div className="mt-4 w-full">
+          <div className="mt-4 w-full ">
             <h4 className="text-gray-700 text-xl font-semibold drop-shadow-sm mb-2">
               Últimas Fotos
             </h4>
@@ -98,7 +98,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
               Últimas Fotos
             </h4>
 
-            <div className="bg-gradient-to-r from-pink-100 to-orange-100 grid grid-cols-2 gap-2">
+            <div className="bg-gradient-to-r from-pink-100 to-orange-100 grid grid-cols-2 gap-2 border-2 border-gray-300 rounded-lg ">
               {profile.imagenesGaleria
                 .slice(-6)
                 .reverse()

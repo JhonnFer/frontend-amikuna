@@ -40,7 +40,7 @@ const SidebarDerecho = ({
       p-2 sm:p-3 md:p-4
       flex-shrink-0
       h-screen
-      border-2 border-gray-400 rounded-2xl  bg-white
+      border border-gray-400 rounded-2xl  bg-white
       "
     >
       {/* CONTENIDO SUPERIOR */}
