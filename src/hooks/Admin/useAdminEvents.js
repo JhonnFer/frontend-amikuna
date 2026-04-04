@@ -22,36 +22,47 @@ const useAdminEvents = () => {
     }
   }, [fetchDataBackend]);
 
+  // ✅ sin try/catch innecesario — el error burbujea al componente
   const crearEvento = async (formData) => {
-    try {
-      const data = await fetchDataBackend("crear-evento", formData, "POST");
-      await obtenerEventos();
-      return data;
-    } catch (error) {
-      throw error;
+    // ── DEBUG ──────────────────────────────────────────
+    console.log("🚀 crearEvento — FormData recibido en hook:");
+    for (const [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+      } else {
+        console.log(`  ${key}: ${value}`);
+      }
     }
+    // ──────────────────────────────────────────────────
+    const data = await fetchDataBackend("crear-evento", formData, "POST");
+    await obtenerEventos();
+    return data;
   };
 
+  // ✅ sin try/catch innecesario
   const actualizarEvento = async (id, formData) => {
     if (!id) throw new Error("ID de evento inválido");
-    try {
-      const data = await fetchDataBackend(`eventos/${id}`, formData, "PUT");
-      await obtenerEventos();
-      return data;
-    } catch (error) {
-      throw error;
+    // ── DEBUG ──────────────────────────────────────────
+    console.log(`🚀 actualizarEvento(${id}) — FormData recibido en hook:`);
+    for (const [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+      } else {
+        console.log(`  ${key}: ${value}`);
+      }
     }
+    // ──────────────────────────────────────────────────
+    const data = await fetchDataBackend(`eventos/${id}`, formData, "PUT");
+    await obtenerEventos();
+    return data;
   };
 
+  // ✅ sin try/catch innecesario
   const eliminarEvento = async (id) => {
     if (!id) throw new Error("ID de evento inválido");
-    try {
-      const data = await fetchDataBackend(`eliminar-evento/${id}`, null, "DELETE");
-      await obtenerEventos();
-      return data;
-    } catch (error) {
-      throw error;
-    }
+    const data = await fetchDataBackend(`eliminar-evento/${id}`, null, "DELETE");
+    await obtenerEventos();
+    return data;
   };
 
   useEffect(() => {
