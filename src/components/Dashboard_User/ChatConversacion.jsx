@@ -150,7 +150,7 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
   return (
     <div className="fixed bottom-4 right-[390px] w-96 h-[600px] bg-white/95 backdrop-blur-md shadow-2xl z-50 rounded-xl flex flex-col border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-3xl">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-red-900 text-white">
+      <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-pink-600  to-orange-400 text-white">
         <div className="flex items-center gap-3">
           <img
             src={chatInfo.imagenPerfil || "https://placehold.co/40x40"}
@@ -162,16 +162,17 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
 
         <div className="flex items-center gap-3">
           {/* ✅ Botón reportar */}
+          
           <button
             onClick={() => setMostrarDenuncia(true)}
             title="Reportar usuario"
-            className="text-white/70 hover:text-white transition"
+            className="text-white/80 hover:text-white transition items-center justify-around flex gap-1 text-xs font-semibold"
           >
-            <FaFlag size={16} />
+            Reportar Usuario < FaFlag size={10} />
           </button>
           <button
             onClick={onCloseChat}
-            className="text-white hover:text-gray-200 transition-colors"
+            className="text-white/80 hover:text-white transition-colors"
           >
             <FaTimes size={20} />
           </button>
@@ -191,7 +192,7 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
                 className={`flex ${esMensajeMio ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[70%] p-3 rounded-xl ${esMensajeMio ? "bg-red-900 text-white" : "bg-gray-200 text-black"}`}
+                  className={`max-w-[70%] p-3 rounded-xl ${esMensajeMio ? "bg-gradient-to-br from-pink-700  to-orange-500 text-white font-semibold" : "bg-gray-200 text-black"}`}
                 >
                   <p>{mensaje.contenido}</p>
                 </div>
@@ -224,7 +225,7 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
         <button
           type="submit"
           disabled={!isConnected || !textoMensaje.trim() || enviando}
-          className="bg-gray-400 text-white px-4 rounded-full disabled:bg-red-900"
+          className="bg-gradient-to-br from-pink-500 to-orange-300 text-white hover:bg-gradient-to-br hover:from-pink-700 hover:to-orange-500 px-4 rounded-full "
         >
           {enviando ? "..." : "Enviar"}
         </button>

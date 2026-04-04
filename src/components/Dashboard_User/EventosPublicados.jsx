@@ -51,8 +51,8 @@ const ModalMisEventos = ({ onClose }) => {
           )}
 
           {!loadingMisEventos && !errorMisEventos && misEventos.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-400 gap-2">
-              <FaClock size={32} className="opacity-30" />
+            <div className="flex flex-col items-center justify-center py-12 bg-gradient-to-br from-pink-600 to-orange-400 bg-clip-text text-transparent gap-2">
+              <FaClock size={32} opacity={30} />
               <p className="text-sm">No tienes eventos confirmados próximamente.</p>
             </div>
           )}
@@ -158,7 +158,7 @@ const EventosPublicados = ({
             <button
               onClick={() => setModalMisEventos(true)}
               title="Ver mis eventos confirmados"
-              className="text-gray-400 hover:text-rose-500 transition-colors"
+              className=" bg-gradient-to-br from-pink-600 to-orange-400  text-white px-3 py-1 rounded-full text-sm font-semibold hover:from-[#ED213A] hover:to-[#93291E]/90 transition"
             >
               <FaClock size={20} />
             </button>
