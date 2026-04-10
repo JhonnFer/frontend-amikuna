@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import useFetch from "../../hooks/useFetch";
 import useSeguirUsuario from "../../hooks/useSeguirUsuario";
 import { toast } from "react-toastify";
-import { FaImages } from "react-icons/fa";
+import { FaImages, FaHeart, FaTimes } from "react-icons/fa";
 import VisorFotos from "../UI/VisorFotos";
 
 const SwipeCards = () => {
@@ -110,7 +110,6 @@ const SwipeCards = () => {
                 backgroundSize: "contain",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
-                
               }}
             >
               <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t  from-black/40   to-transparent pointer-events-none " />
@@ -160,21 +159,42 @@ const SwipeCards = () => {
                   Intereses:{" "}
                   {usuarioActual.intereses?.join(", ") || "No definidos"}
                 </p>
+                {/* CONTADORES DE SEGUIDORES Y SEGUIDOS */}
+                <div className="flex gap-6 mt-3 items-center justify-center">
+                  <div className="flex flex-col items-center">
+                    <span className="text-lg font-bold bg-gradient-to-r from-pink-600  to-orange-400 bg-clip-text text-transparent">
+                      {usuarioActual?.seguidores?.length ?? 0}
+                    </span>
+                    <span className="text-xs text-gray-500 font-medium">
+                      Seguidores
+                    </span>
+                  </div>
+                  <div className="w-px bg-gray-300" />
+                  <div className="flex flex-col items-center">
+                    <span className="text-lg font-bold bg-gradient-to-r from-pink-600  to-orange-400 bg-clip-text text-transparent">
+                      {usuarioActual?.siguiendo?.length ?? 0}
+                    </span>
+                    <span className="text-xs text-gray-500 font-medium">
+                      Siguiendo
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* BOTONES */}
-              <div className="flex justify-center gap-6 mt-2 shrink-0">
+              <div className="flex justify-center gap-20 mt-2 shrink-0">
                 <button
                   onClick={() => handleSwipe("left")}
-                  className="bg-red-500 text-white w-10 h-10 rounded-full shadow-lg hover:bg-red-600 transition"
+                  className="bg-gradient-to-br from-pink-600  to-orange-400 text-white w-10 h-10 rounded-full shadow-lg hover:from-[#ED213A] hover:to-[#93291E]/90 transition flex items-center justify-center"
                 >
-                  ❌
+                  <FaTimes className="w-4 h-4" />
                 </button>
+
                 <button
                   onClick={() => handleSwipe("up")}
-                  className="bg-green-500 text-white w-10 h-10 rounded-full shadow-lg hover:bg-green-600 transition"
+                  className="bg-gradient-to-bl from-pink-600  to-orange-400 text-white  w-10 h-10 rounded-full shadow-lg hover:from-[#ED213A] hover:to-[#93291E]/90 transition flex items-center justify-center"
                 >
-                  ❤️
+                  <FaHeart className="w-4 h-4" />
                 </button>
               </div>
             </div>

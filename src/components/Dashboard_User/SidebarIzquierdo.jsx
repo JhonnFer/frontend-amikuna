@@ -70,6 +70,26 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
               ? profile.fechaNacimiento.split("T")[0]
               : "No definida"}
           </p>
+          {/* CONTADORES DE SEGUIDORES Y SEGUIDOS */}
+          <div className="flex gap-6 mt-3 items-center justify-center">
+            <div className="flex flex-col items-center">
+              <span className="text-lg font-bold bg-gradient-to-r from-pink-600  to-orange-400 bg-clip-text text-transparent">
+                {profile?.seguidores?.length ?? 0}
+              </span>
+              <span className="text-xs text-gray-500 font-medium">
+                Seguidores
+              </span>
+            </div>
+            <div className="w-px bg-gray-300" />
+            <div className="flex flex-col items-center">
+              <span className="text-lg font-bold bg-gradient-to-r from-pink-600  to-orange-400 bg-clip-text text-transparent">
+                {profile?.siguiendo?.length ?? 0}
+              </span>
+              <span className="text-xs text-gray-500 font-medium">
+                Siguiendo
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* GALERÍA - placeholder si no hay fotos */}
@@ -137,7 +157,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
 
       {/* VISOR */}
       <VisorFotos
-        fotos={[profile?.imagenPerfil, ... (profile?.imagenesGaleria || [])]}
+        fotos={[profile?.imagenPerfil, ...(profile?.imagenesGaleria || [])]}
         fotoSeleccionada={fotoSeleccionada}
         fotoIndex={fotoIndex}
         setFotoSeleccionada={setFotoSeleccionada}
