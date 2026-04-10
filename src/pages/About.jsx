@@ -36,7 +36,10 @@ const ValueCard = ({ icon, title, desc, delay }) => {
     >
       {/* borde degradado en hover */}
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#f16783]/10 to-[#f78b50]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-      <div className="text-3xl mb-4">{icon}</div>
+      <div
+        className="text-3xl mb-4 tracking-widest"
+        style={{ fontFamily: "'Courier New', 'Lucida Console', monospace" }}
+      >{icon}</div>
       <h3 className="text-xl font-bold text-gray-900 mb-2 font-serif">{title}</h3>
       <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
     </div>
@@ -79,41 +82,41 @@ const About = () => {
   const [statsRef, statsVisible] = useReveal();
 
   const stats = [
-    { value: "5K+", label: "Estudiantes activos" },
+    { value: "10K+", label: "Usuarios en potencial" },
     { value: "12", label: "Facultades conectadas" },
-    { value: "98%", label: "Satisfacción" },
-    { value: "3", label: "Años de desarrollo" },
+    { value: "100%", label: "Satisfacción del usuario" },
+    { value: "2", label: "Años de desarrollo" },
   ];
 
   const values = [
     {
-      icon: "🤝",
-      title: "Conexión auténtica",
-      desc: "Creemos que las mejores amistades nacen de intereses compartidos, no de algoritmos fríos.",
+      icon: "♥",      // corazón CP437 — conexión / afecto
+      title: "Identidad politécnica",
+      desc: "Amikuna no es una red social genérica; es un ecosistema diseñado específicamente para quienes compartimos el orgullo y la exigencia de ser parte de la EPN.",
       delay: 0,
     },
     {
-      icon: "🎓",
-      title: "Comunidad académica",
-      desc: "Pensada desde adentro por estudiantes que vivieron en carne propia la soledad del primer año.",
+      icon: "▲",      // triángulo ascendente — crecimiento académico
+      title: "Impulso Colectivo",
+      desc: "Nacimos para transformar la experiencia universitaria, facilitando que nadie recorra el camino académico en soledad, sino rodeado de panas que suman.",
       delay: 100,
     },
     {
-      icon: "🌱",
-      title: "Crecimiento mutuo",
-      desc: "Grupos de estudio, proyectos colaborativos y actividades que hacen crecer a toda la comunidad.",
+      icon: "◄►",     // flechas bidireccionales — intercambio / colaboración
+      title: "Colaboración en Eventos",
+      desc: "Fomentamos la participación activa en talleres y actividades del campus. Creemos que el networking real sucede cuando compartes experiencias fuera del aula.",
       delay: 200,
     },
     {
-      icon: "🔒",
-      title: "Espacio seguro",
-      desc: "Verificación universitaria para que cada conexión sea con alguien que realmente pertenece al campus.",
+      icon: "▓",      // bloque sólido — solidez / seguridad
+      title: "Entorno Exclusivo",
+      desc: "Seguridad garantizada mediante validación institucional. Un espacio blindado donde cada usuario es un estudiante verificado de nuestra comunidad.",
       delay: 300,
     },
   ];
 
   return (
-    <div className="bg-[#fafaf8] min-h-screen">
+    <div className="bg-[#fafaf8] min-h-screen" style={{ fontFamily: "'Georgia', serif" }}>
       <Navbar />
 
       {/* ── HERO ── */}
@@ -260,7 +263,7 @@ const About = () => {
           <TimelineItem
             year="Hoy"
             title="Una comunidad en crecimiento"
-            desc="Amikuna ha evolucionado para convertirse en una herramienta clave para la vida universitaria: grupos de estudio, proyectos colaborativos, eventos y conexiones que trascienden las aulas y duran más allá de la carrera."
+            desc="Amikuna esta evolucionando para convertirse en una herramienta clave para la vida universitaria: interacciones digitales, eventos colaborativos y conexiones que trascienden las aulas y duran más allá de la carrera."
             img={historiaImg3}
             reverse={false}
             delay={200}
@@ -280,7 +283,7 @@ const About = () => {
           {
             label: "Visión",
             title: "La red universitaria del futuro",
-            desc: "Ser la plataforma de referencia para la vida universitaria en Ecuador, expandiendo la experiencia de comunidad a más instituciones de educación superior.",
+            desc: "Ser la plataforma de referencia para la vida universitaria en la Escuela Politécnica Nacional, expandiendo la experiencia de comunidad a más instituciones de educación superior.",
             gradient: "from-[#f78b50] to-[#f16783]",
           },
         ].map((item, i) => {
@@ -307,6 +310,7 @@ const About = () => {
           );
         })}
       </section>
+
       <Footer />
     </div>
   );
