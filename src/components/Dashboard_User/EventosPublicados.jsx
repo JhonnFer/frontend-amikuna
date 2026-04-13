@@ -6,8 +6,15 @@ import useEventos from "../../hooks/useEventos";
 
 // ── Modal: Mis Eventos ─────────────────────────────────────────────────────────
 const ModalMisEventos = ({ onClose }) => {
-  const { misEventos, loadingMisEventos, errorMisEventos, obtenerMisEventos } =
-    useEventos({ autoCargar: false });
+  const {
+    misEventos,
+    loadingMisEventos,
+    errorMisEventos,
+    obtenerMisEventos,
+    rechazarAsistencia,
+    cargandoAsistencia,
+  } = useEventos({ autoCargar: false, onAsistenciaSuccess: () => obtenerMisEventos() });
+  
 
   //useEffect en lugar de useState
   useEffect(() => {
@@ -60,15 +67,13 @@ const ModalMisEventos = ({ onClose }) => {
             )}
 
           {!loadingMisEventos && misEventos.length > 0 && (
-            <ul
-              className="space-y-4 pb-2 "
-            >
+            <ul className="space-y-4 pb-2 ">
               {misEventos.map((evento) => (
                 <li
                   key={evento._id}
                   className="border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                 >
-                  {/* ✅ Imagen del evento en el modal */}
+                  {/*  Imagen del evento en el modal */}
                   {evento.imagen && (
                     <img
                       src={evento.imagen}
@@ -124,6 +129,16 @@ const ModalMisEventos = ({ onClose }) => {
                       </p>
                     )}
                   </div>
+                  {/* Botón declinar */}
+                  <button
+                    onClick={() => rechazarAsistencia(evento._id)}
+                    disabled={cargandoAsistencia}
+                    className="mt-3 w-full text-xs px-3 py-1.5 rounded-lg border border-red-300 text-red-500 hover:bg-red-50 transition disabled:opacity-50"
+                  >
+                    {cargandoAsistencia
+                      ? "Procesando..."
+                      : "Declinar asistencia"}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -146,6 +161,10 @@ const ModalMisEventos = ({ onClose }) => {
 
 ModalMisEventos.propTypes = {
   onClose: PropTypes.func.isRequired,
+  rechazarAsistencia: PropTypes.func.isRequired,
+  cargandoAsistencia: PropTypes.bool.isRequired,
+  onAsistenciaSuccess: PropTypes.func.isRequired,
+
 };
 
 // ── Componente Principal ───────────────────────────────────────────────────────

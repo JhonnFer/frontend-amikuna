@@ -7,7 +7,7 @@ const useGaleriaFotos = (cargarPerfil) => {
   const [loading, setLoading] = useState(false);
   const [fotosSeleccionadas, setFotosSeleccionadas] = useState([]);
 
-  // ✅ SUBIR
+  // SUBIR
   const subirFotos = async () => {
     try {
       if (fotosSeleccionadas.length === 0) {
