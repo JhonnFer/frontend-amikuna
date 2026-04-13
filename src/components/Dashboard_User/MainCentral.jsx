@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import PropTypes from "prop-types";
-import { FaUser, FaImages } from "react-icons/fa";
+import { FaUser, FaImages, FaRobot, FaFlag } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import SwipeCards from "./SwipeCards";
 import BotonNotificaciones from "./BotonNotificaciones";
@@ -88,15 +88,15 @@ const MainCentral = ({
           onClick={() => setMostrarChatbot(!mostrarChatbot)}
           className="flex flex-col items-center text-center"
         >
-          <span className="text-base md:text-lg">💬</span>
-          <span className="text-[10px] sm:text-xs text-gray-800">Chat</span>
+          <FaRobot className="text-gray-600 hover:text-gray-200 w-5 h-5 md:w-6 md:h-6" />
+          <span className="text-[10px] sm:text-xs text-gray-800">ChatBot</span>
         </button>
 
         <button
           onClick={() => setMostrarModalStrike(true)}
           className="flex flex-col items-center text-center hover:bg-gray-100 rounded p-1 transition"
         >
-          <span className="text-lg md:text-xl">📝</span>
+          <FaFlag className="text-gray-600 hover:text-gray-200 w-5 h-5 md:w-6 md:h-6" />
           <span className="text-[10px] sm:text-xs text-gray-800">Feedback</span>
         </button>
 

@@ -6,6 +6,8 @@ import useSocket from "../../hooks/useSocket";
 import useStrike from "../../hooks/useStrike";
 import { FaTimes, FaFlag } from "react-icons/fa";
 
+import PerfilUsuarioReadOnly from "./PerfilUsuarioReadOnly";
+
 // --- Panel de Denuncia ---
 const PanelDenuncia = ({ onCerrar, onEnviar, enviando }) => {
   const [razon, setRazon] = useState("");
@@ -89,6 +91,7 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
   const [enviandoDenuncia, setEnviandoDenuncia] = useState(false);
   const [exitoDenuncia, setExitoDenuncia] = useState(false);
   const messagesEndRef = useRef(null);
+  const [mostrarPerfil, setMostrarPerfil] = useState(false);
 
   const handleNuevoMensaje = useCallback((mensaje) => {
     if (!mensaje) return;
@@ -151,7 +154,11 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
     <div className="fixed bottom-4 right-[390px] w-96 h-[600px] bg-white/95 backdrop-blur-md shadow-2xl z-50 rounded-xl flex flex-col border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-3xl">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-pink-600  to-orange-400 text-white">
-        <div className="flex items-center gap-3">
+        <div
+          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
+          onClick={() => setMostrarPerfil(true)}
+          title="Ver perfil"
+        >
           <img
             src={chatInfo.imagenPerfil || "https://placehold.co/40x40"}
             alt={chatInfo.nombre}
@@ -162,13 +169,13 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
 
         <div className="flex items-center gap-3">
           {/* ✅ Botón reportar */}
-          
+
           <button
             onClick={() => setMostrarDenuncia(true)}
             title="Reportar usuario"
             className="text-white/80 hover:text-white transition items-center justify-around flex gap-1 text-xs font-semibold"
           >
-            Reportar Usuario < FaFlag size={10} />
+            Reportar Usuario <FaFlag size={10} />
           </button>
           <button
             onClick={onCloseChat}
@@ -208,8 +215,6 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
         )}
 
         <div ref={messagesEndRef} />
-
-        
       </div>
 
       {/* Input */}
@@ -231,27 +236,31 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
         </button>
       </form>
 
-
       {/* ✅ Mensaje de éxito denuncia */}
-        {exitoDenuncia && (
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
-            <p className="bg-gradient-to-r from-pink-500 to-orange-400 text-white text-xs px-4 py-2 rounded-full shadow-sm font-serif">
-              Reporte enviado. Gracias por ayudarnos a mejorar la comunidad.
-            </p>
-          </div>
-        )}
-        
-        {/* ✅ Panel denuncia */}
-        {mostrarDenuncia && (
-          <PanelDenuncia
-            onCerrar={() => setMostrarDenuncia(false)}
-            onEnviar={handleEnviarDenuncia}
-            enviando={enviandoDenuncia}
-          />
-        )}
-    </div>
+      {exitoDenuncia && (
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
+          <p className="bg-gradient-to-r from-pink-500 to-orange-400 text-white text-xs px-4 py-2 rounded-full shadow-sm font-serif">
+            Reporte enviado. Gracias por ayudarnos a mejorar la comunidad.
+          </p>
+        </div>
+      )}
 
-    
+      {/* ✅ Panel denuncia */}
+      {mostrarDenuncia && (
+        <PanelDenuncia
+          onCerrar={() => setMostrarDenuncia(false)}
+          onEnviar={handleEnviarDenuncia}
+          enviando={enviandoDenuncia}
+        />
+      )}
+
+      {mostrarPerfil && (
+        <PerfilUsuarioReadOnly
+          perfil={chatInfo}
+          onCerrar={() => setMostrarPerfil(false)}
+        />
+      )}
+    </div>
   );
 };
 

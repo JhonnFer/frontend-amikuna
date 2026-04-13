@@ -33,10 +33,23 @@ const useChatSocket = (profile) => {
       setMensajes(mensajesCargados);
 
       setChatInfo((prev) =>
-        prev?.chatId === chatIdToUse
-          ? prev
-          : { chatId: chatIdToUse, nombre: match.nombre, imagenPerfil: match.imagenPerfil }
-      );
+  prev?.chatId === chatIdToUse
+    ? prev
+    : {
+        chatId: chatIdToUse,
+        // datos básicos
+        nombre: match.nombre,
+        imagenPerfil: match.imagenPerfil,
+        // datos para el panel de perfil
+        biografia: match.biografia,
+        genero: match.genero,
+        orientacion: match.orientacion,
+        intereses: match.intereses,
+        ubicacion: match.ubicacion,
+        seguidores: match.seguidores,
+        siguiendo: match.siguiendo,
+        imagenesGaleria: match.imagenesGaleria,
+      });
     },
     [abrirChat, obtenerMensajes, chatIdsCache, profile]
   );
