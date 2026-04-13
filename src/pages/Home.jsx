@@ -87,16 +87,16 @@ const Home = () => {
   const [ctaRef, ctaVisible] = useReveal();
 
   const features = [
-    { icon: "🎯", title: "Matching por intereses", desc: "Conecta con quienes comparten tus pasiones académicas y personales dentro del campus.", delay: 0 },
-    { icon: "📚", title: "Grupos de estudio", desc: "Forma o únete a grupos para materias específicas y supera los parciales en equipo.", delay: 100 },
-    { icon: "🗓️", title: "Eventos del campus", desc: "Descubre y organiza actividades extracurriculares, talleres y encuentros estudiantiles.", delay: 200 },
-    { icon: "🔒", title: "Solo estudiantes EPN", desc: "Acceso verificado exclusivamente para la comunidad de la Escuela Politécnica Nacional.", delay: 300 },
+    { icon: "🎯", title: "Matching Recíproco", desc: "Conecta con tus compañeros de manera digital y colaborativa dentro del campus.", delay: 0 },
+    { icon: "🗓️", title: "Eventos Institucionales", desc: "escubre y organiza actividades extracurriculares, talleres y encuentros estudiantiles.", delay: 100 },
+    { icon: "💬", title: "Interacción Directa", desc: "Comunícate directamente con otros estudiantes y comparte ideas.", delay: 200 },
+    { icon: "🏛️", title: "Comunidad Politécnica", desc: "Un espacio digital diseñado por y para estudiantes de la EPN, fortaleciendo la identidad y el apoyo mutuo.", delay: 300 },
   ];
 
   const steps = [
     { number: "1", title: "Crea tu perfil universitario", desc: "Regístrate con tu correo institucional EPN y completa tu perfil con carrera, semestre e intereses.", delay: 0 },
-    { number: "2", title: "Descubre tu comunidad", desc: "El sistema sugiere estudiantes y grupos afines a tus asignaturas e intereses personales.", delay: 100 },
-    { number: "3", title: "Conecta y colabora", desc: "Únete a grupos de estudio, asiste a eventos y construye relaciones que duran más allá del campus.", delay: 200 },
+    { number: "2", title: "Descubre tu comunidad", desc: "El sistema sugiere estudiantes de toda la EPN mediante un descubrimiento de pares", delay: 100 },
+    { number: "3", title: "Conecta y fortalece la comunidad", desc: "Inicia conversaciones, participa en eventos y construye vínculos significativos dentro de la familia politécnica", delay: 200 },
   ];
 
   return (
