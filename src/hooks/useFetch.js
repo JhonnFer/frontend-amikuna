@@ -9,8 +9,11 @@ let errorToastId = null;
 function useFetch() {
   const fetchDataBackend = useCallback(
     async (endpoint, data, method = "GET", showToast = true) => {
+      if (!endpoint) {
+        throw new Error("Endpoint no definido");
+      }
       // Ajuste para evitar dobles o faltantes de slash
-      const url = `${API_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
+      const url = `${API_URL?.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
 
       const showLoadingToast = showToast && method.toUpperCase() !== "GET";
       const loadingToast = showLoadingToast

@@ -54,28 +54,23 @@ export const useNuevoPassword = (token) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // 🔥 Protección clave
-    if (!token) {
-      setTokenValido(false);
-      setTokenVerificando(false);
-      return;
-    }
+  if (!token) return; // 🔥 ESTA LÍNEA TE FALTABA
 
-    const verificar = async () => {
-      try {
-        await fetchDataBackend(`recuperarpassword/${token}`);
-        setTokenValido(true);
-      } catch (error) {
+  const verificar = async () => {
+    try {
+      await fetchDataBackend(`recuperarpassword/${token}`);
+      setTokenValido(true);
+    } catch (error) {
         console.error("Error verificando token:", error);
-        toast.error("Token inválido o expirado");
-        setTokenValido(false);
-      } finally {
-        setTokenVerificando(false);
-      }
-    };
+      toast.error("Token inválido o expirado");
+      setTokenValido(false);
+    } finally {
+      setTokenVerificando(false);
+    }
+  };
 
-    verificar();
-  }, [token]);
+  verificar();
+}, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
