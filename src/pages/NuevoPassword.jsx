@@ -7,16 +7,7 @@ import { useNuevoPassword } from "../hooks/useRecuperarPassword";
 const NuevoPassword = () => {
   const { token } = useParams();
 
-  // 🔥 Protección inmediata
-  if (!token) {
-    return (
-      <div className="text-center mt-20">
-        <p className="text-red-500">Token inválido</p>
-        <Link to="/olvidepassword">Solicitar nuevo enlace</Link>
-      </div>
-    );
-  }
-
+  // ✅ SIEMPRE llamar el hook
   const {
     tokenValido,
     tokenVerificando,
@@ -39,18 +30,26 @@ const NuevoPassword = () => {
     >
       <ToastContainer />
 
-      {tokenVerificando && (
+      {/* 🔥 Validación después */}
+      {!token && (
+        <div className="text-center">
+          <p className="text-red-400">Token inválido</p>
+          <Link to="/olvidepassword">Solicitar nuevo enlace</Link>
+        </div>
+      )}
+
+      {token && tokenVerificando && (
         <p className="text-white">Verificando enlace...</p>
       )}
 
-      {!tokenVerificando && !tokenValido && (
+      {token && !tokenVerificando && !tokenValido && (
         <div className="text-center">
           <p className="text-red-400">Enlace inválido o expirado</p>
           <Link to="/olvidepassword">Solicitar otro</Link>
         </div>
       )}
 
-      {!tokenVerificando && tokenValido && (
+      {token && !tokenVerificando && tokenValido && (
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-sm bg-white p-6 rounded"
