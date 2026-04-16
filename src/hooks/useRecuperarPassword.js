@@ -1,11 +1,11 @@
-
-//src/hooks/useRecuperarPassword.js
-import { useState, useEffect,  } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify'
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import useFetch from "./useFetch";
 
+// ─────────────────────────────────────────────
+// 🔹 1. Solicitar recuperación
+// ─────────────────────────────────────────────
 export const useSolicitarRecuperacion = () => {
   const { fetchDataBackend } = useFetch();
 
@@ -22,7 +22,12 @@ export const useSolicitarRecuperacion = () => {
 
     setLoading(true);
     try {
-      const data = await fetchDataBackend("recuperarpassword", { email }, "POST");
+      const data = await fetchDataBackend(
+        "recuperarpassword",
+        { email },
+        "POST"
+      );
+
       toast.success(data?.msg || "Revisa tu correo");
       setEmail("");
     } catch (error) {
@@ -35,6 +40,9 @@ export const useSolicitarRecuperacion = () => {
   return { email, setEmail, loading, handleSubmit };
 };
 
+// ─────────────────────────────────────────────
+// 🔹 2. Nuevo password
+// ─────────────────────────────────────────────
 export const useNuevoPassword = (token) => {
   const { fetchDataBackend } = useFetch();
   const navigate = useNavigate();
@@ -46,6 +54,13 @@ export const useNuevoPassword = (token) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // 🔥 Protección clave
+    if (!token) {
+      setTokenValido(false);
+      setTokenVerificando(false);
+      return;
+    }
+
     const verificar = async () => {
       try {
         await fetchDataBackend(`recuperarpassword/${token}`);
@@ -59,7 +74,7 @@ export const useNuevoPassword = (token) => {
       }
     };
 
-    if (token) verificar();
+    verificar();
   }, [token]);
 
   const handleSubmit = async (e) => {
@@ -70,18 +85,27 @@ export const useNuevoPassword = (token) => {
       return;
     }
 
+    if (password.length < 6) {
+      toast.error("Mínimo 6 caracteres");
+      return;
+    }
+
     setLoading(true);
     try {
       const data = await fetchDataBackend(
-  `nuevopassword/${token}`,
-  {
-    password,
-    confirmpassword: confirmPassword,
-  },
-  "POST"
-);
+        `nuevopassword/${token}`,
+        {
+          password,
+          confirmpassword: confirmPassword,
+        },
+        "POST"
+      );
+
       toast.success(data?.msg || "Contraseña actualizada");
-      setTimeout(() => navigate("/login"), 2000);
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error) {
       toast.error(error.message || "Error al actualizar");
     } finally {
@@ -92,8 +116,10 @@ export const useNuevoPassword = (token) => {
   return {
     tokenValido,
     tokenVerificando,
-    password, setPassword,
-    confirmPassword, setConfirmPassword,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
     loading,
     handleSubmit,
   };

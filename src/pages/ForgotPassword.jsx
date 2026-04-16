@@ -5,7 +5,8 @@ import logoAmikuna from "../assets/forgot.jpg";
 import { useSolicitarRecuperacion } from "../hooks/useRecuperarPassword";
 
 const ForgotPassword = () => {
-  const { email, setEmail, solicitarRecuperacion, loading } = useSolicitarRecuperacion();
+  const { email, setEmail, handleSubmit, loading } =
+    useSolicitarRecuperacion();
 
   return (
     <div
@@ -19,43 +20,35 @@ const ForgotPassword = () => {
       <ToastContainer />
 
       <form
-        onSubmit={solicitarRecuperacion}
+        onSubmit={handleSubmit}
         className="w-full max-w-sm p-6 rounded-lg backdrop-blur-md bg-black/40 shadow-xl"
       >
         <h1 className="text-3xl sm:text-4xl font-semibold mb-8 text-center">
           ¿Olvidaste tu contraseña?
         </h1>
 
-        <label
-          htmlFor="email"
-          className="block mb-2 font-medium text-center text-lg sm:text-xl"
-        >
+        <label className="block mb-2 text-center text-lg">
           Correo electrónico
         </label>
 
         <input
           type="email"
-          id="email"
-          placeholder="Tu correo electrónico"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 mb-4 border border-gray-300 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-red-400"
+          className="w-full p-2 mb-4 border rounded text-black"
           required
         />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 disabled:opacity-50 transition"
+          className="w-full bg-red-500 py-2 rounded hover:bg-red-600"
         >
-          {loading ? "Enviando..." : "Enviar enlace de recuperación"}
+          {loading ? "Enviando..." : "Enviar enlace"}
         </button>
       </form>
 
-      <Link
-        to="/login"
-        className="text-white hover:underline text-sm text-center mt-4"
-      >
+      <Link to="/login" className="mt-4 hover:underline">
         Volver al login
       </Link>
     </div>

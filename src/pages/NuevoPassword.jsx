@@ -7,6 +7,16 @@ import { useNuevoPassword } from "../hooks/useRecuperarPassword";
 const NuevoPassword = () => {
   const { token } = useParams();
 
+  // 🔥 Protección inmediata
+  if (!token) {
+    return (
+      <div className="text-center mt-20">
+        <p className="text-red-500">Token inválido</p>
+        <Link to="/olvidepassword">Solicitar nuevo enlace</Link>
+      </div>
+    );
+  }
+
   const {
     tokenValido,
     tokenVerificando,
@@ -30,72 +40,47 @@ const NuevoPassword = () => {
       <ToastContainer />
 
       {tokenVerificando && (
-        <p className="text-white text-lg">Verificando enlace...</p>
+        <p className="text-white">Verificando enlace...</p>
       )}
 
       {!tokenVerificando && !tokenValido && (
         <div className="text-center">
-          <p className="text-red-400 text-lg mb-4">
-            El enlace es inválido o ha expirado.
-          </p>
-
-          <Link
-            to="/olvidepassword"
-            className="text-blue-300 hover:underline"
-          >
-            Solicitar nuevo enlace
-          </Link>
+          <p className="text-red-400">Enlace inválido o expirado</p>
+          <Link to="/olvidepassword">Solicitar otro</Link>
         </div>
       )}
 
       {!tokenVerificando && tokenValido && (
-        <>
-          <h1 className="text-3xl sm:text-4xl font-semibold mb-6 text-white text-center">
-            Crear nueva contraseña
-          </h1>
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-sm bg-white p-6 rounded"
+        >
+          <input
+            type="password"
+            placeholder="Nueva contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full mb-3 p-2 border"
+            required
+          />
 
-          <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-sm bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-lg"
+          <input
+            type="password"
+            placeholder="Confirmar contraseña"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full mb-3 p-2 border"
+            required
+          />
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-green-600 text-white p-2"
           >
-            <label className="block mb-2 font-medium">
-              Nueva contraseña
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 mb-4 border rounded"
-              required
-            />
-
-            <label className="block mb-2 font-medium">
-              Confirmar contraseña
-            </label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-2 mb-4 border rounded"
-              required
-            />
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 disabled:opacity-50 transition"
-            >
-              {loading ? "Actualizando..." : "Actualizar contraseña"}
-            </button>
-
-            <Link
-              to="/login"
-              className="block text-center mt-4 text-red-600 hover:underline"
-            >
-              Volver al login
-            </Link>
-          </form>
-        </>
+            {loading ? "Guardando..." : "Guardar"}
+          </button>
+        </form>
       )}
     </div>
   );
