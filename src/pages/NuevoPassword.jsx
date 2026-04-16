@@ -22,12 +22,7 @@ const NuevoPassword = () => {
 
   useEffect(() => {
   if (window.location.hash) {
-    // 🔥 Limpia el hash de Supabase
-    window.history.replaceState(
-      null,
-      "",
-      window.location.pathname
-    );
+    window.history.replaceState(null, "", window.location.pathname);
   }
 }, []);
 

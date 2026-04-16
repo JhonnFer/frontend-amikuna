@@ -30,8 +30,11 @@ function App() {
   const token = storeAuth(state => state.token);
 
   const profile = storeProfile((state) => state.profile);
+  
   useEffect(() => {
-  if (token && !profile) {
+  if (!token) return; // 🔥 ESTA LÍNEA
+
+  if (!profile) {
     loadProfile();
   }
 }, [token]);
@@ -53,7 +56,6 @@ function App() {
         <Route path="/confirmar/:token" element={<><Navbar /><ConfirmarCuenta /></>} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/forgot2" element={<ForgotAdministrador />} />
-        <Route path="/recuperarPassword/:token" element={<NuevoPassword />} />
         <Route path="/nuevopassword/:token" element={<NuevoPassword />} />
         <Route path="/admin/cambiar-password" element={<ForgotAdministrador />} />
         <Route path="/admin/generar-nueva-password" element={<ForgotAdministrador />} />
