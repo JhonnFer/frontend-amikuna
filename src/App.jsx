@@ -54,6 +54,7 @@ function App() {
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/forgot2" element={<ForgotAdministrador />} />
         <Route path="/recuperarPassword/:token" element={<NuevoPassword />} />
+        <Route path="/nuevopassword/:token" element={<NuevoPassword />} />
         <Route path="/admin/cambiar-password" element={<ForgotAdministrador />} />
         <Route path="/admin/generar-nueva-password" element={<ForgotAdministrador />} />
         <Route path="/auth/google/success" element={<GoogleSuccess />} />
