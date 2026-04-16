@@ -1,98 +1,97 @@
 
 //src/hooks/useRecuperarPassword.js
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect,  } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import { toast } from 'react-toastify'
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL
+import useFetch from "./useFetch";
 
-// ── 1. Solicitar enlace de recuperación ──────────────────────────
 export const useSolicitarRecuperacion = () => {
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
+  const { fetchDataBackend } = useFetch();
+
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!email.trim()) {
-      toast.error('Por favor ingresa un correo válido')
-      return
+      toast.error("Por favor ingresa un correo válido");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const { data } = await axios.post(`${BASE_URL}recuperarpassword`, { email })
-      toast.success(data?.msg || 'Revisa tu correo para recuperar tu contraseña')
-      setEmail('')
+      const data = await fetchDataBackend("recuperarpassword", {
+        method: "POST",
+        body: { email },
+      });
+
+      toast.success(data?.msg || "Revisa tu correo");
+      setEmail("");
     } catch (error) {
-      toast.error(error?.response?.data?.msg || 'Error enviando solicitud')
+      toast.error(error.message || "Error enviando solicitud");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  return { email, setEmail, loading, handleSubmit }
-}
+  return { email, setEmail, loading, handleSubmit };
+};
 
-// ── 2. Verificar token + guardar nueva contraseña ─────────────────
 export const useNuevoPassword = (token) => {
-  const navigate = useNavigate()
-  const ejecutado = useRef(false)
+  const { fetchDataBackend } = useFetch();
+  const navigate = useNavigate();
 
-  const [tokenValido, setTokenValido] = useState(false)
-  const [tokenVerificando, setTokenVerificando] = useState(true)
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [tokenValido, setTokenValido] = useState(false);
+  const [tokenVerificando, setTokenVerificando] = useState(true);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // GET — verificar token al montar
   useEffect(() => {
-    if (ejecutado.current) return
-    ejecutado.current = true
-
     const verificar = async () => {
       try {
-        await axios.get(`${BASE_URL}recuperarpassword/${token}`)
-        setTokenValido(true)
+        await fetchDataBackend(`recuperarpassword/${token}`);
+        setTokenValido(true);
       } catch (error) {
-        toast.error(error?.response?.data?.msg || 'Token inválido o expirado')
-        setTokenValido(false)
+        console.error("Error verificando token:", error);
+        toast.error("Token inválido o expirado");
+        setTokenValido(false);
       } finally {
-        setTokenVerificando(false)
+        setTokenVerificando(false);
       }
-    }
+    };
 
-    verificar()
-  }, [token])
+    if (token) verificar();
+  }, [token]);
 
-  // POST — guardar nueva contraseña
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    if (password.trim() !== confirmPassword.trim()) {
-      toast.error('Las contraseñas no coinciden')
-      return
-    }
-    if (password.trim().length < 6) {
-      toast.error('La contraseña debe tener al menos 6 caracteres')
-      return
+    if (password !== confirmPassword) {
+      toast.error("Las contraseñas no coinciden");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const { data } = await axios.post(`${BASE_URL}nuevopassword/${token}`, {
-        password,
-        confirmpassword: confirmPassword,
-      })
-      toast.success(data?.msg || 'Contraseña actualizada, ya puedes iniciar sesión')
-      setTimeout(() => navigate('/login'), 2000)
+      const data = await fetchDataBackend(`nuevopassword/${token}`, {
+        method: "POST",
+        body: {
+          password,
+          confirmpassword: confirmPassword,
+        },
+      });
+
+      toast.success(data?.msg || "Contraseña actualizada");
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      toast.error(error?.response?.data?.msg || 'Error al actualizar la contraseña')
+      toast.error(error.message || "Error al actualizar");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return {
     tokenValido,
@@ -101,5 +100,5 @@ export const useNuevoPassword = (token) => {
     confirmPassword, setConfirmPassword,
     loading,
     handleSubmit,
-  }
-}
+  };
+};
