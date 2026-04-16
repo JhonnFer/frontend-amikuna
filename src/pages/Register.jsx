@@ -20,6 +20,7 @@ const Register = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -58,17 +59,16 @@ const Register = () => {
       return toast.error("Las contraseñas no coinciden.");
     }
 
-    
     try {
-    const res = await registerUser(formData);
-    toast.success(
+      const res = await registerUser(formData);
+      toast.success(
         res.msg || "Registro exitoso. Revisa tu correo para confirmar.",
-        { autoClose: 4000 }  // dale 4 segundos para leerlo
-    );
-    setTimeout(() => navigate("/login"), 4500); // redirige después del toast
-} catch (errorMsg) {
-    toast.error(errorMsg);
-}
+        { autoClose: 4000 }, // dale 4 segundos para leerlo
+      );
+      setTimeout(() => navigate("/login"), 4500); // redirige después del toast
+    } catch (errorMsg) {
+      toast.error(errorMsg);
+    }
 
     setLoading(false);
   };
@@ -142,7 +142,7 @@ const Register = () => {
 
             <label className="text-sm font-medium">Contraseña</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={formData.password}
               onChange={handleChange}
@@ -154,30 +154,47 @@ const Register = () => {
               Confirma la Contraseña
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
               className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
               required
             />
+
+            <label
+              className="flex items-center text-sm text-gray-600 cursor-pointer gap-2
+                  sm:text-base 
+                  md:text-lg 
+                  lg:text-xl"
+            >
+              <input
+                type="checkbox"
+                className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6"
+                onChange={() => setShowPassword(!showPassword)}
+              />
+              <span className="text-xs sm:text-sm md:text-base lg:text-lg">
+                Mostrar contraseña
+              </span>
+            </label>
+            
           </div>
 
-          <div className="mt-4 flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              type="submit"
-              className="text-sm font-semibold px-8 py-2 rounded-full bg-white text-black border border-gray-400 hover:bg-gray-900 hover:text-white transition-all"
-              disabled={loading}
-            >
-              {loading ? "Registrando..." : "Enviar"}
-            </button>
-
+          <div className="mt-4 flex flex-col sm:flex-row  gap-4 justify-center">
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="text-sm font-semibold px-8 py-2 rounded-full bg-white text-black border border-gray-400 hover:bg-black hover:text-white transition-all"
+              className="text-sm font-semibold px-8 py-2 md:mx-10 rounded-full bg-white text-black border border-gray-400 hover:bg-black hover:text-white transition-all"
             >
               Regresar
+            </button>
+
+            <button
+              type="submit"
+              className="text-sm font-semibold px-8 py-2 md:mx-10 rounded-full bg-white text-black border border-gray-400 hover:bg-gray-900 hover:text-white transition-all"
+              disabled={loading}
+            >
+              {loading ? "Registrando..." : "Enviar"}
             </button>
           </div>
         </form>
