@@ -2,10 +2,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
 import logoAmikuna from "../assets/forgot.jpg";
-import { useRecuperarPassword } from "../hooks/useRecuperarPassword";
+import { useSolicitarRecuperacion } from "../hooks/useRecuperarPassword";
 
 const ForgotPassword = () => {
-  const { email, setEmail, solicitarRecuperacion, loading } = useRecuperarPassword();
+  const { email, setEmail, solicitarRecuperacion, loading } = useSolicitarRecuperacion();
 
   return (
     <div
