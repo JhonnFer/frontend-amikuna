@@ -22,11 +22,7 @@ export const useSolicitarRecuperacion = () => {
 
     setLoading(true);
     try {
-      const data = await fetchDataBackend("recuperarpassword", {
-        method: "POST",
-        body: { email },
-      });
-
+      const data = await fetchDataBackend("recuperarpassword", { email }, "POST");
       toast.success(data?.msg || "Revisa tu correo");
       setEmail("");
     } catch (error) {
@@ -76,14 +72,14 @@ export const useNuevoPassword = (token) => {
 
     setLoading(true);
     try {
-      const data = await fetchDataBackend(`nuevopassword/${token}`, {
-        method: "POST",
-        body: {
-          password,
-          confirmpassword: confirmPassword,
-        },
-      });
-
+      const data = await fetchDataBackend(
+  `nuevopassword/${token}`,
+  {
+    password,
+    confirmpassword: confirmPassword,
+  },
+  "POST"
+);
       toast.success(data?.msg || "Contraseña actualizada");
       setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
