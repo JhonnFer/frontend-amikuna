@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,6 +19,17 @@ const NuevoPassword = () => {
     handleSubmit,
     loading,
   } = useNuevoPassword(token);
+
+  useEffect(() => {
+  if (window.location.hash) {
+    // 🔥 Limpia el hash de Supabase
+    window.history.replaceState(
+      null,
+      "",
+      window.location.pathname
+    );
+  }
+}, []);
 
   return (
     <div
