@@ -13,29 +13,29 @@ export const useSolicitarRecuperacion = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!email.trim()) {
-      toast.error("Por favor ingresa un correo válido");
-      return;
-    }
+  if (!email.trim()) {
+    toast.error("Por favor ingresa un correo válido");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const data = await fetchDataBackend(
-        "recuperarpassword",
-        { email },
-        "POST"
-      );
+  setLoading(true);
 
-      toast.success(data?.msg || "Revisa tu correo");
-      setEmail("");
-    } catch (error) {
-      toast.error(error.message || "Error enviando solicitud");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    await fetchDataBackend(
+      "recuperarpassword",
+      { email },
+      "POST"
+    );
+
+    setEmail("");
+  } catch (error) {
+    toast.error(error.message || "Error enviando solicitud");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return { email, setEmail, loading, handleSubmit };
 };
@@ -62,7 +62,6 @@ export const useNuevoPassword = (token) => {
       setTokenValido(true);
     } catch (error) {
         console.error("Error verificando token:", error);
-      toast.error("Token inválido o expirado");
       setTokenValido(false);
     } finally {
       setTokenVerificando(false);
@@ -73,40 +72,40 @@ export const useNuevoPassword = (token) => {
 }, [token]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (password !== confirmPassword) {
-      toast.error("Las contraseñas no coinciden");
-      return;
-    }
+  if (password !== confirmPassword) {
+    
+    return;
+  }
 
-    if (password.length < 6) {
-      toast.error("Mínimo 6 caracteres");
-      return;
-    }
+  if (password.length < 6) {
+    toast.error("Mínimo 6 caracteres");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      const data = await fetchDataBackend(
-        `nuevopassword/${token}`,
-        {
-          password,
-          confirmpassword: confirmPassword,
-        },
-        "POST"
-      );
+  setLoading(true);
 
-      toast.success(data?.msg || "Contraseña actualizada");
+  try {
+    await fetchDataBackend(
+      `nuevopassword/${token}`,
+      {
+        password,
+        confirmpassword: confirmPassword,
+      },
+      "POST"
+    );
 
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-    } catch (error) {
-      toast.error(error.message || "Error al actualizar");
-    } finally {
-      setLoading(false);
-    }
-  };
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000);
+
+  } catch (error) {
+    toast.error(error.message || "Error al actualizar");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return {
     tokenValido,

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FiArrowLeft } from "react-icons/fi";
 
@@ -44,40 +44,32 @@ const Login = () => {
     const response = await fetchDataBackend("login", data, "POST");
 
     if (!response?.token) {
-      toast.error("No se pudo iniciar sesión");
       return;
     }
 
     const { user, token } = response;
-    const userRole = user?.rol?.toLowerCase()?.trim();
 
-    // Guardar en store
     setAuth({ user, token });
 
-    // ADMIN
+    const userRole = user?.rol?.toLowerCase()?.trim();
+
     if (userRole === "admin") {
       navigate("/admin/dashboard");
       return;
     }
 
-    // ESTUDIANTE
     if (userRole === "estudiante") {
-      // 🔹 Cargar perfil
       const perfil = await cargarPerfil();
-
-      // 🔹 Validar si el perfil está completo
       const perfilOk = isPerfilCompleto(perfil);
 
-      if (perfilOk) {
-        navigate("/user/dashboard");
-      } else {
-        navigate("/user/completar-perfil");
-      }
+      navigate(
+        perfilOk
+          ? "/user/dashboard"
+          : "/user/completar-perfil"
+      );
     }
-
   } catch (error) {
-    console.error("Error en loginUser:", error);
-    toast.error(error.message || "Error al iniciar sesión");
+    console.error(error);
   }
 };
   const handleProfileCompleted = (success) => {

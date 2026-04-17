@@ -1,80 +1,58 @@
-// src/hooks/useSocket.js
-import { useEffect, useState, useRef } from "react";
-import { io } from "socket.io-client";
-import getAuthHeaders from "../helpers/getAuthHeaders.js";
-
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
+import { useEffect, useState } from "react";
+import { socket } from "../helpers/socket"; // ✅ usamos el global
 
 const useSocket = (chatId, onNuevoMensaje) => {
-    const [isConnected, setIsConnected] = useState(false);
-    const socket = useRef(null);
+  const [isConnected, setIsConnected] = useState(socket.connected);
 
-    useEffect(() => {
-        
-        if (!chatId) return;
+  useEffect(() => {
+    if (!chatId) return;
 
-        const authHeaders = getAuthHeaders();
-        const fullToken = authHeaders?.headers?.Authorization;
-        const tokenFromHeaders = fullToken?.startsWith("Bearer ")
-            ? fullToken.split(" ")[1]
-            : fullToken;
+    // 🔌 conexión (solo escucha estado)
+    const handleConnect = () => {
+      setIsConnected(true);
 
-        const token = tokenFromHeaders || localStorage.getItem("token");
-        
+      console.log("🟢 Conectado al socket");
 
-        if (!token) {
-            console.error("No se encontró token de autenticación para el socket.");
-            return;
-        }
-
-        socket.current = io(SOCKET_URL, {
-            auth: { token: token },
-            query: { chatId: chatId },
-        });
-
-        socket.current.on('connect', () => {
-            setIsConnected(true);
-            if (chatId) {
-                // Esto envía el evento al backend para unirse a la sala
-                socket.current.emit('join:chat', chatId); 
-            }
-        });
-        
-
-        socket.current.on("connect_error", (err) => {
-  console.error("✗ Error conectando socket:", err.message); // ← clave
-});
-
-socket.current.on("disconnect", (reason) => {
-  console.log("Socket desconectado, razón:", reason); // ← clave
-  setIsConnected(false);
-});
-
-        socket.current.on('disconnect', () => {
-            setIsConnected(false);
-        });
-
-        // <<-- CAMBIO CLAVE AQUÍ -->>
-        // Escuchamos el evento correcto que tu backend envía
-        socket.current.on('mensaje:nuevo', (data) => onNuevoMensaje(data.mensaje));
-
-        return () => {
-            if (socket.current) {
-                socket.current.off('mensaje:nuevo', onNuevoMensaje);
-                socket.current.disconnect();
-            }
-        };
-    }, [chatId, onNuevoMensaje]);
-
-    // <<-- CAMBIO CLAVE AQUÍ -->>
-    // Retornamos la función para emitir el mensaje
-    const emitMessage = (payload) => {
-        if (socket.current && isConnected) {
-            socket.current.emit('chat:mensaje', payload);
-        }
+      // 🔥 unirse al chat
+      socket.emit("join:chat", chatId);
     };
 
-    return { isConnected, emitMessage };
+    const handleDisconnect = (reason) => {
+      console.log("🔴 Socket desconectado:", reason);
+      setIsConnected(false);
+    };
+
+    const handleNuevoMensaje = (data) => {
+      onNuevoMensaje(data.mensaje);
+    };
+
+    // listeners
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
+    socket.on("mensaje:nuevo", handleNuevoMensaje);
+
+    // 🔥 SI YA estaba conectado antes
+    if (socket.connected) {
+      handleConnect();
+    }
+
+    return () => {
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
+      socket.off("mensaje:nuevo", handleNuevoMensaje);
+    };
+  }, [chatId, onNuevoMensaje]);
+
+  // emitir mensaje
+  const emitMessage = (payload) => {
+    if (socket.connected) {
+      socket.emit("chat:mensaje", payload);
+    } else {
+      console.warn("⚠️ Socket no conectado");
+    }
+  };
+
+  return { isConnected, emitMessage };
 };
 
 export default useSocket;

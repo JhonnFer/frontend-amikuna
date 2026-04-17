@@ -2,7 +2,7 @@
 import PropTypes from "prop-types";
 import EventosPublicados from "./EventosPublicados";
 import ChatbotEstudiante from "./ChatbotEstudiante";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { FiMenu } from "react-icons/fi";
 import useChatbot from "../../hooks/useChatbot";
 
@@ -19,6 +19,7 @@ const SidebarDerecho = ({
   mostrarChatbot,
   setMostrarChatbot,
 }) => {
+  console.log("🔥 matchesMutuos:", matchesMutuos);
 
   const { historial = [], cargarHistorial, enviarMensaje, loading, respuesta } = useChatbot();
   const [mostrarHistorial, setMostrarHistorial] = useState(false);
@@ -30,7 +31,9 @@ const SidebarDerecho = ({
       await cargarHistorial();
     }
   };
-
+  useEffect(() => {
+  console.log("🆕 Nuevo render matches:", matchesMutuos.map(m => m._id));
+}, [matchesMutuos]);
   return (
     <aside
       className="

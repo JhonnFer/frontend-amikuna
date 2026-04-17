@@ -1,27 +1,25 @@
-// 
-// src/hooks/useEventos.js
-// Hook unificado que reemplaza useEventosEstudiante.js y useAsistenciaEvento.js
 import { useState, useEffect, useCallback } from "react";
-import useFetch from "./useFetch";
+import fetchDataBackend from "../helpers/fetchDataBackend"; // ✅ import directo
+import useSocket from "../hooks/useSocket";
+
 
 const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
-  const { fetchDataBackend } = useFetch();
+  const { socket } = useSocket(); 
+  // ── Estado: eventos públicos ───────────────────────────────────────────────
+  const [eventos,            setEventos]            = useState([]);
+  const [loadingEventos,     setLoadingEventos]     = useState(autoCargar);
+  const [errorEventos,       setErrorEventos]       = useState(null);
 
-  // ── Estado: eventos públicos (ver-eventos) ─────────────────────────────────
-  const [eventos,         setEventos]         = useState([]);
-  const [loadingEventos,  setLoadingEventos]  = useState(autoCargar);
-  const [errorEventos,    setErrorEventos]    = useState(null);
-
-  // ── Estado: mis eventos confirmados (mis-eventos) ──────────────────────────
-  const [misEventos,        setMisEventos]        = useState([]);
-  const [loadingMisEventos, setLoadingMisEventos] = useState(false);
-  const [errorMisEventos,   setErrorMisEventos]   = useState(null);
+  // ── Estado: mis eventos ────────────────────────────────────────────────────
+  const [misEventos,         setMisEventos]         = useState([]);
+  const [loadingMisEventos,  setLoadingMisEventos]  = useState(false);
+  const [errorMisEventos,    setErrorMisEventos]    = useState(null);
 
   // ── Estado: asistencia ─────────────────────────────────────────────────────
   const [cargandoAsistencia, setCargandoAsistencia] = useState(false);
   const [errorAsistencia,    setErrorAsistencia]    = useState(null);
 
-  // ── GET estudiantes/ver-eventos ────────────────────────────────────────────
+  // ── GET ver-eventos ────────────────────────────────────────────────────────
   const obtenerEventos = useCallback(async () => {
     setLoadingEventos(true);
     setErrorEventos(null);
@@ -33,7 +31,7 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
     } finally {
       setLoadingEventos(false);
     }
-  }, [fetchDataBackend]);
+  }, []); // ✅ sin dependencias — fetchDataBackend es estable
 
   // ── GET mis-eventos ────────────────────────────────────────────────────────
   const obtenerMisEventos = useCallback(async () => {
@@ -47,9 +45,9 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
     } finally {
       setLoadingMisEventos(false);
     }
-  }, [fetchDataBackend]);
+  }, []); // ✅
 
-  // ── POST estudiantes/asistir/:id ───────────────────────────────────────────
+  // ── POST asistir ───────────────────────────────────────────────────────────
   const confirmarAsistencia = useCallback(async (idEvento) => {
     if (!idEvento) { setErrorAsistencia("ID de evento inválido"); return; }
     setCargandoAsistencia(true);
@@ -64,9 +62,9 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
     } finally {
       setCargandoAsistencia(false);
     }
-  }, [fetchDataBackend, onAsistenciaSuccess]);
+  }, [onAsistenciaSuccess]); // ✅ solo onAsistenciaSuccess que sí puede cambiar
 
-  // ── POST estudiantes/no-asistir/:id ───────────────────────────────────────
+  // ── POST no-asistir ────────────────────────────────────────────────────────
   const rechazarAsistencia = useCallback(async (idEvento) => {
     if (!idEvento) { setErrorAsistencia("ID de evento inválido"); return; }
     setCargandoAsistencia(true);
@@ -81,31 +79,45 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
     } finally {
       setCargandoAsistencia(false);
     }
-  }, [fetchDataBackend, onAsistenciaSuccess]);
+  }, [onAsistenciaSuccess]); // ✅
 
-  // ── Auto-carga inicial ─────────────────────────────────────────────────────
+  // ── Auto-carga ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (autoCargar) obtenerEventos();
-  }, [autoCargar, obtenerEventos]);
+  }, []); // ✅ solo al montar
+  // ── SOCKET: sincronización en tiempo real ─────────────────────────────────
+useEffect(() => {
+  if (!socket) return;
+
+  const handleCambioEventos = () => {
+    console.log("📡 Cambio en eventos detectado por socket");
+    obtenerEventos();
+    obtenerMisEventos();
+  };
+
+  const handleAsistencia = () => {
+    console.log("📡 Cambio en asistencia detectado");
+    obtenerMisEventos();
+  };
+
+  socket.on("evento_creado", handleCambioEventos);
+  socket.on("evento_actualizado", handleCambioEventos);
+  socket.on("evento_eliminado", handleCambioEventos);
+
+  socket.on("asistencia_actualizada", handleAsistencia);
+
+  return () => {
+    socket.off("evento_creado", handleCambioEventos);
+    socket.off("evento_actualizado", handleCambioEventos);
+    socket.off("evento_eliminado", handleCambioEventos);
+    socket.off("asistencia_actualizada", handleAsistencia);
+  };
+}, [socket, obtenerEventos, obtenerMisEventos]);
 
   return {
-    // Eventos públicos
-    eventos,
-    loadingEventos,
-    errorEventos,
-    obtenerEventos,
-
-    // Mis eventos confirmados
-    misEventos,
-    loadingMisEventos,
-    errorMisEventos,
-    obtenerMisEventos,
-
-    // Asistencia
-    confirmarAsistencia,
-    rechazarAsistencia,
-    cargandoAsistencia,
-    errorAsistencia,
+    eventos, loadingEventos, errorEventos, obtenerEventos,
+    misEventos, loadingMisEventos, errorMisEventos, obtenerMisEventos,
+    confirmarAsistencia, rechazarAsistencia, cargandoAsistencia, errorAsistencia,
   };
 };
 

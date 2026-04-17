@@ -1,25 +1,36 @@
-import { useCallback } from "react";
+import { useCallback,useEffect,useState } from "react";
 import useFetch from "./useFetch";
+import { socket } from "../helpers/socket";
 
 const useChat = () => {
   const { fetchDataBackend } = useFetch();
+  const [chats, setChats] = useState([]);
 
   const abrirChat = useCallback(
-    async (idOtro) => {
-      try {
-        const chat = await fetchDataBackend(
-          `estudiantes/chat-con-match/${idOtro}`,
-          {},
-          "POST"
-        );
-        return chat;
-      } catch (err) {
-        console.error("Error al abrir chat:", err);
-        return null;
-      }
-    },
-    [fetchDataBackend]
-  );
+  async (idOtro) => {
+    try {
+      const chat = await fetchDataBackend(
+        `estudiantes/chat-con-match/${idOtro}`,
+        {},
+        "POST"
+      );
+
+      // 🔥 agregar al estado
+      setChats(prev => {
+        const existe = prev.some(c => c._id === chat._id);
+        if (existe) return prev;
+
+        return [chat, ...prev];
+      });
+
+      return chat;
+    } catch (err) {
+      console.error("Error al abrir chat:", err);
+      return null;
+    }
+  },
+  [fetchDataBackend]
+);
 
   const obtenerMensajes = useCallback(
     async (chatId) => {
@@ -55,9 +66,29 @@ const useChat = () => {
     }
   },
   [fetchDataBackend]
-);
 
-  return { abrirChat, obtenerMensajes, enviarMensaje }; // ✅
+
+);
+  useEffect(() => {
+  const handleNuevoChat = (chat) => {
+    //console.log("💬 Nuevo chat en tiempo real:", chat);
+
+    setChats(prev => {
+      const existe = prev.some(c => c._id === chat._id);
+      if (existe) return prev;
+
+      return [chat, ...prev];
+    });
+  };
+
+  socket.on("nuevo_chat", handleNuevoChat);
+
+  return () => {
+    socket.off("nuevo_chat", handleNuevoChat);
+  };
+}, []);
+
+  return { abrirChat,chats, obtenerMensajes, enviarMensaje }; // ✅
 };
 
 export default useChat;

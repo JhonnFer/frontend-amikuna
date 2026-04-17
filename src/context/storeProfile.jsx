@@ -1,62 +1,107 @@
 import { create } from "zustand";
 import axios from "axios";
 import getAuthHeaders from "../helpers/getAuthHeaders";
-import { toast } from "react-toastify";
 
 const baseUrl = (import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api").replace(/\/+$/, "");
 
-const storeProfile = create((set) => ({
+
+const storeProfile = create((set, get) => ({
+  
+  
   profile: null,
+  loading: false,
+  loaded: false, //  NUEVO CONTROL para evitar fetchs repetidos
 
-  // 🔹 Cargar perfil desde backend
   loadProfile: async () => {
-    try {
-      const res = await axios.get(`${baseUrl}/estudiantes/perfil`, getAuthHeaders(true));
-      set({ profile: res.data });
-      return res.data;
-    } catch (error) {
-      toast.error("No se pudo cargar el perfil");
-      return null;
-    }
-  },
+  const { loaded, loading } = get();
+  
+  
+  try {
+    set({ loading: true });
+    const res = await axios.get(`${baseUrl}/estudiantes/perfil`, getAuthHeaders(true))
+  
+    
+    set({ profile: res.data, loading: false, loaded: true })
+  } catch (error) {
+    console.error("❌ Error:", error.response?.status, error.response?.data)
+    set({ loading: false, loaded: false })
+    return null
+  }
 
-  // 🔹 Actualizar perfil
-  updateProfile: async (formData) => {
+
+  // evita doble fetch si ya está en curso
+  if (loaded) return get().profile;
+  if (loading) return null; // 🔥 esto faltaba
+
+  try {
+    set({ loading: true });
+
+    const res = await axios.get(
+      `${baseUrl}/estudiantes/perfil`,
+      getAuthHeaders(true)
+    );
+
+    set({
+      profile: res.data,
+      loading: false,
+      loaded: true,
+    });
+
+    return res.data;
+
+  } catch (error) {
+    console.error("Error loading profile:", error);
+    set({ loading: false, loaded: false }); // 🔥 reset loaded también
+    return null;
+  }
+},
+  
+
+  refreshProfile: async () => {
     try {
-      const res = await axios.put(
-        `${baseUrl}/estudiantes/completarperfil`,
-        formData,
-        {
-          headers: {
-            ...getAuthHeaders(true).headers,
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      const res = await axios.get(
+        `${baseUrl}/estudiantes/perfil`,
+        getAuthHeaders(true)
       );
 
-      set({ profile: res.data.perfilActualizado });
-      toast.success(res.data.msg);
+      set({
+        profile: res.data,
+        loaded: true,
+      });
 
-      return res.data.perfilActualizado;
+      return res.data;
     } catch (error) {
-      toast.error("No se pudo actualizar el perfil");
+      console.error("Error refreshing profile:", error);
       return null;
     }
   },
 
-  // 🔹 Listar posibles matches
-  listarPotencialesMatches: async () => {
-    try {
-      const res = await axios.get(`${baseUrl}/estudiantes/matches`, getAuthHeaders(true));
-      return res.data;
-    } catch (error) {
-      toast.error("Error al listar matches");
-      return [];
-    }
-  },
+  updateProfile: async (formData) => {
+    const res = await axios.put(
+      `${baseUrl}/estudiantes/completarperfil`,
+      formData,
+      {
+        headers: {
+          ...getAuthHeaders(true).headers,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
 
-  // 🔹 limpiar perfil al hacer logout
-  clearProfile: () => set({ profile: null }),
+    set({
+      profile: res.data.perfilActualizado,
+      loaded: true,
+    });
+
+    return res.data.perfilActualizado;
+  },
+  
+
+  clearProfile: () =>
+    set({
+      profile: null,
+      loaded: false, // 🔥 importante reset
+    }),
 }));
 
 export default storeProfile;

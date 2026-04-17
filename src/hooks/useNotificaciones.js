@@ -1,39 +1,26 @@
-//src/hooks/useNotificaciones.js
-import { useState, useEffect, useCallback } from "react";
-import useFetch from "./useFetch";
+import { useState, useEffect } from "react";
+import fetchDataBackend from "../helpers/fetchDataBackend"; 
 
 const useNotificaciones = () => {
   const [notificaciones, setNotificaciones] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { fetchDataBackend } = useFetch();
 
-  const obtenerNotificaciones = useCallback(async () => {
+  const obtenerNotificaciones = async () => {
     setLoading(true);
     try {
-      // Llamada al endpoint
       const response = await fetchDataBackend("estudiantes/notificaciones", null, "GET", false);
-      
-      // ✅ IMPORTANTE: Tu backend devuelve { notificaciones: [...] }
-      // Accedemos a la propiedad y nos aseguramos de que sea un array
-      if (response && response.notificaciones) {
-        setNotificaciones(response.notificaciones);
-      } else {
-        setNotificaciones([]);
-      }
+      setNotificaciones(response?.notificaciones ?? []);
     } catch (error) {
       console.error("Error en obtenerNotificaciones:", error);
-      setNotificaciones([]); // Reset en caso de error
+      setNotificaciones([]);
     } finally {
       setLoading(false);
     }
-  }, [fetchDataBackend]);
+  };
 
   const marcarLeido = async (id) => {
     try {
-      // Enviamos el PUT. El backend responde con { msg: '...' }
       await fetchDataBackend(`estudiantes/notificaciones/${id}/leido`, {}, "PUT");
-
-      // Actualizamos el estado local (Optimistic Update)
       setNotificaciones((prev) =>
         prev.map((n) => (n._id === id ? { ...n, leido: true } : n))
       );
@@ -44,14 +31,9 @@ const useNotificaciones = () => {
 
   useEffect(() => {
     obtenerNotificaciones();
-  }, [obtenerNotificaciones]);
+  }, []); 
 
-  return {
-    notificaciones,
-    loading,
-    marcarLeido,
-    obtenerNotificaciones,
-  };
+  return { notificaciones, loading, marcarLeido, obtenerNotificaciones };
 };
 
 export default useNotificaciones;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import  { useState, useEffect, useCallback } from "react";
 import useMatches from "../hooks/useMatches";
 import useChat from "../hooks/useChat";
 import ChatConversacion from "./ChatConversacion";
@@ -12,6 +12,7 @@ const ListaMatches = ({ miId }) => {
     enviarMensaje,
     subscribeToNewMessages,
     chatIdActivo,
+    
   } = useChat();
 
   const [chatInfo, setChatInfo] = useState(null);

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import Modal from "../components/Modals_Dashboards/modal";
 import ModalPayment from "../components/treatments/ModalPayment";
 import StrikeForm from "../components/Dashboard_User/StrikeForm";
@@ -12,12 +12,18 @@ import ModalGaleria from "../components/Modals_Dashboards/Modalgaleria";
 import ModalConfirmarEliminar from "../components/Modals_Dashboards/Modalconfirmareliminar";
 
 import useDashboardState from "../hooks/Usedashboardstate";
+import storeProfile from "../context/storeProfile";
 
 const Dashboard_Users = () => {
+
+const profile = storeProfile((state) => state.profile);
+const loadProfile = storeProfile((state) => state.loadProfile);
+const loading = storeProfile((state) => state.loading);
+  
   const resetModoEliminarRef = useRef(null); // ← ref para resetear el toggle del ModalGaleria
  
   const {
-    profile, loadingPerfil, cargarPerfil,
+    loadingPerfil, cargarPerfil,
     matches, loadingMatches,
     solicitudes, loadingSolicitudes,
     eventosDisponibles, loadingEventos,
@@ -33,16 +39,30 @@ const Dashboard_Users = () => {
     mostrarModalStrike, setMostrarModalStrike,
     mostrarChatbot, setMostrarChatbot,
     eventosExpandidos, setEventosExpandidos,
-    matchesMutuos,
     mostrarModalAporte, setMostrarModalAporte,
     aporteSeleccionado,
     handleOpenAporteModal, handleAporteSuccess,
     handleLogout,
   } = useDashboardState();
+
+  useEffect(() => {
+  if (!profile) {
+    
+    loadProfile();
+  }
+}, [profile, loadProfile]); 
  
-  if (!profile || !profile._id) return <div>Cargando perfil...</div>;
+  if (loading) {
+  return <div>Cargando perfil...</div>;
+}
+
+if (!profile) {
+
+  return <div>No se pudo cargar el perfil, intenta de nuevo.</div>;
+}
  
   const perfilIncompleto = !profile.genero || !profile.orientacion || !profile.ubicacion?.ciudad;
+    
  
   if (!loadingPerfil && perfilIncompleto) {
     return (
@@ -53,7 +73,9 @@ const Dashboard_Users = () => {
         <FormularioCompletarPerfil initialData={profile} onSuccess={cargarPerfil} />
       </Modal>
     );
+    
   }
+  
  
   return (
     <div className="flex h-screen w-full bg-gradient-to-br from-red-100 via-orange-50  to-orange-100 overflow-hidden">
@@ -84,7 +106,8 @@ const Dashboard_Users = () => {
         cargandoAsistencia={cargandoAsistencia}
         eventosExpandidos={eventosExpandidos}
         setEventosExpandidos={setEventosExpandidos}
-        matchesMutuos={matchesMutuos}
+        matchesMutuos={matches}
+        
         handleAbrirChat={handleAbrirChat}
         mostrarChatbot={mostrarChatbot}
         setMostrarChatbot={setMostrarChatbot}

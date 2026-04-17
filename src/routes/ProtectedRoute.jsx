@@ -1,4 +1,5 @@
 import { Navigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import storeAuth from "../context/storeAuth";
 import storeProfile from "../context/storeProfile";
 import { isPerfilCompleto } from "../hooks/usePerfilUsuarioAutenticado";
@@ -26,18 +27,12 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     }
 
   } catch (error) {
+    
     logout();
     return <Navigate to="/login" replace />;
   }
 
-  //  Esperar perfil
-if (requiredRole === "estudiante" && !profile) {
-  return (
-    <div className="flex justify-center items-center h-screen">
-      <p className="text-lg">Cargando perfil...</p>
-    </div>
-  );
-}
+  
   //  Validar rol
   if (requiredRole && user?.rol !== requiredRole) {
   return <Navigate to="/forbidden" replace />;
@@ -45,14 +40,26 @@ if (requiredRole === "estudiante" && !profile) {
 
   //  Perfil completo
   if (requiredRole === "estudiante") {
-  const perfilOk = isPerfilCompleto(profile);
+  const loaded = storeProfile.getState().loaded;
+  const loading = storeProfile.getState().loading;
 
+  // Esperar a que termine de cargar antes de redirigir
+  if (loading || !loaded) return null;
+
+  const perfilOk = isPerfilCompleto(profile);
   if (!perfilOk && window.location.pathname !== "/user/completar-perfil") {
     return <Navigate to="/user/completar-perfil" replace />;
   }
 }
 
+ 
+
   return children;
+};
+
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+  requiredRole: PropTypes.string, // opcional, si se quiere controlar por rol
 };
 
 export default ProtectedRoute;
