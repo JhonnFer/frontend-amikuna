@@ -1,106 +1,50 @@
+// src/context/storeProfile.jsx
 import { create } from "zustand";
-import axios from "axios";
-import getAuthHeaders from "../helpers/getAuthHeaders";
-
-const baseUrl = (import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api").replace(/\/+$/, "");
-
+import fetchDataBackend from "../helpers/fetchDataBackend";
 
 const storeProfile = create((set, get) => ({
-  
-  
+
   profile: null,
   loading: false,
-  loaded: false, //  NUEVO CONTROL para evitar fetchs repetidos
+  loaded: false,
+  authError: false,
 
   loadProfile: async () => {
-  const { loaded, loading } = get();
-  
-  
-  try {
-    set({ loading: true });
-    const res = await axios.get(`${baseUrl}/estudiantes/perfil`, getAuthHeaders(true))
-  
-    
-    set({ profile: res.data, loading: false, loaded: true })
-  } catch (error) {
-    console.error("❌ Error:", error.response?.status, error.response?.data)
-    set({ loading: false, loaded: false })
-    return null
-  }
+    const { loaded, loading } = get();
+    if (loaded) return get().profile;
+    if (loading) return null;
 
-
-  // evita doble fetch si ya está en curso
-  if (loaded) return get().profile;
-  if (loading) return null; // 🔥 esto faltaba
-
-  try {
-    set({ loading: true });
-
-    const res = await axios.get(
-      `${baseUrl}/estudiantes/perfil`,
-      getAuthHeaders(true)
-    );
-
-    set({
-      profile: res.data,
-      loading: false,
-      loaded: true,
-    });
-
-    return res.data;
-
-  } catch (error) {
-    console.error("Error loading profile:", error);
-    set({ loading: false, loaded: false }); // 🔥 reset loaded también
-    return null;
-  }
-},
-  
-
-  refreshProfile: async () => {
     try {
-      const res = await axios.get(
-        `${baseUrl}/estudiantes/perfil`,
-        getAuthHeaders(true)
-      );
-
-      set({
-        profile: res.data,
-        loaded: true,
-      });
-
-      return res.data;
+      set({ loading: true });
+      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", false);
+      set({ profile: data, loading: false, loaded: true });
+      return data;
     } catch (error) {
-      console.error("Error refreshing profile:", error);
+      set({ loading: false, loaded: false, authError: true }); // ← marcar error
       return null;
     }
   },
 
-  updateProfile: async (formData) => {
-    const res = await axios.put(
-      `${baseUrl}/estudiantes/completarperfil`,
-      formData,
-      {
-        headers: {
-          ...getAuthHeaders(true).headers,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    set({
-      profile: res.data.perfilActualizado,
-      loaded: true,
-    });
-
-    return res.data.perfilActualizado;
+  refreshProfile: async () => {
+    try {
+      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", false);
+      set({ profile: data, loaded: true });
+      return data;
+    } catch (error) {
+      return null;
+    }
   },
-  
+
+ updateProfile: async (formData) => {
+  const data = await fetchDataBackend("estudiantes/completarperfil", formData, "PUT", false);
+  set({ profile: data.perfilActualizado, loaded: true });
+  return data.perfilActualizado;
+},
 
   clearProfile: () =>
     set({
       profile: null,
-      loaded: false, // 🔥 importante reset
+      loaded: false,
     }),
 }));
 

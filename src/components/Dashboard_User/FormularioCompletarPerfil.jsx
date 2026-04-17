@@ -1,8 +1,10 @@
+//src/components/Dashboard_User/FormularioCompletarPerfil.jsx
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import storeAuth from "../../context/storeAuth";
 import { useNavigate } from "react-router-dom";
 import storeProfile from "../../context/storeProfile";
+import { validate, rules } from "../../helpers/validators";
 
 const steps = ["Personal", "Identidad", "Ubicación", "Foto"];
 
@@ -23,7 +25,49 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
     ciudad: "",
     pais: "",
   });
+  const [fieldErrors, setFieldErrors] = useState({});
 
+  const schemasPorPaso = [
+    // Paso 0 — Personal
+    {
+      nombre: [rules.required, rules.noSpaces, rules.minLength(2)],
+      apellido: [rules.required, rules.minLength(2)],
+    },
+    // Paso 1 — Identidad
+    {
+      genero: [rules.selectRequired],
+      orientacion: [rules.selectRequired],
+      fechaNacimiento: [rules.required, rules.minAge(18)],
+    },
+    // Paso 2 — Ubicación
+    {
+      ciudad: [rules.required, rules.noSpaces],
+      pais: [rules.required, rules.noSpaces],
+    },
+    // Paso 3 — Foto (sin validaciones obligatorias)
+    {},
+  ];
+  const validarAmbosOtro = () => {
+    if (formData.genero === "otro" && formData.orientacion === "otro") {
+      return {
+        genero: "Género y orientación no pueden ser 'otro' al mismo tiempo.",
+      };
+    }
+    return {};
+  };
+
+  const handleNext = () => {
+    const { isValid, errors } = validate(formData, schemasPorPaso[currentStep]);
+    const extrasErrors = currentStep === 1 ? validarAmbosOtro() : {};
+    const todosLosErrores = { ...errors, ...extrasErrors };
+
+    if (!isValid || Object.keys(extrasErrors).length > 0) {
+      setFieldErrors(todosLosErrores);
+      return;
+    }
+    setFieldErrors({});
+    setCurrentStep((s) => s + 1);
+  };
   const [imagenArchivo, setImagenArchivo] = useState(null);
   const [imagenPreview, setImagenPreview] = useState("");
   const [guardando, setGuardando] = useState(false);
@@ -49,10 +93,18 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
   }, [initialData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (name === "genero") setShowGeneroWarning(value === "otro");
-  };
+  const { name, value } = e.target;
+  setFormData((prev) => ({ ...prev, [name]: value }));
+  if (name === "genero") setShowGeneroWarning(value === "otro");
+  // Limpiar error del campo al escribir
+  if (fieldErrors[name]) {
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      delete next[name];
+      return next;
+    });
+  }
+};
 
   const handleImagenChange = (e) => {
     const file = e.target.files[0];
@@ -84,6 +136,11 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
   // ✅ Ya no recibe evento — se llama directamente como función
   const handleSubmit = async () => {
     if (currentStep !== steps.length - 1) return; // 🛡️ guarda extra
+    const { isValid, errors } = validate(formData, schemasPorPaso[currentStep]);
+    if (!isValid) {
+      setFieldErrors(errors);
+      return;
+    }
     const errorValidacion = validarFormulario();
     if (errorValidacion) {
       setError(errorValidacion);
@@ -221,8 +278,13 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 placeholder="Tu nombre"
                 value={formData.nombre}
                 onChange={handleChange}
-                className={inputClass}
+                className={`${inputClass} ${fieldErrors.nombre ? "border-red-400 focus:ring-red-300" : ""}`}
               />
+              {fieldErrors.nombre && (
+                <p className="text-[11px] text-red-500 mt-1 pl-1">
+                  {fieldErrors.nombre}
+                </p>
+              )}
             </div>
             <div>
               <label className={labelClass}>Apellido</label>
@@ -232,8 +294,13 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 placeholder="Tu apellido"
                 value={formData.apellido}
                 onChange={handleChange}
-                className={inputClass}
+                className={`${inputClass} ${fieldErrors.apellido ? "border-red-400 focus:ring-red-300" : ""}`}
               />
+              {fieldErrors.apellido && (
+                <p className="text-[11px] text-red-500 mt-1 pl-1">
+                  {fieldErrors.apellido}
+                </p>
+              )}
             </div>
             <div>
               <label className={labelClass}>Biografía</label>
@@ -272,13 +339,20 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 name="genero"
                 value={formData.genero}
                 onChange={handleChange}
-                className={inputClass}
+                className={`${inputClass} ${fieldErrors.genero ? "border-red-400 focus:ring-red-300" : ""}`}
               >
+                
                 <option value="">Seleccione género</option>
                 <option value="hombre">Hombre</option>
                 <option value="mujer">Mujer</option>
                 <option value="otro">Otro</option>
               </select>
+              {fieldErrors.genero && (
+                <p className="text-[11px] text-red-500 mt-1 pl-1">
+                  {fieldErrors.genero}
+                </p>
+              )}
+
               {showGeneroWarning && (
                 <p className="text-xs text-orange-500 mt-1.5 pl-1">
                   Recuerda que orientación no puede ser (otro) también
@@ -291,7 +365,7 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 name="orientacion"
                 value={formData.orientacion}
                 onChange={handleChange}
-                className={inputClass}
+                className={`${inputClass} ${fieldErrors.orientacion ? "border-red-400 focus:ring-red-300" : ""}`}
               >
                 <option value="">Seleccione orientación</option>
                 <option value="heterosexual">Heterosexual</option>
@@ -299,6 +373,11 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 <option value="bisexual">Bisexual</option>
                 <option value="otro">Otro</option>
               </select>
+              {fieldErrors.orientacion && (
+                <p className="text-[11px] text-red-500 mt-1 pl-1">
+                  {fieldErrors.orientacion}
+                </p>
+              )}
             </div>
             <div>
               <label className={labelClass}>Fecha de nacimiento</label>
@@ -307,8 +386,13 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 name="fechaNacimiento"
                 value={formData.fechaNacimiento}
                 onChange={handleChange}
-                className={inputClass}
+                className={`${inputClass} ${fieldErrors.fechaNacimiento ? "border-red-400 focus:ring-red-300" : ""}`}
               />
+              {fieldErrors.fechaNacimiento && (
+                <p className="text-[11px] text-red-500 mt-1 pl-1">
+                  {fieldErrors.fechaNacimiento}
+                </p>
+              )}
             </div>
           </div>
 
@@ -324,8 +408,13 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 placeholder="Tu ciudad"
                 value={formData.ciudad}
                 onChange={handleChange}
-                className={inputClass}
+                className={`${inputClass} ${fieldErrors.ciudad ? "border-red-400 focus:ring-red-300" : ""}`}
               />
+              {fieldErrors.ciudad && (
+                <p className="text-[11px] text-red-500 mt-1 pl-1">
+                  {fieldErrors.ciudad}
+                </p>
+              )}
             </div>
             <div>
               <label className={labelClass}>País</label>
@@ -335,8 +424,13 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 placeholder="Tu país"
                 value={formData.pais}
                 onChange={handleChange}
-                className={inputClass}
+                className={`${inputClass} ${fieldErrors.pais ? "border-red-400 focus:ring-red-300" : ""}`}
               />
+              {fieldErrors.pais && (
+                <p className="text-[11px] text-red-500 mt-1 pl-1">
+                  {fieldErrors.pais}
+                </p>
+              )}
             </div>
           </div>
 
@@ -399,9 +493,10 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
               </button>
             )}
           </div>
-        </form>{/* ✅ form cierra ANTES de los botones de navegación */}
+        </form>
+        {/*  form cierra ANTES de los botones de navegación */}
 
-        {/* ✅ Navegación FUERA del form — nunca dispara submit accidental */}
+        {/*  Navegación FUERA del form — nunca dispara submit accidental */}
         <div className="flex items-center justify-between mt-6 sm:mt-8 gap-2 sm:gap-3">
           <button
             type="button"
@@ -415,7 +510,7 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
           {currentStep < steps.length - 1 ? (
             <button
               type="button"
-              onClick={() => setCurrentStep((s) => s + 1)}
+              onClick={handleNext}
               className="flex-1 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-red-400 to-orange-400 text-white text-xs sm:text-sm font-semibold hover:from-red-500 hover:to-orange-500 shadow-md shadow-orange-200 transition-all duration-200 active:scale-[0.98]"
             >
               Siguiente →

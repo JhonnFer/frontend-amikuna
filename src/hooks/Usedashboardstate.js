@@ -49,10 +49,10 @@ const useDashboardState = () => {
     if (!loadingPerfil && !profile) cargarPerfil();
   }, [loadingPerfil, profile, cargarPerfil]);
 
-  const handleLogout = useCallback(() => {
-    storeAuth.getState().logout();
-    window.location.href = "/login";
-  }, []);
+  const handleLogout = useCallback(async () => {
+  await storeAuth.getState().logout();
+  window.location.href = "/login";
+}, []);
 
   const handleOpenAporteModal = useCallback((monto, concepto, descripcion) => {
     setAporteSeleccionado({ monto, concepto, descripcion });

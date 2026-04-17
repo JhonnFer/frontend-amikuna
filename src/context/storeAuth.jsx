@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import storeProfile from "./storeProfile";
+import fetchDataBackend from "../helpers/fetchDataBackend";
 import { socket } from "../helpers/socket";
 
 const getValidToken = () => {
@@ -52,17 +53,18 @@ const storeAuth = create((set) => ({
   set({ user, token });
 },
 
-  logout: () => {
-
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  // 🔥 desconectar socket
-  socket.disconnect();
-
-  set({ user: null, token: null });
-
-  storeProfile.getState().clearProfile();
+  logout: async () => {
+  try {
+    await fetchDataBackend("api/logout", null, "POST", false);
+  } catch {
+    // Si falla igual limpiamos local
+  } finally {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    socket.disconnect();
+    set({ user: null, token: null });
+    storeProfile.getState().clearProfile();
+  }
 }
 
 }));

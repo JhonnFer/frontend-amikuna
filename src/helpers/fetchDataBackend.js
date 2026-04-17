@@ -2,12 +2,18 @@
 
 import axios from "axios";
 import { toast } from "react-toastify";
+import { socket } from "./socket"; // importar socket para desconectar en 401
 
 const API_URL = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 
 let errorToastId = null;
 
-const fetchDataBackend = async (endpoint, data, method = "GET", showToast = true) => {
+const fetchDataBackend = async (
+  endpoint,
+  data,
+  method = "GET",
+  showToast = true,
+) => {
   try {
     const url = `${API_URL}/${endpoint.replace(/^\//, "")}`;
     const token = localStorage.getItem("token");
@@ -32,7 +38,6 @@ const fetchDataBackend = async (endpoint, data, method = "GET", showToast = true
     }
 
     return response.data;
-
   } catch (error) {
     const status = error?.response?.status;
     const errorMsg =
@@ -45,6 +50,16 @@ const fetchDataBackend = async (endpoint, data, method = "GET", showToast = true
       toast.error(errorMsg, { toastId: "403-error" });
       throw new Error(errorMsg);
     }
+    if (status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      socket.disconnect(); // importar socket arriba
+      toast.error("Sesión cerrada. Inicia sesión nuevamente.", {
+        toastId: "401-session",
+      });
+      window.location.href = "/login";
+      return;
+    }
 
     if (errorMsg.toLowerCase().includes("token expired")) {
       localStorage.removeItem("token");
@@ -56,7 +71,9 @@ const fetchDataBackend = async (endpoint, data, method = "GET", showToast = true
     if (!errorToastId) {
       errorToastId = toast.error(errorMsg, {
         toastId: `error-${errorMsg}`,
-        onClose: () => { errorToastId = null; },
+        onClose: () => {
+          errorToastId = null;
+        },
       });
     }
 

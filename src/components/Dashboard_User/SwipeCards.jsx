@@ -129,12 +129,12 @@ const SwipeCards = () => {
 
             {/* INFO */}
             <div className="flex flex-col flex-[4] justify-between p-4 text-center overflow-hidden bg-white sm:max-h-[45%] ">
-              <div className="flex flex-col  top-2 pt-4 gap-0.5 overflow-hidden">
+              <div className="flex flex-col  gap-0.5 overflow-hidden ">
                 <h3 className="text-3xl font-bold text-gray-800 truncate">
                   {usuarioActual.nombre}
                 </h3>
 
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-gray-500 truncate ">
                   {usuarioActual.ubicacion?.ciudad},{" "}
                   {usuarioActual.ubicacion?.pais}
                 </p>
@@ -143,12 +143,12 @@ const SwipeCards = () => {
                   {usuarioActual.biografia || "Sin biografía"}
                 </p>
 
-                <p className="text-xs text-gray-700">
+                <p className="text-xs text-gray-700 line-clamp-1">
                   Género:{" "}
                   <span className="font-medium">{usuarioActual.genero}</span>
                 </p>
 
-                <p className="text-xs text-gray-700">
+                <p className="text-xs text-gray-700 line-clamp-1">
                   Orientación:{" "}
                   <span className="font-medium">
                     {usuarioActual.orientacion}

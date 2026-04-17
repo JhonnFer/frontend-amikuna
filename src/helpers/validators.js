@@ -47,6 +47,33 @@ const rules = {
     /^https?:\/\/.+/.test(value)
       ? null
       : "URL inválida.",
+  // Agrega dentro del objeto rules:
+
+noSpaces: (value) =>
+  /\s/.test(String(value).trim())
+    ? "No se permiten espacios."
+    : null,
+
+selectRequired: (value) =>
+  !value || value === ""
+    ? "Selecciona una opción."
+    : null,
+
+minAge: (minYears) => (value) => {
+  if (!value) return "La fecha es obligatoria.";
+  const nacimiento = new Date(value);
+  if (isNaN(nacimiento.getTime())) return "Fecha inválida.";
+  const hoy = new Date();
+  const edad = hoy.getFullYear() - nacimiento.getFullYear();
+  const cumplio =
+    hoy.getMonth() > nacimiento.getMonth() ||
+    (hoy.getMonth() === nacimiento.getMonth() &&
+      hoy.getDate() >= nacimiento.getDate());
+  return (cumplio ? edad : edad - 1) >= minYears
+    ? null
+    : `Debes tener al menos ${minYears} años.`;
+},
+
 };
 
 // ─── Función principal ────────────────────────────────────────────
