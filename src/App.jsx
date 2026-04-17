@@ -51,7 +51,6 @@ function App() {
 
 useEffect(() => {
   if (token && !socketInitialized.current) {
-    console.log("🔐 Conectando socket UNA SOLA VEZ...");
 
     socket.auth = { token };
     socket.connect();

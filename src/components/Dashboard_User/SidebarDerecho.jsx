@@ -19,7 +19,7 @@ const SidebarDerecho = ({
   mostrarChatbot,
   setMostrarChatbot,
 }) => {
-  console.log("🔥 matchesMutuos:", matchesMutuos);
+  
 
   const { historial = [], cargarHistorial, enviarMensaje, loading, respuesta } = useChatbot();
   const [mostrarHistorial, setMostrarHistorial] = useState(false);
@@ -31,9 +31,10 @@ const SidebarDerecho = ({
       await cargarHistorial();
     }
   };
+  
   useEffect(() => {
-  console.log("🆕 Nuevo render matches:", matchesMutuos.map(m => m._id));
 }, [matchesMutuos]);
+
   return (
     <aside
       className="

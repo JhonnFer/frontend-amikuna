@@ -19,7 +19,7 @@ const getValidToken = () => {
     if (!socket.connected) {
       socket.auth = { token };
       socket.connect();
-      console.log("🟢 Socket conectado UNA SOLA VEZ");
+      
     }
 
     return token;

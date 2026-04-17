@@ -8,7 +8,6 @@ const useMatches = () => {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  console.log("🔥 matches hook:", matches);
 
   const fetchMatches = useCallback(async () => {
     setLoading(true);
@@ -31,7 +30,6 @@ const useMatches = () => {
   // 🎧 listener socket
   useEffect(() => {
   const handleNuevoMatch = () => {
-    console.log("🔥 nuevo_match o nuevo_chat recibido");
     fetchMatches();
   };
 
