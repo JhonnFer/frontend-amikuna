@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import fetchDataBackend from "../helpers/fetchDataBackend"; // ✅ import directo
-import useSocket from "../hooks/useSocket";
+import { socket } from "../helpers/socket";
 
 
 const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
-  const { socket } = useSocket(); 
+
   // ── Estado: eventos públicos ───────────────────────────────────────────────
   const [eventos,            setEventos]            = useState([]);
   const [loadingEventos,     setLoadingEventos]     = useState(autoCargar);
@@ -20,18 +20,21 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
   const [errorAsistencia,    setErrorAsistencia]    = useState(null);
 
   // ── GET ver-eventos ────────────────────────────────────────────────────────
-  const obtenerEventos = useCallback(async () => {
-    setLoadingEventos(true);
-    setErrorEventos(null);
-    try {
-      const data = await fetchDataBackend("estudiantes/ver-eventos", null, "GET");
-      setEventos(data ?? []);
-    } catch (err) {
-      setErrorEventos(err.message || "Error al obtener eventos");
-    } finally {
-      setLoadingEventos(false);
-    }
-  }, []); // ✅ sin dependencias — fetchDataBackend es estable
+const obtenerEventos = useCallback(async () => {
+  setLoadingEventos(true);
+  setErrorEventos(null);
+  try {
+    const data = await fetchDataBackend("estudiantes/ver-eventos", null, "GET");
+    // Backend ya filtra — solo guardamos lo que llega
+    setEventos(data ?? []);
+  } catch (err) {
+    setErrorEventos(err.message || "Error al obtener eventos");
+  } finally {
+    setLoadingEventos(false);
+  }
+}, []);
+
+
 
   // ── GET mis-eventos ────────────────────────────────────────────────────────
   const obtenerMisEventos = useCallback(async () => {
@@ -84,13 +87,32 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
   // ── Auto-carga ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (autoCargar) obtenerEventos();
-  }, []); // ✅ solo al montar
+  }, []); 
+
+  
+  // Intervalo — limpia eventos que ya iniciaron sin recargar
+useEffect(() => {
+  const limpiarEventosPasados = () => {
+    const ahora = new Date();
+    setEventos((prev) => prev.filter((e) => {
+      const [horas, minutos] = e.hora.split(":").map(Number);
+      const fechaEvento = new Date(e.fecha);
+      fechaEvento.setUTCHours(horas + 5, minutos, 0, 0);
+      return fechaEvento >= ahora;
+    }));
+  };
+
+  limpiarEventosPasados();
+  const intervalo = setInterval(limpiarEventosPasados, 60000);
+  return () => clearInterval(intervalo);
+}, []);
   // ── SOCKET: sincronización en tiempo real ─────────────────────────────────
 useEffect(() => {
   if (!socket) return;
+  
+  
 
   const handleCambioEventos = () => {
-    console.log("📡 Cambio en eventos detectado por socket");
     obtenerEventos();
     obtenerMisEventos();
   };

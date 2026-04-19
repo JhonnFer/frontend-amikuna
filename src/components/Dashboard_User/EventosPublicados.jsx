@@ -13,8 +13,10 @@ const ModalMisEventos = ({ onClose }) => {
     obtenerMisEventos,
     rechazarAsistencia,
     cargandoAsistencia,
-  } = useEventos({ autoCargar: false, onAsistenciaSuccess: () => obtenerMisEventos() });
-  
+  } = useEventos({
+    autoCargar: false,
+    onAsistenciaSuccess: () => obtenerMisEventos(),
+  });
 
   //useEffect en lugar de useState
   useEffect(() => {
@@ -164,7 +166,6 @@ ModalMisEventos.propTypes = {
   rechazarAsistencia: PropTypes.func.isRequired,
   cargandoAsistencia: PropTypes.bool.isRequired,
   onAsistenciaSuccess: PropTypes.func.isRequired,
-
 };
 
 // ── Componente Principal ───────────────────────────────────────────────────────
@@ -182,7 +183,7 @@ const EventosPublicados = ({
 
   if (loading) return <p>Cargando eventos...</p>;
 
-  const eventosMostrados = isExpanded ? eventos : eventos.slice(0, 2);
+  const eventosMostrados = eventos;
   const hayMasEventos = eventos.length > 2;
 
   return (
@@ -232,6 +233,9 @@ const EventosPublicados = ({
             <ul className="space-y-4 pb-2">
               {eventosMostrados.map((evento) => {
                 const isRechazado = !!eventosRechazados[evento._id];
+                const fechaCompleta = new Date(
+                  `${evento.fecha.split("T")[0]}T${evento.hora }`,
+                );
                 return (
                   <li
                     key={evento._id}
@@ -251,7 +255,7 @@ const EventosPublicados = ({
                     <h3 className="font-semibold text-rose-800">
                       {evento.titulo}
                     </h3>
-                    <p className="text-sm text-gray-700 mt-1">
+                    <p className="text-sm text-gray-700 ">
                       {evento.descripcion}
                     </p>
 
@@ -262,32 +266,38 @@ const EventosPublicados = ({
                       </p>
                     )}
 
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-xs text-gray-500">
+                    <div className="flex justify-center flex-col mt-2">
+                      <span className="text-xs text-gray-500 ">
                         📅{" "}
-                        {new Date(evento.fecha).toLocaleDateString("es-EC", {
+                        {fechaCompleta.toLocaleString("es-EC", {
                           weekday: "short",
                           day: "numeric",
                           month: "short",
                           year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          timeZone: "America/Guayaquil",
                         })}
                       </span>
-                      <div className="flex gap-2">
+                      <div className="flex gap-4 mt-2 justify-center">
                         <button
                           onClick={() => onConfirmar(evento._id)}
                           disabled={cargandoAsistencia || isRechazado}
-                          className="relative p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                          className="relative flex gap-1 p-2 items-center font-semibold bg-gradient-to-br from-green-400 to-blue-500 text-white rounded-full hover:bg-green-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
                           title="Confirmar asistencia"
                         >
                           <FaCalendarCheck />
+                          <span>Unirme</span>
+
                         </button>
                         <button
                           onClick={() => onRechazar(evento._id)}
                           disabled={cargandoAsistencia || isRechazado}
-                          className="relative p-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                          className="relative flex gap-1 p-2 px-3 font-medium items-center bg-gradient-to-br from-red-500 to-pink-500 text-white rounded-full hover:bg-red-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
                           title="Rechazar asistencia"
                         >
                           <FaTimesCircle />
+                          <span>Omitir</span>
                         </button>
                       </div>
                     </div>

@@ -72,13 +72,16 @@ const useDashboardState = () => {
   }, [matches, profile]);
 
   const eventosDisponibles = useMemo(() => {
-    if (!eventos || !profile?._id) return [];
-    return eventos.filter((evento) => {
-      const asistentes  = evento.asistentes.map((a) => a._id);
-      const noAsistiran = evento.noAsistiran.map((a) => a._id);
-      return !asistentes.includes(profile._id) && !noAsistiran.includes(profile._id);
-    });
-  }, [eventos, profile]);
+  if (!eventos || !profile?._id) return [];
+  
+  const profileId = profile._id.toString(); // ← convertir a string
+  
+  return eventos.filter((evento) => {
+    const asistentes  = evento.asistentes.map((a) => a._id?.toString());
+    const noAsistiran = evento.noAsistiran.map((a) => a._id?.toString());
+    return !asistentes.includes(profileId) && !noAsistiran.includes(profileId);
+  });
+}, [eventos, profile]);
 
   return {
     profile, loadingPerfil, cargarPerfil,
