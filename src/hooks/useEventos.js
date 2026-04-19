@@ -93,15 +93,14 @@ const obtenerEventos = useCallback(async () => {
   // Intervalo — limpia eventos que ya iniciaron sin recargar
 useEffect(() => {
   const limpiarEventosPasados = () => {
-  const ahora = new Date();
-  setEventos((prev) => prev.filter((e) => {
-    if (!e.hora) return true; // ← si no tiene hora, no filtrar
-    const [horas, minutos] = e.hora.split(":").map(Number);
-    const fechaEvento = new Date(e.fecha);
-    fechaEvento.setUTCHours(horas + 5, minutos, 0, 0);
-    return fechaEvento >= ahora;
-  }));
-};
+    const ahora = new Date();
+    setEventos((prev) => prev.filter((e) => {
+      const [horas, minutos] = e.hora.split(":").map(Number);
+      const fechaEvento = new Date(e.fecha);
+      fechaEvento.setUTCHours(horas + 5, minutos, 0, 0);
+      return fechaEvento >= ahora;
+    }));
+  };
 
   limpiarEventosPasados();
   const intervalo = setInterval(limpiarEventosPasados, 60000);
