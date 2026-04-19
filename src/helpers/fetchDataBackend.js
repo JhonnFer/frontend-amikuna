@@ -51,9 +51,12 @@ const fetchDataBackend = async (
       throw new Error(errorMsg);
     }
     if (status === 401) {
+      // ← si es el login, dejar que el componente maneje el error
+      if (endpoint.includes("login")) throw new Error(errorMsg);
+
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      socket.disconnect(); // importar socket arriba
+      socket.disconnect();
       toast.error("Sesión cerrada. Inicia sesión nuevamente.", {
         toastId: "401-session",
       });

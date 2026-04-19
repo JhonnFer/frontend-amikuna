@@ -100,6 +100,7 @@ const SwipeCards = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
             className="absolute inset-0  rounded-2xl shadow-xl overflow-hidden flex flex-col"
+            style={{ WebkitFontSmoothing: "antialiased", willChange: "transform" }} 
           >
             {/* FOTO PRINCIPAL — técnica Tinder */}
             <div
@@ -130,7 +131,7 @@ const SwipeCards = () => {
             {/* INFO */}
             <div className="flex flex-col flex-[4] justify-between p-4 text-center overflow-hidden bg-white sm:max-h-[45%] ">
               <div className="flex flex-col  gap-0.5 overflow-hidden ">
-                <h3 className="text-3xl font-bold text-gray-800 truncate">
+                <h3 className="text-xl font-bold text-gray-800 truncate" style={{ WebkitFontSmoothing: "antialiased" }}>
                   {usuarioActual.nombre}
                 </h3>
 
