@@ -11,6 +11,8 @@ import VisorFotos from "../components/UI/VisorFotos";
 import ModalGaleria from "../components/Modals_Dashboards/Modalgaleria";
 import ModalConfirmarEliminar from "../components/Modals_Dashboards/Modalconfirmareliminar";
 
+import { FaUser } from "react-icons/fa";
+
 import useDashboardState from "../hooks/Usedashboardstate";
 import storeProfile from "../context/storeProfile";
 
@@ -123,7 +125,7 @@ if (!profile) {
         />
       )}
  
-      <Modal isOpen={mostrarEditarPerfil} title="Editar perfil" showCloseButton={true} onClose={() => setMostrarEditarPerfil(false)}>
+      <Modal isOpen={mostrarEditarPerfil} title="Editar perfil" icon={<FaUser size={22}/>} showCloseButton={true} onClose={() => setMostrarEditarPerfil(false)}>
         <FormularioCompletarPerfil
           initialData={profile}
           onSuccess={async () => { await cargarPerfil(); setMostrarEditarPerfil(false); }}

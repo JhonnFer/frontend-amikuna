@@ -55,7 +55,7 @@ const storeAuth = create((set) => ({
 
   logout: async () => {
   try {
-    await fetchDataBackend("api/logout", null, "POST", false);
+    await fetchDataBackend("/logout", null, "POST", false);
   } catch {
     // Si falla igual limpiamos local
   } finally {

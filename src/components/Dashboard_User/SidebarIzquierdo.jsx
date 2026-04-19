@@ -9,19 +9,19 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
   return (
     <aside className="hidden sm:flex md:flex-col w-full sm:w-64 md:w-72 lg:w-80 xl:w-[350px] bg-gradient-to-t from-red-200 via-orange-100  to-orange-200   p-4 shadow flex-shrink-0 h-screen border border-gray-400 rounded-2xl  bg-white">
       <div
-        className="flex flex-col h-full overflow-y-auto scrollbar-sidebar scrollbar-left "
+        className="flex flex-col h-full overflow-y-auto scrollbar-sidebar scrollbar-left w-full max-w-md px-2 "
         style={{ scrollBehavior: "smooth" }}
       >
         
           {/* HEADER */}
-          <header className="mb-6 text-center w-[20vw] md:max-w-[27vw]">
+          <header className="mb-6 text-center ">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent border-b-2 border-pink-600 pb-2">
               Tu Perfil
             </h1>
           </header>
 
           {/* PERFIL */}
-          <div className="flex flex-col items-center mb-4 w-[20vw] md:max-w-[27vw]">
+          <div className="flex flex-col items-center mb-4 ]">
             <img
               src={profile?.imagenPerfil || "https://placehold.co/150x150"}
               alt="Tu foto de perfil"
@@ -35,13 +35,13 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
             <h3 className="text-xl font-bold text-gray-800">
               {profile?.nombre || "Sin nombre"}
             </h3>
-            <p className="text-center text-gray-500 italic">
+            <p className="text-justify text-gray-500 italic items-center">
               {profile?.biografia || "Sin biografía definida"}
             </p>
           </div>
 
           {/* DATOS PERSONALES */}
-          <div className="bg-gradient-to-r  from-red-100 via-orange-50  to-orange-100 border-2 border-gray-300 rounded-lg shadow-md  p-4  space-y-2 mb-4 w-[20vw] md:max-w-[27vw]">
+          <div className="bg-gradient-to-r  from-red-100 via-orange-50  to-orange-100 border-2 border-gray-300 rounded-lg shadow-md  p-4  space-y-2 mb-4 ">
             <p>
               <strong className="bg-gradient-to-r from-[#ED213A] to-[#93291E] bg-clip-text text-transparent">
                 Género:
@@ -96,7 +96,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
           {/* GALERÍA - placeholder si no hay fotos */}
           {(!profile?.imagenesGaleria ||
             profile.imagenesGaleria.length === 0) && (
-            <div className="mt-4 w-[20vw] md:max-w-[27vw]">
+            <div className="mt-4 ">
               <h4 className="text-gray-700 text-xl font-semibold drop-shadow-sm mb-2">
                 Últimas Fotos
               </h4>
@@ -116,7 +116,7 @@ const SidebarIzquierdo = ({ profile, setMostrarGaleriaFotos }) => {
 
           {/* GALERÍA - con fotos */}
           {profile?.imagenesGaleria?.length > 0 && (
-            <div className="mt-4 w-[20vw] md:max-w-[27vw]">
+            <div className="mt-4 ">
               <h4 className="text-gray-700 text-xl font-semibold mb-2">
                 Últimas Fotos
               </h4>

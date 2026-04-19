@@ -142,12 +142,7 @@ const ModalMisEventos = () => {
 };
 
 
-ModalMisEventos.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  rechazarAsistencia: PropTypes.func.isRequired,
-  cargandoAsistencia: PropTypes.bool.isRequired,
-  onAsistenciaSuccess: PropTypes.func.isRequired,
-};
+ModalMisEventos.propTypes = {};
 
 // ── Componente Principal ───────────────────────────────────────────────────────
 const EventosPublicados = ({
