@@ -133,39 +133,40 @@ const SwipeCards = () => {
 
             {/* INFO */}
             <div className="flex flex-col flex-[4] justify-between p-2 sm:p-4 text-center overflow-hidden bg-white sm:max-h-[45%] ">
-              <div className="flex flex-col  gap-0.5 overflow-hidden ">
+              <div className="flex flex-col  gap-0.5 overflow-y-auto scrollbar-sidebar ">
                 <h3
-                  className="text-base sm:text-lg md:text-xl font-bold text-gray-800 truncate"
+                  className="text-base sm:text-lg md:text-xl font-bold text-gray-800 line-clamp-none"
                   style={{ WebkitFontSmoothing: "antialiased" }}
                 >
                   {usuarioActual.nombre}
                 </h3>
 
-                <p className="text-[11px] sm:text-xs text-gray-500 truncate ">
+                <p className="text-[11px] sm:text-xs text-gray-500 line-clamp-none">
                   {usuarioActual.ubicacion?.ciudad},{" "}
                   {usuarioActual.ubicacion?.pais}
                 </p>
 
-                <p className="text-[11px] sm:text-xs italic text-gray-600 line-clamp-2">
+                <p className="text-[11px] sm:text-xs italic text-gray-600 line-clamp-none">
                   {usuarioActual.biografia || "Sin biografía"}
                 </p>
 
-                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-1">
+                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-none">
                   Género:{" "}
                   <span className="font-medium">{usuarioActual.genero}</span>
                 </p>
 
-                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-1">
+                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-none">
                   Orientación:{" "}
                   <span className="font-medium">
                     {usuarioActual.orientacion}
                   </span>
                 </p>
 
-                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-1">
+                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-none">
                   Intereses:{" "}
                   {usuarioActual.intereses?.join(", ") || "No definidos"}
                 </p>
+                
                 {/* CONTADORES DE SEGUIDORES Y SEGUIDOS */}
                 <div className="flex gap-6 mt-3 items-center justify-center">
                   <div className="flex flex-col items-center">
