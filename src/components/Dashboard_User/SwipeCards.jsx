@@ -100,7 +100,10 @@ const SwipeCards = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
             className="absolute inset-0  rounded-2xl shadow-xl overflow-hidden flex flex-col"
-            style={{ WebkitFontSmoothing: "antialiased", willChange: "transform" }} 
+            style={{
+              WebkitFontSmoothing: "antialiased",
+              willChange: "transform",
+            }}
           >
             {/* FOTO PRINCIPAL — técnica Tinder */}
             <div
@@ -129,34 +132,37 @@ const SwipeCards = () => {
             </div>
 
             {/* INFO */}
-            <div className="flex flex-col flex-[4] justify-between p-4 text-center overflow-hidden bg-white sm:max-h-[45%] ">
+            <div className="flex flex-col flex-[4] justify-between p-2 sm:p-4 text-center overflow-hidden bg-white sm:max-h-[45%] ">
               <div className="flex flex-col  gap-0.5 overflow-hidden ">
-                <h3 className="text-xl font-bold text-gray-800 truncate" style={{ WebkitFontSmoothing: "antialiased" }}>
+                <h3
+                  className="text-base sm:text-lg md:text-xl font-bold text-gray-800 truncate"
+                  style={{ WebkitFontSmoothing: "antialiased" }}
+                >
                   {usuarioActual.nombre}
                 </h3>
 
-                <p className="text-xs text-gray-500 truncate ">
+                <p className="text-[11px] sm:text-xs text-gray-500 truncate ">
                   {usuarioActual.ubicacion?.ciudad},{" "}
                   {usuarioActual.ubicacion?.pais}
                 </p>
 
-                <p className="text-xs italic text-gray-600 line-clamp-2">
+                <p className="text-[11px] sm:text-xs italic text-gray-600 line-clamp-2">
                   {usuarioActual.biografia || "Sin biografía"}
                 </p>
 
-                <p className="text-xs text-gray-700 line-clamp-1">
+                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-1">
                   Género:{" "}
                   <span className="font-medium">{usuarioActual.genero}</span>
                 </p>
 
-                <p className="text-xs text-gray-700 line-clamp-1">
+                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-1">
                   Orientación:{" "}
                   <span className="font-medium">
                     {usuarioActual.orientacion}
                   </span>
                 </p>
 
-                <p className="text-xs text-gray-700 line-clamp-1">
+                <p className="text-[11px] sm:text-xs text-gray-700 line-clamp-1">
                   Intereses:{" "}
                   {usuarioActual.intereses?.join(", ") || "No definidos"}
                 </p>
