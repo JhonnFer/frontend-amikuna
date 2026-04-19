@@ -44,21 +44,10 @@ const SidebarDerecho = ({
       p-2 sm:p-3 md:p-4
       flex-shrink-0
       h-screen
-      border border-gray-400 rounded-2xl  bg-white
+      border border-gray-400 rounded-2xl 
       "
     >
-      {/* CONTENIDO SUPERIOR */}
-      <div
-        className="
-        flex flex-col
-        flex-1
-        min-h-0
-        overflow-y-auto
-        scrollbar-hide
-        text-xs sm:text-sm md:text-base
-        "
-      >
-        <EventosPublicados
+      <EventosPublicados
           eventos={eventosDisponibles}
           loading={loadingEventos}
           onConfirmar={confirmarAsistencia}
@@ -67,6 +56,18 @@ const SidebarDerecho = ({
           isExpanded={eventosExpandidos}
           toggleExpand={() => setEventosExpandidos(!eventosExpandidos)}
         />
+      {/* CONTENIDO SUPERIOR */}
+      <div
+        className="
+        flex flex-col
+        flex-1
+        min-h-0
+        text-xs sm:text-sm md:text-base
+        overflow-y-auto
+        scrollbar-sidebar
+        "
+      >
+        
 
         <h2 className="text-gray-500 uppercase mt-4 mb-2 text-xs sm:text-sm">
           Matches con quien chatear!
@@ -86,6 +87,7 @@ const SidebarDerecho = ({
                 hover:bg-gray-100
                 p-2
                 rounded
+                
                 "
               >
                 <img

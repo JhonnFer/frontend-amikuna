@@ -3,9 +3,10 @@ import PropTypes from "prop-types";
 import { FaCalendarCheck, FaTimesCircle, FaClock } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import useEventos from "../../hooks/useEventos";
+import Modal from "../Modals_Dashboards/modal";
 
 // ── Modal: Mis Eventos ─────────────────────────────────────────────────────────
-const ModalMisEventos = ({ onClose }) => {
+const ModalMisEventos = () => {
   const {
     misEventos,
     loadingMisEventos,
@@ -18,33 +19,13 @@ const ModalMisEventos = ({ onClose }) => {
     onAsistenciaSuccess: () => obtenerMisEventos(),
   });
 
-  //useEffect en lugar de useState
   useEffect(() => {
     obtenerMisEventos();
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-gradient-to-br from-red-100 via-orange-50  to-orange-100 rounded-xl shadow-2xl w-full max-w-md max-h-[85vh] flex flex-col">
-        {/* Header */}
-        <div className="flex justify-between items-center border-b px-5 py-4 shrink-0">
-          <div className="flex items-center gap-2">
-            <FaClock className=" text-black/70" size={18} />
-            <h3 className="text-lg font-bold text-gray-800">
-              Mis Próximos Eventos
-            </h3>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-xl font-bold leading-none"
-            aria-label="Cerrar"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="overflow-y-auto flex-1 px-5 py-4">
+        
+        <div className="max-h-[60vh] overflow-y-auto scrollbar-eventos">
           {loadingMisEventos && (
             <p className="text-sm text-gray-400 animate-pulse text-center py-8">
               Cargando tus eventos...
@@ -70,96 +51,96 @@ const ModalMisEventos = ({ onClose }) => {
 
           {!loadingMisEventos && misEventos.length > 0 && (
             <ul className="space-y-4 pb-2 ">
-              {misEventos.map((evento) => (
-                <li
-                  key={evento._id}
-                  className="border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-                >
-                  {/*  Imagen del evento en el modal */}
-                  {evento.imagen && (
-                    <img
-                      src={evento.imagen}
-                      alt={evento.titulo}
-                      className="w-full h-full  max-h-[25%] bg-contain bg-gradient-to-b from-orange-50 via-red-50 to-blue-100 bg-center object-contain bg-no-repeat aspect-video"
-                    />
-                  )}
-
-                  <div className="p-4">
-                    {/* Título */}
-                    <h4 className="font-semibold text-rose-700 text-sm">
-                      {evento.titulo}
-                    </h4>
-
-                    {/* Descripción */}
-                    {evento.descripcion && (
-                      <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                        {evento.descripcion}
-                      </p>
-                    )}
-
-                    {/* Fecha y lugar */}
-                    <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
-                      {evento.fecha && (
-                        <span>
-                          📅{" "}
-                          {new Date(evento.fecha).toLocaleDateString("es-EC", {
-                            weekday: "short",
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })}
-                        </span>
-                      )}
-                      {evento.lugar && <span>📍 {evento.lugar}</span>}
-                    </div>
-
-                    {/* Creador */}
-                    {evento.creador && (
-                      <p className="text-xs text-gray-400 mt-1">
-                        Organizado por:{" "}
-                        <span className="font-medium text-gray-600">
-                          {evento.creador.nombre} {evento.creador.apellido}
-                        </span>
-                      </p>
-                    )}
-
-                    {/* Asistentes */}
-                    {evento.asistentes?.length > 0 && (
-                      <p className="text-xs text-gray-400 mt-1">
-                        👥 {evento.asistentes.length} asistente
-                        {evento.asistentes.length !== 1 ? "s" : ""}
-                      </p>
-                    )}
-                  </div>
-                  {/* Botón declinar */}
-                  <button
-                    onClick={() => rechazarAsistencia(evento._id)}
-                    disabled={cargandoAsistencia}
-                    className="mt-3 w-full text-xs px-3 py-1.5 rounded-lg border border-red-300 text-red-500 hover:bg-red-50 transition disabled:opacity-50"
+              {misEventos.map((evento) => {
+                const fechaCompleta = new Date(
+                  `${evento.fecha.split("T")[0]}T${evento.hora}`,
+                );
+                return (
+                  <li
+                    key={evento._id}
+                    className="border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                   >
-                    {cargandoAsistencia
-                      ? "Procesando..."
-                      : "Declinar asistencia"}
-                  </button>
-                </li>
-              ))}
+                    {/*  Imagen del evento en el modal */}
+                    {evento.imagen && (
+                      <img
+                        src={evento.imagen}
+                        alt={evento.titulo}
+                        className="w-full h-full  max-h-[25%] bg-contain bg-gradient-to-b from-orange-50 via-red-50 to-blue-100 bg-center object-contain bg-no-repeat aspect-video"
+                      />
+                    )}
+
+                    <div className="p-4">
+                      {/* Título */}
+                      <h4 className="font-semibold text-rose-700 text-sm">
+                        {evento.titulo}
+                      </h4>
+
+                      {/* Descripción */}
+                      {evento.descripcion && (
+                        <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                          {evento.descripcion}
+                        </p>
+                      )}
+
+                      {/* Fecha y lugar */}
+                      <div className="flex flex-wrap gap-3 mt-2 text-xs text-gray-500">
+                        {evento.fecha && (
+                          <span>
+                            📅{" "}
+                            {fechaCompleta.toLocaleString("es-EC", {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              timeZone: "America/Guayaquil",
+                            })}
+                          </span>
+                        )}
+                        {evento.lugar && <span>📍 {evento.lugar}</span>}
+                      </div>
+
+                      {/* Creador */}
+                      {evento.creador && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          Organizado por:{" "}
+                          <span className="font-medium text-gray-600">
+                            {evento.creador.nombre} {evento.creador.apellido}
+                          </span>
+                        </p>
+                      )}
+
+                      {/* Asistentes */}
+                      {evento.asistentes?.length > 0 && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          👥 {evento.asistentes.length} asistente
+                          {evento.asistentes.length !== 1 ? "s" : ""}
+                        </p>
+                      )}
+                    </div>
+                    {/* Botón declinar */}
+                    <button
+                      onClick={() => rechazarAsistencia(evento._id)}
+                      disabled={cargandoAsistencia}
+                      className="mt-3 w-full text-xs px-3 py-1.5 rounded-lg border border-red-300 text-red-500 hover:bg-red-50 transition disabled:opacity-50"
+                    >
+                      {cargandoAsistencia
+                        ? "Procesando..."
+                        : "Declinar asistencia"}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
-        </div>
 
-        {/* Footer */}
-        <div className="border-t px-5 py-3 flex justify-end shrink-0">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-          >
-            Cerrar
-          </button>
         </div>
-      </div>
-    </div>
-  );
+     
+);
+
 };
+
 
 ModalMisEventos.propTypes = {
   onClose: PropTypes.func.isRequired,
@@ -234,7 +215,7 @@ const EventosPublicados = ({
               {eventosMostrados.map((evento) => {
                 const isRechazado = !!eventosRechazados[evento._id];
                 const fechaCompleta = new Date(
-                  `${evento.fecha.split("T")[0]}T${evento.hora }`,
+                  `${evento.fecha.split("T")[0]}T${evento.hora}`,
                 );
                 return (
                   <li
@@ -288,7 +269,6 @@ const EventosPublicados = ({
                         >
                           <FaCalendarCheck />
                           <span>Unirme</span>
-
                         </button>
                         <button
                           onClick={() => onRechazar(evento._id)}
@@ -310,9 +290,16 @@ const EventosPublicados = ({
       </div>
 
       {/* Modal mis eventos */}
-      {modalMisEventos && (
-        <ModalMisEventos onClose={() => setModalMisEventos(false)} />
-      )}
+      <Modal
+        isOpen={modalMisEventos}
+        onClose={() => setModalMisEventos(false)}
+        title="Mis Próximos Eventos" 
+        icon={<FaClock size={22} />}
+
+      >
+        
+        <ModalMisEventos />
+      </Modal>
     </>
   );
 };

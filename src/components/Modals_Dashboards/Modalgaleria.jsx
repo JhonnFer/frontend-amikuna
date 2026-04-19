@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Modal from "./modal";
 import { FiTrash2 } from "react-icons/fi";
+import { FaImages } from "react-icons/fa";
 
 const ModalGaleria = ({
   isOpen,
@@ -46,7 +47,7 @@ const ModalGaleria = ({
   };
 
   return (
-    <Modal isOpen={isOpen} title="Agregar fotos a tu galería" showCloseButton={true} onClose={onClose}>
+    <Modal isOpen={isOpen} title="Agregar fotos a tu galería" icon={<FaImages size={22} />} showCloseButton={true} onClose={onClose}>
 
       {loadingFotos && (
         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center rounded-lg">
@@ -57,7 +58,7 @@ const ModalGaleria = ({
         </div>
       )}
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 overflow-hidden">
         <input
           type="file"
           multiple
@@ -72,7 +73,7 @@ const ModalGaleria = ({
             if (!res.ok) alert(res.msg);
           }}
           disabled={loadingFotos}
-          className="bg-rose-600 text-white py-2 rounded hover:bg-rose-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-gradient-to-r from-pink-600 to-orange-400 text-white py-2 rounded hover:from-pink-700 hover:to-orange-500 transitiondisabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loadingFotos ? "Subiendo..." : "Subir Fotos"}
         </button>
@@ -80,7 +81,7 @@ const ModalGaleria = ({
         {profile?.imagenesGaleria?.length > 0 && (
           <>
             {/* Barra de acciones */}
-            <div className="flex items-center justify-between">
+            <div className="flex overflow-hidden items-center justify-between">
               {modoEliminar ? (
                 <>
                   <span className="text-sm text-gray-500">
@@ -115,7 +116,7 @@ const ModalGaleria = ({
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 overflow-y-auto  max-h-[40vh] scrollbar-eventos">
               {profile.imagenesGaleria.map((foto, i) => {
                 const estaSeleccionada = seleccionadas.includes(foto);
                 return (

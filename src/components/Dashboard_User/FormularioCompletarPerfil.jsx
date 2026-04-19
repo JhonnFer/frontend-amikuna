@@ -1,12 +1,15 @@
 //src/components/Dashboard_User/FormularioCompletarPerfil.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import storeAuth from "../../context/storeAuth";
 import { useNavigate } from "react-router-dom";
 import storeProfile from "../../context/storeProfile";
 import { validate, rules } from "../../helpers/validators";
 
+
+
 const steps = ["Personal", "Identidad", "Ubicación", "Foto"];
+
 
 const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
   const { updateProfile, loadProfile } = storeProfile();
@@ -26,6 +29,7 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
     pais: "",
   });
   const [fieldErrors, setFieldErrors] = useState({});
+  const scrollRef = useRef(null);
 
   const schemasPorPaso = [
     // Paso 0 — Personal
@@ -93,18 +97,18 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
   }, [initialData]);
 
   const handleChange = (e) => {
-  const { name, value } = e.target;
-  setFormData((prev) => ({ ...prev, [name]: value }));
-  if (name === "genero") setShowGeneroWarning(value === "otro");
-  // Limpiar error del campo al escribir
-  if (fieldErrors[name]) {
-    setFieldErrors((prev) => {
-      const next = { ...prev };
-      delete next[name];
-      return next;
-    });
-  }
-};
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "genero") setShowGeneroWarning(value === "otro");
+    // Limpiar error del campo al escribir
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => {
+        const next = { ...prev };
+        delete next[name];
+        return next;
+      });
+    }
+  };
 
   const handleImagenChange = (e) => {
     const file = e.target.files[0];
@@ -184,10 +188,19 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
   const labelClass =
     "block text-[10px] sm:text-xs font-semibold text-orange-700 uppercase tracking-widest mb-1 sm:mb-1.5";
 
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  }, [currentStep]);
+
   return (
-    <div className="w-full max-w-[95%] md:max-w-[45rem] bg-gradient-to-br from-red-100 via-orange-50 to-orange-100 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-orange-200/60 mx-auto">
+    <div className="w-full overflow-hidden md:max-w-[45rem] bg-gradient-to-br from-red-100 via-orange-50 to-orange-100 rounded-2xl sm:rounded-3xl shadow-2xl  border border-orange-200/60 mx-auto">
       {/* Header */}
-      <div className="relative bg-gradient-to-r from-red-400 to-orange-400 px-5 pt-6 pb-14 sm:px-8 sm:pt-8 sm:pb-14">
+      <div className="relative bg-gradient-to-r from-red-400 to-orange-400 px-5 pt-6 pb-14 sm:px-8 sm:pt-8 sm:pb-14 overflow-hidden">
         <div className="absolute -bottom-6 left-0 right-0 h-12 bg-gradient-to-br from-red-100 via-orange-50 to-orange-100 rounded-t-3xl" />
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -244,7 +257,10 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
       </div>
 
       {/* Contenido del formulario */}
-      <div className="px-5 pt-7 pb-5 sm:px-8 sm:pt-8 sm:pb-6">
+      <div
+        ref={scrollRef}
+        className="px-5 pt-7 pb-5 sm:px-8 sm:pt-8 sm:pb-6 overflow-y-auto scrollbar-eventos max-h-[40vh] "
+      >
         {error && (
           <div className="mb-4 sm:mb-5 bg-red-50 border border-red-200 text-red-600 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm font-medium flex items-center gap-2">
             <svg
@@ -341,7 +357,6 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
                 onChange={handleChange}
                 className={`${inputClass} ${fieldErrors.genero ? "border-red-400 focus:ring-red-300" : ""}`}
               >
-                
                 <option value="">Seleccione género</option>
                 <option value="hombre">Hombre</option>
                 <option value="mujer">Mujer</option>
@@ -552,42 +567,42 @@ const FormularioCompletarPerfil = ({ initialData, onSuccess, onCancel }) => {
             </button>
           )}
         </div>
-      </div>
 
-      {/* Footer con acciones secundarias */}
-      <div className="px-5 pb-5 sm:px-8 sm:pb-7 flex items-center justify-center gap-4 sm:gap-6">
-        <button
-          type="button"
-          onClick={handleCerrarSesion}
-          className="text-xs text-gray-400 hover:text-gray-600 transition-colors font-medium flex items-center gap-1.5"
-        >
-          <svg
-            className="w-3.5 h-3.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
+        {/* Footer con acciones secundarias */}
+        <div className="px-5 sm:px-8  flex items-center justify-center gap-4 sm:gap-6 pt-8">
+          <button
+            type="button"
+            onClick={handleCerrarSesion}
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors font-medium flex items-center gap-1.5"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-            />
-          </svg>
-          Cerrar sesión
-        </button>
-        {onCancel && (
-          <>
-            <span className="text-orange-200">·</span>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium"
+            <svg
+              className="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              Cancelar
-            </button>
-          </>
-        )}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
+            </svg>
+            Cerrar sesión
+          </button>
+          {onCancel && (
+            <>
+              <span className="text-orange-200">·</span>
+              <button
+                type="button"
+                onClick={onCancel}
+                className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium"
+              >
+                Cancelar
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -54,7 +54,16 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
         null,
         "GET",
       );
-      setMisEventos(data ?? []);
+      const ahora = new Date();
+      // Filtrar aquí mismo cuando llegan los datos
+      const eventosFuturos = (data ?? []).filter((e) => {
+        if (!e.hora) return true;
+        const [horas, minutos] = e.hora.split(":").map(Number);
+        const fechaEvento = new Date(e.fecha);
+        fechaEvento.setUTCHours(horas + 5, minutos, 0, 0);
+        return fechaEvento >= ahora;
+      });
+      setMisEventos(eventosFuturos); // ← ya filtrado desde el inicio
     } catch (err) {
       setErrorMisEventos(err.message || "Error al obtener mis eventos");
     } finally {
