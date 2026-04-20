@@ -11,7 +11,8 @@ const BotonNotificaciones = ({ navbarRef }) => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [menuStyle, setMenuStyle] = useState({});
 
-  const { notificaciones, loading, marcarLeido, obtenerNotificaciones } = useNotificaciones();
+  const { notificaciones, loading, marcarLeido, obtenerNotificaciones } =
+    useNotificaciones();
   const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario();
 
   const noLeidas = Array.isArray(notificaciones)
@@ -19,35 +20,35 @@ const BotonNotificaciones = ({ navbarRef }) => {
     : 0;
 
   useEffect(() => {
-  if (!mostrarMenu || !navbarRef?.current) return;
+    if (!mostrarMenu || !navbarRef?.current) return;
 
-  const updatePosition = () => {
-    const rect = navbarRef.current.getBoundingClientRect();
+    const updatePosition = () => {
+      const rect = navbarRef.current.getBoundingClientRect();
 
-    setMenuStyle({
-      position: "fixed",
-      top: rect.bottom + 8,
-      left: rect.left,
-      width: rect.width / 1.25,
-      zIndex: 999,
-    });
-  };
+      setMenuStyle({
+        position: "fixed",
+        top: rect.bottom + 8,
+        left: rect.left,
+        width: rect.width / 1.25,
+        zIndex: 999,
+      });
+    };
 
-  // 🔥 cálculo inicial
-  updatePosition();
+    // 🔥 cálculo inicial
+    updatePosition();
 
-  // 🔥 escucha cambios reales del layout
-  const observer = new ResizeObserver(updatePosition);
-  observer.observe(navbarRef.current);
+    // 🔥 escucha cambios reales del layout
+    const observer = new ResizeObserver(updatePosition);
+    observer.observe(navbarRef.current);
 
-  // 🔥 opcional pero recomendado: scroll también
-  window.addEventListener("scroll", updatePosition);
+    // 🔥 opcional pero recomendado: scroll también
+    window.addEventListener("scroll", updatePosition);
 
-  return () => {
-    observer.disconnect();
-    window.removeEventListener("scroll", updatePosition);
-  };
-}, [mostrarMenu, navbarRef]);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", updatePosition);
+    };
+  }, [mostrarMenu, navbarRef]);
 
   const handleAceptarSolicitud = async (notificacion) => {
     try {
@@ -67,6 +68,12 @@ const BotonNotificaciones = ({ navbarRef }) => {
       console.error("Error al aceptar:", error);
     }
   };
+
+  useEffect(() => {
+    const handleEsc = (e) => e.key === "Escape" && setMostrarMenu(false);
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
   return (
     <div className="relative inline-block text-left">
@@ -89,7 +96,7 @@ const BotonNotificaciones = ({ navbarRef }) => {
         {mostrarMenu && (
           <>
             <motion.div
-              className="fixed inset-0 z-[998] bg-black/40"
+              className="fixed inset-0 z-[998] bg-black/30"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -101,62 +108,85 @@ const BotonNotificaciones = ({ navbarRef }) => {
               initial={{ scale: 0.8, opacity: 0, y: 50 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.8, opacity: 0, y: 50 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white border border-gray-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-gradient-to-br from-red-100 via-orange-50 to-orange-100 border border-gray-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             >
-              <div className="p-4 border-b bg-gray-50/50 flex justify-between items-center shrink-0">
-                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wider">
-                  Notificaciones
-                </h3>
+              {/* HEADER */}
+              <div className="p-4 border-b bg-white/60 backdrop-blur flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <FaBell className="w-5 h-5 text-gray-600" />
+                  <h3 className="text-sm font-bold text-gray-800 tracking-wide">
+                    Notificaciones
+                  </h3>
+                </div>
+
                 <span className="text-[10px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">
                   {noLeidas} nuevas
                 </span>
               </div>
 
-              <ul className="max-h-[50vh] overflow-y-auto divide-y divide-gray-100">
+              {/* LISTA */}
+              <ul className="max-h-[50vh] overflow-y-auto scrollbar-eventos divide-y divide-gray-100">
+                {/* LOADING */}
                 {loading && (
-                  <li className="p-8 text-center text-sm text-gray-500 italic">
-                    Actualizando...
+                  <li className="p-6 space-y-3 animate-pulse">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-4 bg-gray-200 rounded w-full" />
+                    ))}
                   </li>
                 )}
 
-                {!loading && notificaciones.length === 0 ? (
+                {/* VACÍO */}
+                {!loading && notificaciones.length === 0 && (
                   <li className="p-10 text-center text-gray-400 text-sm">
-                    <div className="flex flex-col items-center gap-2">
-                      <FaBell className="text-gray-200 w-8 h-8" />
-                      <p>No tienes notificaciones pendientes</p>
+                    <div className="flex flex-col items-center gap-3">
+                      <FaBell className="text-gray-200 w-10 h-10" />
+                      <p>No tienes notificaciones</p>
                     </div>
                   </li>
-                ) : (
+                )}
+
+                {/* NOTIFICACIONES */}
+                {!loading &&
                   notificaciones.map((n) => (
                     <li
                       key={n._id}
-                      className={`p-4 flex flex-col gap-3 transition-colors ${
-                        n.leido ? "bg-white opacity-70" : "bg-blue-50/40"
+                      className={`p-4 flex flex-col gap-3 transition-all duration-200 hover:bg-white/60 ${
+                        n.leido ? "opacity-70" : "bg-blue-50/40"
                       }`}
                     >
+                      {/* MENSAJE */}
                       <div className="flex justify-between items-start gap-3">
-                        <p className={`text-sm leading-snug ${n.leido ? "text-gray-500" : "text-gray-800 font-medium"}`}>
+                        <p
+                          className={`text-sm leading-snug ${
+                            n.leido
+                              ? "text-gray-500"
+                              : "text-gray-800 font-medium"
+                          }`}
+                        >
                           {n.mensaje}
                         </p>
+
                         {!n.leido && (
-                          <span className="h-2.5 w-2.5 bg-blue-500 rounded-full mt-1 shrink-0" />
+                          <span className="h-2.5 w-2.5 bg-blue-500 rounded-full mt-1 shrink-0 animate-pulse" />
                         )}
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      {/* ACCIONES */}
+                      <div className="flex items-center gap-3 flex-wrap">
                         {n.tipo === "seguidor" && !n.leido ? (
                           <>
                             <button
                               onClick={() => handleAceptarSolicitud(n)}
                               disabled={cargandoSeguir}
-                              className="flex items-center gap-2 bg-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-full hover:bg-blue-700 shadow-sm transition-all disabled:opacity-50"
+                              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full hover:from-blue-600 hover:to-blue-700 shadow-sm transition-all disabled:opacity-50 active:scale-95"
                             >
-                              <FaCheck size={10} /> Seguir de vuelta
+                              <FaCheck size={10} /> Seguir
                             </button>
+
                             <button
                               onClick={() => marcarLeido(n._id)}
-                              className="text-xs text-gray-500 font-semibold hover:text-gray-700 transition-colors"
+                              className="text-xs text-gray-500 font-medium hover:text-gray-700 transition"
                             >
                               Ignorar
                             </button>
@@ -165,16 +195,15 @@ const BotonNotificaciones = ({ navbarRef }) => {
                           !n.leido && (
                             <button
                               onClick={() => marcarLeido(n._id)}
-                              className="text-[11px] text-blue-600 font-bold uppercase tracking-tighter hover:text-blue-800 transition-colors"
+                              className="text-[11px] text-blue-600 font-semibold uppercase tracking-tight hover:text-blue-800 transition"
                             >
-                              Marcar como leída
+                              Marcar leída
                             </button>
                           )
                         )}
                       </div>
                     </li>
-                  ))
-                )}
+                  ))}
               </ul>
             </motion.div>
           </>

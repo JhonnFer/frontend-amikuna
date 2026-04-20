@@ -11,7 +11,6 @@ const useSocket = (chatId, onNuevoMensaje) => {
     const handleConnect = () => {
       setIsConnected(true);
 
-      console.log("🟢 Conectado al socket");
 
       // 🔥 unirse al chat
       socket.emit("join:chat", chatId);

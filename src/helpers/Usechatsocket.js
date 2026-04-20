@@ -50,6 +50,8 @@ const useChatSocket = (profile) => {
         siguiendo: match.siguiendo,
         imagenesGaleria: match.imagenesGaleria,
       });
+
+      return chatIdToUse;
     },
     [abrirChat, obtenerMensajes, chatIdsCache, profile]
   );

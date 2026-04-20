@@ -24,6 +24,7 @@ const PanelDenuncia = ({ onCerrar, onEnviar, enviando }) => {
     };
   };
 
+
   return (
     <>
       {/* Overlay */}
@@ -150,8 +151,29 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
       setEnviandoDenuncia(false);
     }
   };
+
+  useEffect(() => {
+  const handleEsc = (e) => {
+    if (e.key === "Escape") onCloseChat();
+  };
+  window.addEventListener("keydown", handleEsc);
+  return () => window.removeEventListener("keydown", handleEsc);
+}, [onCloseChat]);
+
   return (
-    <div className="fixed bottom-4 right-[390px] w-96 h-[600px] bg-white/95 backdrop-blur-md shadow-2xl z-50 rounded-xl flex flex-col border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-3xl">
+    <div
+      className="
+  fixed z-50
+  bottom-4
+  right-2 sm:right-65 md:right-75 lg:right-85 xl:right-96
+  w-[calc(100vw-1rem)] sm:w-80 md:w-88 lg:w-96
+  h-[70vh] sm:h-[500px] md:h-[550px] lg:h-[600px]
+  bg-white/95 backdrop-blur-md shadow-2xl rounded-xl
+  flex flex-col border border-gray-200 overflow-hidden
+  transition-all duration-300 hover:shadow-3xl
+"
+    >
+      {" "}
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-pink-600  to-orange-400 text-white">
         <div
@@ -216,7 +238,6 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
 
         <div ref={messagesEndRef} />
       </div>
-
       {/* Input */}
       <form onSubmit={handleEnviarMensaje} className="p-4 border-t flex gap-2">
         <input
@@ -235,7 +256,6 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
           {enviando ? "..." : "Enviar"}
         </button>
       </form>
-
       {/* ✅ Mensaje de éxito denuncia */}
       {exitoDenuncia && (
         <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
@@ -244,7 +264,6 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
           </p>
         </div>
       )}
-
       {/* ✅ Panel denuncia */}
       {mostrarDenuncia && (
         <PanelDenuncia
@@ -253,7 +272,6 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
           enviando={enviandoDenuncia}
         />
       )}
-
       {mostrarPerfil && (
         <PerfilUsuarioReadOnly
           perfil={chatInfo}

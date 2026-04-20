@@ -35,7 +35,8 @@ const loading = storeProfile((state) => state.loading);
     fotoSeleccionada, setFotoSeleccionada,
     fotoIndex, setFotoIndex,
     fotosAEliminar, setFotosAEliminar,
-    chatInfo, mensajes, handleAbrirChat, handleCerrarChat, handleEnviarMensaje,
+    chatInfo, mensajes, handleAbrirChatConLeido, handleCerrarChat, handleEnviarMensaje,
+    unreadCounts, formatBadge,
     mostrarEditarPerfil, setMostrarEditarPerfil,
     mostrarGaleriaFotos, setMostrarGaleriaFotos,
     mostrarModalStrike, setMostrarModalStrike,
@@ -109,8 +110,9 @@ if (!profile) {
         eventosExpandidos={eventosExpandidos}
         setEventosExpandidos={setEventosExpandidos}
         matchesMutuos={matches}
-        
-        handleAbrirChat={handleAbrirChat}
+        unreadCounts={unreadCounts}
+        formatBadge={formatBadge} 
+        handleAbrirChatConLeido={handleAbrirChatConLeido}
         mostrarChatbot={mostrarChatbot}
         setMostrarChatbot={setMostrarChatbot}
       />

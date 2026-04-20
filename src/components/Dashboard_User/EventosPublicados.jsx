@@ -24,8 +24,8 @@ const ModalMisEventos = () => {
   }, []);
 
   return (
-        
-        <div className="max-h-[60vh] overflow-y-auto scrollbar-eventos">
+        /**/
+        <div className="flex flex-col gap-4 max-h-[60vh] overflow-y-auto scrollbar-eventos">
           {loadingMisEventos && (
             <p className="text-sm text-gray-400 animate-pulse text-center py-8">
               Cargando tus eventos...
@@ -255,11 +255,11 @@ const EventosPublicados = ({
                           timeZone: "America/Guayaquil",
                         })}
                       </span>
-                      <div className="flex gap-4 mt-2 justify-center">
+                      <div className="flex mt-2 justify-center items-center sm:text-xs sm:gap-4 md:text-sm md:gap-8 lg:text-base lg:gap-12 xl:text-base xl:gap-16">
                         <button
                           onClick={() => onConfirmar(evento._id)}
                           disabled={cargandoAsistencia || isRechazado}
-                          className="relative flex gap-1 p-2 items-center font-semibold bg-gradient-to-br from-green-400 to-blue-500 text-white rounded-full hover:bg-green-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                          className="relative flex gap-1 p-2 items-center font-semibold bg-gradient-to-br from-green-400 to-blue-500 text-white rounded-full hover:bg-green-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed z-10 "
                           title="Confirmar asistencia"
                         >
                           <FaCalendarCheck />
