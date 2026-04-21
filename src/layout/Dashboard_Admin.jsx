@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../context/storeAuth";
 
-import PerfilAdmin from "../components/Dashboard_Admin/PerfilAdmin";
-import CambiarPasswordAdmin from "../components/Dashboard_Admin/CambiarPasswordAdmin";
+import PerfilAdmin, { CambiarPasswordAdmin } from '../components/Dashboard_Admin/PerfilAdmin';
+
 import EventList from "../components/Dashboard_Admin/EventList";
 import UserList from "../components/Dashboard_Admin/UserList";
 import MisStrikes from "../components/Dashboard_Admin/MisStrikes";
