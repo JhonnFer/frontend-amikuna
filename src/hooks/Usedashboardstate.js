@@ -50,7 +50,9 @@ const useDashboardState = () => {
     handleAbrirChat,
     handleCerrarChat,
     handleEnviarMensaje,
-  } = useChatSocket(profile);
+  } = useChatSocket(profile, async () => {
+    await cargarPerfil(); // recarga perfil para actualizar seguidores/siguiendo
+  });
 
   const [mostrarEditarPerfil, setMostrarEditarPerfil] = useState(false);
   const [mostrarGaleriaFotos, setMostrarGaleriaFotos] = useState(false);

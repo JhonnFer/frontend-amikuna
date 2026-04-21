@@ -175,13 +175,13 @@ const MisStrikes = () => {
   // Cuando se elimina el match/chat desde ModalDetalleDenuncia,
   // refrescamos el strike en la lista para reflejar que ya no tiene chat
   const handleEliminado = (strikeId) => {
-    setStrikes((prev) =>
-      prev.map((s) =>
-        s._id === strikeId ? { ...s, chat: null } : s
-      )
-    );
-    setDenunciaSeleccionada(null);
-  };
+  setStrikes((prev) =>
+    prev.map((s) =>
+      s._id === strikeId ? { ...s, status: "resuelto" } : s  // ✅ antes era chat: null
+    )
+  );
+  setDenunciaSeleccionada(null);
+};
 
   const strikesFiltrados =
     filtro === "todos" ? strikes : strikes.filter((s) => s.tipo === filtro);

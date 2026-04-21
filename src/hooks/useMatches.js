@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import useFetch from "./useFetch";
-import { socket } from "../helpers/socket"; // ✅ SOLO este
+import { socket } from "../helpers/socket";
 
 const useMatches = () => {
-  
   const { fetchDataBackend } = useFetch();
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,29 +21,32 @@ const useMatches = () => {
     }
   }, [fetchDataBackend]);
 
-  // carga inicial
+  // 🔵 carga inicial
   useEffect(() => {
     fetchMatches();
   }, [fetchMatches]);
 
-  // 🎧 listener socket
+  // 🎧 listeners socket (AHORA COMPLETO)
   useEffect(() => {
-  const handleNuevoMatch = () => {
-    fetchMatches();
-  };
+    const handleNuevoMatch = () => {
+      fetchMatches();
+    };
 
-  socket.on("nuevo_match", handleNuevoMatch);
+    const handleMatchEliminado = (data) => {
+      console.log("🔥 match eliminado recibido:", data);
+      fetchMatches(); // 🔥 clave: refrescar lista
+    };
 
-  return () => {
-    socket.off("nuevo_match", handleNuevoMatch);
-    socket.off("nuevo_chat", handleNuevoMatch);
-  };
-}, [fetchMatches]);
+    socket.on("nuevo_match", handleNuevoMatch);
+    socket.on("match_eliminado", handleMatchEliminado);
 
+    return () => {
+      socket.off("nuevo_match", handleNuevoMatch);
+      socket.off("match_eliminado", handleMatchEliminado);
+    };
+  }, [fetchMatches]);
 
   return { matches, loading, error, refetch: fetchMatches };
-  
 };
-
 
 export default useMatches;

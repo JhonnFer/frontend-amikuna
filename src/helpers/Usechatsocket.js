@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import useChat from "../hooks/useChat";
 import useSocket from "../hooks/useSocket";
 
-const useChatSocket = (profile) => {
+const useChatSocket = (profile, onMatchEliminado) => {
   const [chatInfo, setChatInfo] = useState(null);
   const [mensajes, setMensajes] = useState([]);
   const [chatIdsCache, setChatIdsCache] = useState({});
@@ -12,6 +12,7 @@ const useChatSocket = (profile) => {
   // Reutiliza tu useSocket existente con token y eventos correctos
   const { isConnected } = useSocket(chatInfo?.chatId, (mensajeNuevo) => {
     setMensajes((prev) => [...prev, mensajeNuevo]);
+    onMatchEliminado
   });
 
   const handleAbrirChat = useCallback(
