@@ -41,7 +41,7 @@ const Login = () => {
 
   const loginUser = async (data) => {
   try {
-    const response = await fetchDataBackend("login", data, "POST", false);
+    const response = await fetchDataBackend("login", data, "POST", true);
 
     if (!response?.token) {
       return;

@@ -12,7 +12,7 @@ const fetchDataBackend = async (
   endpoint,
   data,
   method = "GET",
-  showToast = true,
+  showToast = false,
 ) => {
   try {
     const url = `${API_URL}/${endpoint.replace(/^\//, "")}`;

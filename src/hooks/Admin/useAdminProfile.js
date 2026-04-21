@@ -12,7 +12,7 @@ const useAdminProfile = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchDataBackend('perfil', {}, 'GET');
+      const data = await fetchDataBackend('perfil', {}, 'GET',true);
       setPerfil(data.perfil);
     } catch (err) {
       setError(err.message || 'Error al obtener perfil');
@@ -44,7 +44,7 @@ const useAdminProfile = () => {
 
   const generarNuevaPassword = async (payload) => {
     try {
-      const data = await fetchDataBackend('admin/generar-nueva-password', payload, 'POST');
+      const data = await fetchDataBackend('admin/generar-nueva-password', payload, 'POST',true);
       return data;
     } catch (err) {
       setError(err.message || 'Error al generar nueva contraseña');
