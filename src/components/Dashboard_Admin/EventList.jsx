@@ -25,6 +25,53 @@ const EventList = () => {
     imagen: null,
   });
 
+  // ─── FUNCIONES DE VALIDACIÓN DE FECHA Y HORA ───────────────────────
+
+  /**
+   * Verifica si un evento está caducado (fecha y hora ya pasaron)
+   * @param {string} fecha - Fecha en formato YYYY-MM-DD
+   * @param {string} hora - Hora en formato HH:mm
+   * @returns {boolean} true si el evento está caducado
+   */
+  const isEventExpired = (fecha, hora) => {
+    if (!fecha || !hora) return false;
+    const eventDateTime = new Date(`${fecha}T${hora}`);
+    const now = new Date();
+    return eventDateTime < now;
+  };
+
+  /**
+   * Valida que la fecha y hora del evento no sean anteriores a la actual
+   * Considera la combinación correcta de fecha y hora
+   * @param {string} fecha - Fecha en formato YYYY-MM-DD
+   * @param {string} hora - Hora en formato HH:mm
+   * @returns {object} { valid: boolean, message: string }
+   */
+  const isValidEventDateTime = (fecha, hora) => {
+    if (!fecha || !hora) {
+      return { valid: false, message: "Fecha y hora son requeridas" };
+    }
+
+    const eventDateTime = new Date(`${fecha}T${hora}`);
+    const now = new Date();
+
+    // Validar que la combinación de fecha y hora sea válida
+    if (isNaN(eventDateTime.getTime())) {
+      return { valid: false, message: "Fecha u hora inválida" };
+    }
+
+    // Validar que no sea una fecha anterior a la actual
+    if (eventDateTime < now) {
+      return {
+        valid: false,
+        message:
+          "No se puede crear un evento en una fecha y hora pasada. Selecciona una fecha y hora futura.",
+      };
+    }
+
+    return { valid: true, message: "" };
+  };
+
   const iniciarEdicion = (evento) => {
     setEditId(evento._id);
     setForm({
@@ -42,7 +89,7 @@ const EventList = () => {
     const { name, value, files } = e.target;
     if (name === "imagen") {
       const archivo = files[0];
-      /* console.log("📁 Imagen seleccionada:", archivo);  */// ← DEBUG
+      /* console.log("📁 Imagen seleccionada:", archivo);  */ // ← DEBUG
       setForm((prev) => ({ ...prev, imagen: archivo }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
@@ -51,6 +98,29 @@ const EventList = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validar fecha y hora antes de procesar
+    const validation = isValidEventDateTime(form.fecha, form.hora);
+    if (!validation.valid) {
+      toast.error(validation.message);
+      return;
+    }
+
+    // Si estamos editando, validar que el evento no esté caducado
+    if (editId) {
+      // Buscar el evento original para verificar su fecha actual
+      const eventoOriginal = eventos.find((ev) => ev._id === editId);
+      if (
+        eventoOriginal &&
+        isEventExpired(eventoOriginal.fecha?.slice(0, 10), eventoOriginal.hora)
+      ) {
+        toast.error(
+          "No se puede editar un evento que ya ha caducado. El evento ya pasó de fecha.",
+        );
+        return;
+      }
+    }
+
     setSaving(true);
 
     // ── DEBUG ──────────────────────────────────────────
@@ -69,7 +139,8 @@ const EventList = () => {
         formData.append("imagen", form.imagen);
         /* console.log("✅ imagen agregada al FormData:", form.imagen.name, form.imagen.size, "bytes"); */ // ← DEBUG
       } else {
-        /* console.warn("⚠️  No hay imagen en el estado, no se agrega al FormData"); */ // ← DEBUG
+        /* console.warn("⚠️  No hay imagen en el estado, no se agrega al FormData"); */
+        // ← DEBUG
       }
 
       // ── DEBUG: inspeccionar FormData completo ──────
@@ -110,14 +181,23 @@ const EventList = () => {
     }
   };
 
-  const handleEliminar = async (id) => {
+  const handleEliminar = async (id, fechaEvento, horaEvento) => {
     if (!id) {
       toast.error("ID inválido");
       return;
     }
+
+    // Validar que el evento no esté caducado
+    if (isEventExpired(fechaEvento?.slice(0, 10), horaEvento)) {
+      toast.error(
+        "No se puede eliminar un evento que ya ha caducado. El evento ya pasó de fecha.",
+      );
+      return;
+    }
+
     if (window.confirm("¿Eliminar evento?")) {
       try {
-        await eliminarEvento(id);
+        await eliminarEvento(id, fechaEvento);
         toast.success("Evento eliminado");
         obtenerEventos();
       } catch (err) {
@@ -291,8 +371,13 @@ const EventList = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => iniciarEdicion(ev)}
-                      className="p-2 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition-colors duration-200"
-                      title="Editar"
+                      disabled={isEventExpired(ev.fecha?.slice(0, 10), ev.hora)}
+                      className="p-2 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
+                      title={
+                        isEventExpired(ev.fecha?.slice(0, 10), ev.hora)
+                          ? "No se puede editar eventos caducados"
+                          : "Editar"
+                      }
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -309,9 +394,14 @@ const EventList = () => {
                       </svg>
                     </button>
                     <button
-                      onClick={() => handleEliminar(ev._id)}
-                      className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
-                      title="Eliminar"
+                      onClick={() => handleEliminar(ev._id, ev.fecha, ev.hora)}
+                      disabled={isEventExpired(ev.fecha?.slice(0, 10), ev.hora)}
+                      className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
+                      title={
+                        isEventExpired(ev.fecha?.slice(0, 10), ev.hora)
+                          ? "No se puede eliminar eventos caducados"
+                          : "Eliminar"
+                      }
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -331,9 +421,7 @@ const EventList = () => {
               ))}
             </div>
           )}
-          {error && (
-            <p className="text-red-600 mt-4 text-center">{error}</p>
-          )}
+          {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
         </div>
       </div>
     </div>

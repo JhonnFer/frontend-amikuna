@@ -58,13 +58,29 @@ const useAdminEvents = () => {
   };
 
   // ✅ sin try/catch innecesario
-  const eliminarEvento = async (id) => {
-    if (!id) throw new Error("ID de evento inválido");
-    const data = await fetchDataBackend(`eliminar-evento/${id}`, null, "DELETE");
-    await obtenerEventos();
-    return data;
-  };
+  const eliminarEvento = async (id, fechaEvento) => {
+  if (!id) throw new Error("ID de evento inválido");
 
+  if (!fechaEvento) {
+    throw new Error("Fecha del evento no proporcionada");
+  }
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  const fechaEv = new Date(fechaEvento);
+  fechaEv.setHours(0, 0, 0, 0);
+
+  console.log("📅 Comparando:", { hoy, fechaEv });
+
+  if (fechaEv < hoy) {
+    throw new Error("No se puede eliminar un evento caducado");
+  }
+
+  const data = await fetchDataBackend(`eliminar-evento/${id}`, null, "DELETE");
+  await obtenerEventos();
+  return data;
+};
   useEffect(() => {
     obtenerEventos();
   }, [obtenerEventos]);
