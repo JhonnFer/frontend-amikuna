@@ -68,9 +68,15 @@ const CambiarPasswordAdmin = () => {
     e.preventDefault();
 
     const fullSchema = {
-      newPassword:     [rules.required, rules.passwordStrong],
-      confirmPassword: [rules.required, rules.matchField(form.newPassword, 'Las contraseñas')],
-    };
+  newPassword: [
+    rules.required,
+    rules.minLength(6),
+  ],
+  confirmPassword: [
+    rules.required,
+    rules.matchField(form.newPassword, 'Las contraseñas'),
+  ],
+};
 
     const { isValid, errors } = validate(form, fullSchema);
     if (!isValid) {
