@@ -28,16 +28,16 @@ const useLogin = () => {
           "login",
           formData,
           "POST",
-          false // 👈 sin toast
+          false 
         );
 
-        // ❌ error primero
+        //error primero
         if (!response?.token) {
           setServerError("Credenciales inválidas. Intenta de nuevo.");
           return;
         }
 
-        // ✅ éxito
+        //  éxito
         const { user, token } = response;
         setAuth({ user, token });
         setServerSuccess("Inicio de sesión exitoso");

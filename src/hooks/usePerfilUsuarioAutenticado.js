@@ -1,35 +1,45 @@
+//src/hooks/usePerfilUsuarioAutenticado.js
 import { useState, useEffect } from "react";
-import useFetch from "./useFetch";
+import fetchDataBackend from "../helpers/fetchDataBackend";
 
-// Función para verificar si el perfil está completo
+// ── Validación de perfil completo ───────────────────────
 export const isPerfilCompleto = (perfil) => {
   if (!perfil) return false;
 
   const tieneFoto = !!perfil.imagenPerfil;
   const tieneGenero = perfil.genero && perfil.genero !== "otro";
   const tieneBiografia = !!perfil.biografia?.trim();
-  const tieneIntereses = Array.isArray(perfil.intereses) && perfil.intereses.length > 0;
-  const tieneUbicacion = !!perfil.ubicacion?.ciudad && !!perfil.ubicacion?.pais;
+  const tieneIntereses =
+    Array.isArray(perfil.intereses) && perfil.intereses.length > 0;
+  const tieneUbicacion =
+    !!perfil.ubicacion?.ciudad && !!perfil.ubicacion?.pais;
 
-  return tieneFoto && tieneGenero && tieneBiografia && tieneIntereses && tieneUbicacion;
+  return (
+    tieneFoto &&
+    tieneGenero &&
+    tieneBiografia &&
+    tieneIntereses &&
+    tieneUbicacion
+  );
 };
 
 function usePerfilUsuarioAutenticado() {
-  const { fetchDataBackend } = useFetch();
   const [perfil, setPerfil] = useState(null);
   const [loadingPerfil, setLoadingPerfil] = useState(true);
 
+  // ── Cargar perfil ─────────────────────────────────────
   const cargarPerfil = async () => {
     setLoadingPerfil(true);
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return null;
-
-      const headers = { Authorization: `Bearer ${token}` };
-      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", headers, false);
+      const data = await fetchDataBackend(
+        "estudiantes/perfil",
+        null,
+        "GET",
+        { showErrorToast: false } 
+      );
 
       setPerfil(data);
-      return data; // 🔹 Retorna para login
+      return data;
     } catch (error) {
       console.error("Error cargando perfil:", error);
       setPerfil(null);
@@ -39,32 +49,60 @@ function usePerfilUsuarioAutenticado() {
     }
   };
 
-  const actualizarPerfil = async (formData) => {
+  // ── COMPLETAR PERFIL ─────────────────────────────────
+  const completarPerfil = async (formData) => {
     try {
-      const token = localStorage.getItem("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
       const response = await fetchDataBackend(
         "estudiantes/completarPerfil",
         formData,
         "PUT",
-        headers,
-        true
+        {
+          showSuccessToast: false,
+          showErrorToast: false,
+        }
       );
 
       setPerfil(response.perfilActualizado || response);
       return response;
     } catch (error) {
-      console.error("Error actualizando perfil:", error);
+      console.error("Error completando perfil:", error);
       throw error;
     }
   };
 
+  // ── EDITAR PERFIL ────────────────────────────────────
+  const editarPerfil = async (formData) => {
+    try {
+      const response = await fetchDataBackend(
+        "estudiantes/editarPerfil", 
+        formData,
+        "PUT",
+        {
+          showSuccessToast: false,
+          showErrorToast: false,
+        }
+      );
+
+      setPerfil(response.perfilActualizado || response);
+      return response;
+    } catch (error) {
+      console.error("Error editando perfil:", error);
+      throw error;
+    }
+  };
+
+  // ── INIT ─────────────────────────────────────────────
   useEffect(() => {
     cargarPerfil();
   }, []);
 
-  return { perfil, loadingPerfil, cargarPerfil, actualizarPerfil };
+  return {
+    perfil,
+    loadingPerfil,
+    cargarPerfil,
+    completarPerfil, 
+    editarPerfil,    
+  };
 }
 
 export default usePerfilUsuarioAutenticado;
