@@ -12,14 +12,15 @@ const fetchDataBackend = async (
   endpoint,
   data,
   method = "GET",
-  showToast = false,
+  options = {},
 ) => {
+  const { showSuccessToast = false, showErrorToast = true } = options;
   try {
     const url = `${API_URL}/${endpoint.replace(/^\//, "")}`;
     const token = localStorage.getItem("token");
     const isFormData = data instanceof FormData;
 
-    const options = {
+    const axiosConfig = {
       method: method.toUpperCase(),
       url,
       headers: {
@@ -29,9 +30,9 @@ const fetchDataBackend = async (
       ...(method.toUpperCase() !== "GET" && data ? { data } : {}),
     };
 
-    const response = await axios(options);
+    const response = await axios(axiosConfig);
 
-    if (showToast && response?.data?.msg) {
+    if (showSuccessToast && response?.data?.msg) {
       toast.success(response.data.msg, {
         toastId: `success-${response.data.msg}`,
       });
@@ -39,17 +40,19 @@ const fetchDataBackend = async (
 
     return response.data;
   } catch (error) {
-    const status = error?.response?.status;
     const errorMsg =
       error?.response?.data?.msg ||
       error?.response?.data?.error ||
       error?.message ||
       "Error desconocido";
 
+    const status = error?.response?.status;
+
     if (status === 403) {
       toast.error(errorMsg, { toastId: "403-error" });
       throw new Error(errorMsg);
     }
+
     if (status === 401) {
       // ← si es el login, dejar que el componente maneje el error
       if (endpoint.includes("login")) throw new Error(errorMsg);
@@ -71,7 +74,7 @@ const fetchDataBackend = async (
       return;
     }
 
-    if (!errorToastId) {
+    if (!errorToastId && showErrorToast) {
       errorToastId = toast.error(errorMsg, {
         toastId: `error-${errorMsg}`,
         onClose: () => {

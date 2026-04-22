@@ -1,9 +1,9 @@
-import { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useForm } from "react-hook-form";
+import { useNavigate, Link } from "react-router-dom";
+import { useEffect } from "react";
 import { FiArrowLeft } from "react-icons/fi";
+
+import useRegister from "../hooks/useRegister";
 
 import logoAmikuna from "../assets/Logo.png";
 import loginImage from "../assets/Registro.png";
@@ -11,73 +11,40 @@ import loginImage from "../assets/Registro.png";
 const Register = () => {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    nombre: "",
-    apellido: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  // ── Hook ─────────────────────────────────────────
+  const {
+    isLoading,
+    serverError,
+    serverSuccess,
+    showPassword,
+    registerUser,
+    togglePassword,
+  } = useRegister();
 
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  // ── React Hook Form ─────────────────────────────
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const password = watch("password");
 
-  const registerUser = async (data) => {
-    try {
-      const url = `${import.meta.env.VITE_BACKEND_URL}registro`;
-      const response = await axios.post(url, data);
-      return response.data;
-    } catch (error) {
-      return Promise.reject(
-        error?.response?.data?.msg || "Error al registrar usuario.",
-      );
+  // ── Redirección después de éxito ────────────────
+  useEffect(() => {
+    if (serverSuccess) {
+      const timer = setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
+      return () => clearTimeout(timer);
     }
-  };
-
-  const handleSubmitForm = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const { nombre, apellido, email, password, confirmPassword } = formData;
-
-    if (!nombre || !apellido || !email || !password || !confirmPassword) {
-      setLoading(false);
-      return toast.error("Completa todos los campos obligatorios.");
-    }
-
-    if (password.length < 6) {
-      setLoading(false);
-      return toast.error("La contraseña debe tener al menos 6 caracteres.");
-    }
-
-    if (password !== confirmPassword) {
-      setLoading(false);
-      return toast.error("Las contraseñas no coinciden.");
-    }
-
-    try {
-      const res = await registerUser(formData);
-      toast.success(
-        res.msg || "Registro exitoso. Revisa tu correo para confirmar.",
-        { autoClose: 4000 }, // dale 4 segundos para leerlo
-      );
-      setTimeout(() => navigate("/login"), 4500); // redirige después del toast
-    } catch (errorMsg) {
-      toast.error(errorMsg);
-    }
-
-    setLoading(false);
-  };
+  }, [serverSuccess, navigate]);
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-screen overflow-hidden relative">
-      <ToastContainer />
-
-      {/* Botón regresar */}
+    <div className="flex flex-col md:flex-row w-full min-h-screen relative">
+      {/* Botón volver */}
       <button
         onClick={() => navigate("/")}
         className="absolute top-6 left-6 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
@@ -86,125 +53,164 @@ const Register = () => {
       </button>
 
       {/* FORMULARIO */}
-      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white ">
+      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white">
         <div className="flex items-center mb-6">
-          <div className="w-[60px] h-[60px] md:w-[80px] md:h-[80px]">
-            <img
-              src={logoAmikuna}
-              alt="Logo"
-              className="w-full h-full object-contain"
-            />
-          </div>
-
-          <h1 className="text-2xl md:text-3xl font-bold ml-2 font-serif text-[#FF4E4E]">
+          <img
+            src={logoAmikuna}
+            alt="Logo"
+            className="w-16 h-16 object-contain"
+          />
+          <h1 className="text-3xl font-bold ml-2 font-serif text-[#FF4E4E]">
             AMIKUNA
           </h1>
         </div>
 
         <form
-          onSubmit={handleSubmitForm}
-          className="flex flex-col gap-5 w-full max-w-sm"
+          onSubmit={handleSubmit(registerUser)}
+          className="flex flex-col gap-4 w-full max-w-sm"
         >
-          <h2 className="text-2xl md:text-4xl font-bold text-[#c4481b] text-center">
+          <h2 className="text-xl font-bold text-center text-gray-700">
             ¡Únete ahora!
           </h2>
 
-          <div className="flex flex-col gap-3">
-            <label className="text-sm font-medium">Nombre</label>
+          {/*  Error backend */}
+          {serverError && (
+            <p className="text-red-500 text-sm text-center bg-red-50 border border-red-200 rounded-lg p-2">
+              {serverError}
+            </p>
+          )}
+
+          {/* Success */}
+          {serverSuccess && !serverError && (
+            <p className="text-green-600 text-sm text-center bg-green-50 border border-green-200 rounded-lg p-2">
+              {serverSuccess}
+            </p>
+          )}
+
+          {/*  Error formulario */}
+          {!serverError && !serverSuccess && Object.keys(errors).length > 0 && (
+            <p className="text-red-500 text-sm text-center bg-red-50 border border-red-200 rounded-lg p-2">
+              Revisa los campos marcados.
+            </p>
+          )}
+
+          {/* Nombre */}
+          <div className="space-y-1">
             <input
               type="text"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
-              required
+              placeholder="Nombre"
+              {...register("nombre", { required: "El nombre es obligatorio" })}
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
             />
-
-            <label className="text-sm font-medium">Apellido</label>
-            <input
-              type="text"
-              name="apellido"
-              value={formData.apellido}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
-              required
-            />
-
-            <label className="text-sm font-medium">Correo electrónico</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
-              required
-            />
-
-            <label className="text-sm font-medium">Contraseña</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
-              required
-            />
-
-            <label className="text-sm font-medium">
-              Confirma la Contraseña
-            </label>
-            <input
-              type={showPassword ? "text" : "password"}
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-lg text-sm bg-gray-100"
-              required
-            />
-
-            <label
-              className="flex items-center text-sm text-gray-600 cursor-pointer gap-2
-                  sm:text-base 
-                  md:text-lg 
-                  lg:text-xl"
-            >
-              <input
-                type="checkbox"
-                className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6"
-                onChange={() => setShowPassword(!showPassword)}
-              />
-              <span className="text-xs sm:text-sm md:text-base lg:text-lg">
-                Mostrar contraseña
-              </span>
-            </label>
-            
+            {errors.nombre && (
+              <p className="text-red-500 text-xs">{errors.nombre.message}</p>
+            )}
           </div>
 
-          <div className="mt-4 flex flex-col sm:flex-row  gap-4 justify-center">
-            <button
-              type="button"
-              onClick={() => navigate("/login")}
-              className="text-sm font-semibold px-8 py-2 md:mx-10 rounded-full bg-white text-black border border-gray-400 hover:bg-black hover:text-white transition-all"
-            >
-              Regresar
-            </button>
+          {/* Apellido */}
+          <div className="space-y-1">
+            <input
+              type="text"
+              placeholder="Apellido"
+              {...register("apellido", {
+                required: "El apellido es obligatorio",
+              })}
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
+            />
+            {errors.apellido && (
+              <p className="text-red-500 text-xs">{errors.apellido.message}</p>
+            )}
+          </div>
 
-            <button
-              type="submit"
-              className="text-sm font-semibold px-8 py-2 md:mx-10 rounded-full bg-white text-black border border-gray-400 hover:bg-gray-900 hover:text-white transition-all"
-              disabled={loading}
+          {/* Email */}
+          <div className="space-y-1">
+            <input
+              type="email"
+              placeholder="Correo electrónico"
+              {...register("email", {
+                required: "El correo es obligatorio",
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Correo electrónico inválido",
+                },
+              })}
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs">{errors.email.message}</p>
+            )}
+          </div>
+
+          {/* Password */}
+          <div className="space-y-1">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Contraseña"
+              {...register("password", {
+                required: "La contraseña es obligatoria",
+                minLength: {
+                  value: 6,
+                  message: "La contraseña debe tener al menos 6 caracteres",
+                },
+              })}
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
+            />
+            {errors.password && (
+              <p className="text-red-500 text-xs">{errors.password.message}</p>
+            )}
+          </div>
+
+          {/* Confirm Password */}
+          <div className="space-y-1">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Confirmar contraseña"
+              {...register("confirmPassword", {
+                required: "Confirma tu contraseña",
+                validate: (value) =>
+                  value === password || "Las contraseñas no coinciden",
+              })}
+              className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
+            />
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs">
+                {errors.confirmPassword.message}
+              </p>
+            )}
+          </div>
+
+          {/* Toggle password */}
+          <label className="flex items-center text-sm text-gray-600 cursor-pointer">
+            <input type="checkbox" className="mr-2" onChange={togglePassword} />
+            Mostrar contraseña
+          </label>
+
+          {/* Botón */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-[#c4481b] text-white py-3 rounded-full font-bold hover:bg-[#FF4E4E] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+          >
+            {isLoading ? "Registrando..." : "Registrarse"}
+          </button>
+
+          {/* Link login */}
+          <div className="flex flex-col gap-3 mt-4">
+            <Link
+              to="/login"
+              className="text-sm text-[#c4481b] text-center font-bold hover:underline"
             >
-              {loading ? "Registrando..." : "Enviar"}
-            </button>
+              ¿Ya tienes cuenta? Inicia sesión
+            </Link>
           </div>
         </form>
       </div>
 
       {/* IMAGEN */}
-      <div className="hidden md:block md:w-1/2 h-full rounded-3xl overflow-hidden md:mr-9">
+      <div className="hidden md:block md:w-1/2 md:h-screen rounded-3xl overflow-hidden md:mr-9">
         <img
           src={loginImage}
-          alt="Decoración"
+          alt="Registro"
           className="w-full h-full object-cover"
         />
       </div>

@@ -1,28 +1,26 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { FiArrowLeft } from "react-icons/fi";
 
-import usePerfilUsuarioAutenticado, { isPerfilCompleto } from "../hooks/usePerfilUsuarioAutenticado";
-import useFetch from "../hooks/useFetch";
-import storeAuth from "../context/storeAuth";
-
-
+import useLogin from "../hooks/useLogin";
 import Modal from "../components/Modals_Dashboards/modal";
 import PerfilUsuario from "../components/Dashboard_User/PerfilUsuario";
 
 import logoAmikuna from "../assets/Logo.png";
 import loginImage from "../assets/prueba1.jpg";
-import logingogle from "../assets/gogle.png";
 
 const Login = () => {
   const navigate = useNavigate();
-
-  const [showPassword, setShowPassword] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
+  const {
+    isLoading,
+    serverError,
+    showPassword,
+    loginUser,
+    togglePassword,
+  } = useLogin();
 
   const {
     register,
@@ -30,48 +28,6 @@ const Login = () => {
     formState: { errors },
   } = useForm();
 
-  const { fetchDataBackend } = useFetch();
-  const { cargarPerfil } = usePerfilUsuarioAutenticado();
-
-  const setAuth = storeAuth((state) => state.setAuth);
-
-  const backendBase = (
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:3000/api"
-  ).replace(/\/api\/?$/, "");
-
-  const loginUser = async (data) => {
-  try {
-    const response = await fetchDataBackend("login", data, "POST", true);
-
-    if (!response?.token) {
-      return;
-    }
-
-    const { user, token } = response;
-
-    setAuth({ user, token });
-
-    const userRole = user?.rol?.toLowerCase()?.trim();
-
-    if (userRole === "admin") {
-      navigate("/admin/dashboard");
-      return;
-    }
-
-    if (userRole === "estudiante") {
-      const perfil = await cargarPerfil();
-      const perfilOk = isPerfilCompleto(perfil);
-
-      navigate(
-        perfilOk
-          ? "/user/dashboard"
-          : "/user/completar-perfil"
-      );
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
   const handleProfileCompleted = (success) => {
     if (success) {
       setShowProfileModal(false);
@@ -81,8 +37,6 @@ const Login = () => {
 
   return (
     <div className="flex flex-col md:flex-row w-full min-h-screen relative">
-      <ToastContainer />
-
       <button
         onClick={() => navigate("/")}
         className="absolute top-6 left-6 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
@@ -93,12 +47,7 @@ const Login = () => {
       {/* FORMULARIO */}
       <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white">
         <div className="flex items-center mb-6">
-          <img
-            src={logoAmikuna}
-            alt="Logo"
-            className="w-16 h-16 object-contain"
-          />
-
+          <img src={logoAmikuna} alt="Logo" className="w-16 h-16 object-contain" />
           <h1 className="text-3xl font-bold ml-2 font-serif text-[#FF4E4E]">
             AMIKUNA
           </h1>
@@ -112,19 +61,36 @@ const Login = () => {
             Inicia Sesión
           </h2>
 
+          {/* 🔴 Error backend */}
+          {serverError && (
+            <p className="text-red-500 text-sm text-center bg-red-50 border border-red-200 rounded-lg p-2">
+              {serverError}
+            </p>
+          )}
+
+          {/* 🔴 Error formulario */}
+          {!serverError && Object.keys(errors).length > 0 && (
+            <p className="text-red-500 text-sm text-center bg-red-50 border border-red-200 rounded-lg p-2">
+              Completa todos los campos correctamente.
+            </p>
+          )}
+
+          {/* EMAIL */}
           <div className="space-y-1">
             <input
               type="email"
               placeholder="Correo electrónico"
-              {...register("email", { required: "El correo es obligatorio" })}
+              {...register("email", {
+                required: "El correo es obligatorio",
+              })}
               className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
             />
-
             {errors.email && (
               <p className="text-red-500 text-xs">{errors.email.message}</p>
             )}
           </div>
 
+          {/* PASSWORD */}
           <div className="space-y-1">
             <input
               type={showPassword ? "text" : "password"}
@@ -134,7 +100,6 @@ const Login = () => {
               })}
               className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
             />
-
             {errors.password && (
               <p className="text-red-500 text-xs">{errors.password.message}</p>
             )}
@@ -144,29 +109,20 @@ const Login = () => {
             <input
               type="checkbox"
               className="mr-2"
-              onChange={() => setShowPassword(!showPassword)}
+              onChange={togglePassword}
             />
             Mostrar contraseña
           </label>
 
           <button
             type="submit"
-            className="w-full bg-[#c4481b] text-white py-3 rounded-full font-bold hover:bg-[#FF4E4E]"
+            disabled={isLoading}
+            className="w-full bg-[#c4481b] text-white py-3 rounded-full font-bold hover:bg-[#FF4E4E] disabled:opacity-60 disabled:cursor-not-allowed transition-all"
           >
-            Ingresar
+            {isLoading ? "Ingresando..." : "Ingresar"}
           </button>
 
           <div className="flex flex-col gap-3 mt-4">
-            <a
-              href={`${backendBase}/auth/google`}
-              className="flex items-center justify-center gap-2 border p-2 rounded-full hover:bg-gray-50"
-            >
-              <img src={logingogle} alt="Google" className="w-5 h-5" />
-              <span className="text-sm font-medium">
-                Ingresar con Google
-              </span>
-            </a>
-
             <Link
               to="/forgot"
               className="text-sm text-blue-600 text-center hover:underline"
@@ -186,24 +142,17 @@ const Login = () => {
 
       {/* IMAGEN */}
       <div className="hidden md:block md:w-1/2 md:h-screen rounded-3xl overflow-hidden md:mr-9">
-        <img
-          src={loginImage}
-          alt="Login"
-          className="w-full h-full object-cover"
-        />
+        <img src={loginImage} alt="Login" className="w-full h-full object-cover" />
       </div>
 
-      {/* MODAL COMPLETAR PERFIL */}
+      {/* MODAL PERFIL */}
       <Modal
         isOpen={showProfileModal}
         onClose={() => setShowProfileModal(false)}
         title="¡Bienvenido a AmiKuna!"
         showCloseButton={false}
       >
-        <PerfilUsuario
-          
-          onFinished={handleProfileCompleted}
-        />
+        <PerfilUsuario onFinished={handleProfileCompleted} />
       </Modal>
     </div>
   );

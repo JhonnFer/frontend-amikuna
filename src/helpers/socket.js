@@ -27,5 +27,5 @@ socket.on("reconnect_attempt", () => {
 });
 
 socket.on("nuevo_chat", () => {
-  console.log("💬 CHAT RECIBIDO EN FRONT");
+  console.log("💬 CHAT RECIBIDO ");
 });
