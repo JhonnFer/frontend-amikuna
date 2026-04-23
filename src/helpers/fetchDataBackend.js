@@ -2,7 +2,8 @@
 
 import axios from "axios";
 import { toast } from "react-toastify";
-import { socket } from "./socket"; // importar socket para desconectar en 401
+import { socket } from "./socket";
+import tokenManager from "./tokenManager";
 
 const API_URL = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 
@@ -12,15 +13,15 @@ const fetchDataBackend = async (
   endpoint,
   data,
   method = "GET",
-  options = {},
+  Showoptions = {},
 ) => {
-  const { showSuccessToast = false, showErrorToast = true } = options;
+  const { showSuccessToast = false, showErrorToast = true } = Showoptions;
   try {
-    const url = `${API_URL}/${endpoint.replace(/^\//, "")}`;
-    const token = localStorage.getItem("token");
+    const url = `${API_URL}/${endpoint.replace(/^\/$/, "")}`;
+    const token = tokenManager.getToken();
     const isFormData = data instanceof FormData;
 
-    const axiosConfig = {
+    const options = {
       method: method.toUpperCase(),
       url,
       headers: {
@@ -30,7 +31,7 @@ const fetchDataBackend = async (
       ...(method.toUpperCase() !== "GET" && data ? { data } : {}),
     };
 
-    const response = await axios(axiosConfig);
+    const response = await axios(options);
 
     if (showSuccessToast && response?.data?.msg) {
       toast.success(response.data.msg, {
@@ -54,21 +55,19 @@ const fetchDataBackend = async (
     }
 
     if (status === 401) {
-      // ← si es el login, dejar que el componente maneje el error
-      if (endpoint.includes("login")) throw new Error(errorMsg);
-
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      tokenManager.clearToken();
       socket.disconnect();
-      toast.error("Sesión cerrada. Inicia sesión nuevamente.", {
-        toastId: "401-session",
-      });
-      window.location.href = "/login";
+
+      // evitar loops
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+
       return;
     }
 
     if (errorMsg.toLowerCase().includes("token expired")) {
-      localStorage.removeItem("token");
+      tokenManager.clearToken();
       toast.error("Sesión expirada");
       window.location.href = "/login";
       return;

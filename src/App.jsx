@@ -20,7 +20,7 @@ import ConfirmarCuenta from "./pages/ConfirmarCuenta";
 import Dashboard_Admin from "./layout/Dashboard_Admin";
 import Dashboard_Users from "./layout/Dashboard_Users";
 import Forbidden from "./pages/Forbidden";
-import FormularioCompletarPerfil from "./components/Dashboard_User/FormularioCompletarPerfil";
+import FormularioCompletarPerfil from "./components/Dashboard_User/Perfil/FormularioCompletarPerfil";
 import Download from "./pages/Community";
 import About from "./pages/About";
 import GoogleSuccess from "./pages/GoogleSuccess";
@@ -66,6 +66,7 @@ useEffect(() => {
 }, [token]);
 
   return (
+
     <BrowserRouter>
       <ToastContainer />
 

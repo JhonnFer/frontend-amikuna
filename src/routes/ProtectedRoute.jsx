@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import storeAuth from "../context/storeAuth";
 import storeProfile from "../context/storeProfile";
+import tokenManager from "../helpers/tokenManager";
 import { isPerfilCompleto } from "../hooks/usePerfilUsuarioAutenticado";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
@@ -10,14 +11,13 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   const user = storeAuth((state) => state.user);
   const profile = storeProfile((state) => state.profile);
 
-   // Sin token en store O en localStorage → login directo sin pasar por perfil
-  if (!token || !localStorage.getItem("token")) {
+  // Sin token válido → login directo sin pasar por perfil
+  if (!tokenManager.isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
 
   // Sin user → esperar
   if (!user) return null;
-
 
   // Verificar expiración
   try {
@@ -50,8 +50,8 @@ const ProtectedRoute = ({ children, requiredRole }) => {
         </div>
       );
 
-    // Token en store pero no en localStorage → sesión inválida, no renderizar
-    if (!localStorage.getItem("token")) return null;
+    // Token inválido → sesión inválida, no renderizar
+    if (!tokenManager.isAuthenticated()) return null;
 
     if (loading || !loaded) return null;
 

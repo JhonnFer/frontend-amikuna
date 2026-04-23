@@ -2,7 +2,7 @@ import  { useState,  useCallback } from "react";
 // Usamos el hook que me diste al inicio
 import usePerfilUsuarioAutenticado from "../../hooks/usePerfilUsuarioAutenticado"; 
 // Importamos el componente de formulario
-import FormularioCompletarPerfil from "../Dashboard_User/FormularioCompletarPerfil"; 
+import FormularioCompletarPerfil from "../Dashboard_User/Perfil/FormularioEditarPerfil"; 
 
 const PerfilUsuario = () => {
   const { perfil, loadingPerfil, actualizarPerfil } = usePerfilUsuarioAutenticado();

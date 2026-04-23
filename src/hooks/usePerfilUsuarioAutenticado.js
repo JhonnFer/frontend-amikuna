@@ -1,6 +1,7 @@
 //src/hooks/usePerfilUsuarioAutenticado.js
 import { useState, useEffect } from "react";
 import fetchDataBackend from "../helpers/fetchDataBackend";
+import tokenManager from "../helpers/tokenManager";
 
 // ── Validación de perfil completo ───────────────────────
 export const isPerfilCompleto = (perfil) => {
@@ -11,8 +12,7 @@ export const isPerfilCompleto = (perfil) => {
   const tieneBiografia = !!perfil.biografia?.trim();
   const tieneIntereses =
     Array.isArray(perfil.intereses) && perfil.intereses.length > 0;
-  const tieneUbicacion =
-    !!perfil.ubicacion?.ciudad && !!perfil.ubicacion?.pais;
+  const tieneUbicacion = !!perfil.ubicacion?.ciudad && !!perfil.ubicacion?.pais;
 
   return (
     tieneFoto &&
@@ -29,14 +29,20 @@ function usePerfilUsuarioAutenticado() {
 
   // ── Cargar perfil ─────────────────────────────────────
   const cargarPerfil = async () => {
+    const token = tokenManager.getToken();
+
+    if (!token) {
+      setLoadingPerfil(false);
+      setPerfil(null);
+      return null;
+    }
+
     setLoadingPerfil(true);
+
     try {
-      const data = await fetchDataBackend(
-        "estudiantes/perfil",
-        null,
-        "GET",
-        { showErrorToast: false } 
-      );
+      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", {
+        showErrorToast: false,
+      });
 
       setPerfil(data);
       return data;
@@ -59,7 +65,7 @@ function usePerfilUsuarioAutenticado() {
         {
           showSuccessToast: false,
           showErrorToast: false,
-        }
+        },
       );
 
       setPerfil(response.perfilActualizado || response);
@@ -74,13 +80,13 @@ function usePerfilUsuarioAutenticado() {
   const editarPerfil = async (formData) => {
     try {
       const response = await fetchDataBackend(
-        "estudiantes/editarPerfil", 
+        "estudiantes/editarPerfil",
         formData,
         "PUT",
         {
           showSuccessToast: false,
           showErrorToast: false,
-        }
+        },
       );
 
       setPerfil(response.perfilActualizado || response);
@@ -93,15 +99,20 @@ function usePerfilUsuarioAutenticado() {
 
   // ── INIT ─────────────────────────────────────────────
   useEffect(() => {
+    const token = tokenManager.getToken();
+    if (!token) {
+      setLoadingPerfil(false);
+      return;
+    }
+
     cargarPerfil();
   }, []);
-
   return {
     perfil,
     loadingPerfil,
     cargarPerfil,
-    completarPerfil, 
-    editarPerfil,    
+    completarPerfil,
+    editarPerfil,
   };
 }
 
