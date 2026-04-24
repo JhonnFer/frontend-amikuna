@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import logindes from '../assets/descarga.png';
-import historiaImg1 from '../assets/Somos1.png';
-import historiaImg2 from '../assets/Chicos.png';
 import Footer from "./Footer";
+import PropTypes from "prop-types";
 
 /* ─── hook de reveal ─── */
 const useReveal = (threshold = 0.15) => {
@@ -12,8 +10,10 @@ const useReveal = (threshold = 0.15) => {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold }
+      ([e]) => {
+        if (e.isIntersecting) setVisible(true);
+      },
+      { threshold },
     );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
@@ -40,10 +40,19 @@ const BigFeatureCard = ({ icon, title, desc, tag, color, delay, reverse }) => {
       >
         <span
           className="text-4xl mb-4 tracking-widest leading-none"
-          style={{ fontFamily: "'Courier New', 'Lucida Console', monospace", letterSpacing: "0.1em" }}
-        >{icon}</span>
-        <span className="text-xs font-bold tracking-[0.25em] uppercase text-white/60 mb-2">{tag}</span>
-        <h3 className="text-2xl md:text-3xl font-bold text-white leading-snug">{title}</h3>
+          style={{
+            fontFamily: "'Courier New', 'Lucida Console', monospace",
+            letterSpacing: "0.1em",
+          }}
+        >
+          {icon}
+        </span>
+        <span className="text-xs font-bold tracking-[0.25em] uppercase text-white/60 mb-2">
+          {tag}
+        </span>
+        <h3 className="text-2xl md:text-3xl font-bold text-white leading-snug">
+          {title}
+        </h3>
       </div>
       <div className="flex-1 bg-white flex flex-col justify-center p-10 md:p-14">
         <p className="text-gray-500 text-base leading-relaxed">{desc}</p>
@@ -51,7 +60,23 @@ const BigFeatureCard = ({ icon, title, desc, tag, color, delay, reverse }) => {
     </div>
   );
 };
-
+BigFeatureCard.propTypes = {
+ icon: PropTypes.node.isRequired, 
+  
+  // Estos se renderizan como texto
+  title: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  tag: PropTypes.string,
+  
+  // Color suele ser un string (ej: "#hex" o "rgba")
+  color: PropTypes.string,
+  
+  // delay es un número (milisegundos)
+  delay: PropTypes.number,
+  
+  // reverse es un booleano (true/false)
+  reverse: PropTypes.bool,
+};
 /* ─── Sección "¿Por qué unirte?" — reemplaza testimonios ─── */
 const WhyJoin = () => {
   const [ref, visible] = useReveal();
@@ -92,10 +117,7 @@ const WhyJoin = () => {
             Hecha para la realidad universitaria
           </h2>
         </div>
-        <div
-          ref={ref}
-          className="grid grid-cols-1 sm:grid-cols-2 gap-8"
-        >
+        <div ref={ref} className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {reasons.map((r, i) => (
             <div
               key={i}
@@ -108,13 +130,19 @@ const WhyJoin = () => {
             >
               <span
                 className="text-3xl font-bold flex-shrink-0 text-transparent bg-clip-text leading-none mt-1"
-                style={{ backgroundImage: "linear-gradient(135deg, #f16783, #f78b50)" }}
+                style={{
+                  backgroundImage: "linear-gradient(135deg, #f16783, #f78b50)",
+                }}
               >
                 {r.number}
               </span>
               <div>
-                <h3 className="font-bold text-gray-900 mb-2 text-lg">{r.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{r.desc}</p>
+                <h3 className="font-bold text-gray-900 mb-2 text-lg">
+                  {r.title}
+                </h3>
+                <p className="text-gray-500 text-sm leading-relaxed">
+                  {r.desc}
+                </p>
               </div>
             </div>
           ))}
@@ -137,7 +165,10 @@ const CtaFinal = () => {
     >
       <div
         className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: "radial-gradient(circle at 30% 50%, #fff 0%, transparent 60%)" }}
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 30% 50%, #fff 0%, transparent 60%)",
+        }}
       />
       {/* patrón de puntos sutil */}
       <div
@@ -197,7 +228,7 @@ const Community = () => {
 
   const features = [
     {
-      icon: "░▒▓",   // bloques de densidad — "procesando / IA"
+      icon: "░▒▓", // bloques de densidad — "procesando / IA"
       title: "Asistente IA con jerga ecuatoriana",
       desc: "¿No sabes como funciona la aplicación? Nuestro chatbot te responde 'de una'. Entiende nuestro lenguaje, te orienta sobre materias y te ayuda a no quedarte en supletorios. ¡Habla como un politécnico más!",
       tag: "Inteligencia Artificial",
@@ -206,7 +237,7 @@ const Community = () => {
       reverse: false,
     },
     {
-      icon: "♥ ♥",  
+      icon: "♥ ♥",
       title: "Haz match con tus compañeros",
       desc: "El sistema te muestra perfiles de otros compañeros de la Escuela Politécnica Nacional promoviendo la interacción social y la creación de amigos de verdad en la EPN.",
       tag: "Conexiones",
@@ -215,7 +246,7 @@ const Community = () => {
       reverse: true,
     },
     {
-      icon: "◄►",   // flechas de diálogo — "comunicación"
+      icon: "◄►", // flechas de diálogo — "comunicación"
       title: "Chat en tiempo real",
       desc: "Habla con tus nuevas conexiones al instante dentro de la misma plataforma. Sin saltar a otras apps, sin compartir tu número. Todo dentro de Amikuna.",
       tag: "Comunicación",
@@ -224,7 +255,7 @@ const Community = () => {
       reverse: false,
     },
     {
-      icon: "▣",    // cuadro con interior — "marco / galería"
+      icon: "▣", // cuadro con interior — "marco / galería"
       title: "Galería compartida del campus",
       desc: "Sube fotos de tus proyectos, talleres, eventos y momentos en la EPN. Construye tu presencia dentro de la comunidad y descubre lo que otros están viviendo.",
       tag: "Galería",
@@ -233,7 +264,7 @@ const Community = () => {
       reverse: true,
     },
     {
-      icon: "♪♫",   // notas musicales CP437 — "celebración / evento"
+      icon: "♪♫", // notas musicales CP437 — "celebración / evento"
       title: "Eventos del campus",
       desc: "Descubre hackathons, talleres, charlas y actividades extracurriculares organizadas por y para la comunidad EPN. Nunca más te pierdas algo interesante.",
       tag: "Eventos",
@@ -242,7 +273,7 @@ const Community = () => {
       reverse: false,
     },
     {
-      icon: "☺☺",   // caritas CP437 — "personas / red"
+      icon: "☺☺", // caritas CP437 — "personas / red"
       title: "Sigue y sé seguido",
       desc: "Crea tu red universitaria siguiendo a compañeros, proyectos y grupos que te inspiran. Construye tu comunidad dentro del campus desde el primer día.",
       tag: "Red social",
@@ -251,7 +282,7 @@ const Community = () => {
       reverse: true,
     },
     {
-      icon: "◙",    
+      icon: "◙",
       title: "Solidaridad y Aportes",
       desc: "Apoya a la plataforma con un pequeño aporte económico para que la plataforma evolucione para todos.",
       tag: "Comunidad",
@@ -294,17 +325,27 @@ const Community = () => {
               Amikuna no es solo{" "}
               <span
                 className="text-transparent bg-clip-text"
-                style={{ backgroundImage: "linear-gradient(135deg, #f16783, #f78b50)" }}
+                style={{
+                  backgroundImage: "linear-gradient(135deg, #f16783, #f78b50)",
+                }}
               >
                 una red social.
               </span>
             </h1>
             <p className="text-gray-500 text-lg leading-relaxed mb-8 max-w-xl">
-              Es tu espacio dentro de la EPN para conectar, aprender, compartir y
-              hacer que la vida universitaria valga la pena — con todo lo que necesitas en un solo lugar.
+              Es tu espacio dentro de la EPN para conectar, aprender, compartir
+              y hacer que la vida universitaria valga la pena — con todo lo que
+              necesitas en un solo lugar.
             </p>
             <div className="flex flex-wrap gap-3">
-              {["IA ░▒▓", "Match ♥", "Chat ◄►", "Galería ▣", "Eventos ♪", "Aportes ◙"].map((tag) => (
+              {[
+                "IA ░▒▓",
+                "Match ♥",
+                "Chat ◄►",
+                "Galería ▣",
+                "Eventos ♪",
+                "Aportes ◙",
+              ].map((tag) => (
                 <span
                   key={tag}
                   className="px-4 py-2 rounded-full text-sm font-semibold bg-white border border-gray-200 text-gray-600 shadow-sm"
@@ -323,7 +364,9 @@ const Community = () => {
           Funcionalidades
         </p>
         <div className="flex flex-col gap-4">
-          {features.map((f, i) => <BigFeatureCard key={i} {...f} />)}
+          {features.map((f, i) => (
+            <BigFeatureCard key={i} {...f} />
+          ))}
         </div>
       </section>
 

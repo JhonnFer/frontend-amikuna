@@ -80,7 +80,7 @@ function usePerfilUsuarioAutenticado() {
   const editarPerfil = async (formData) => {
     try {
       const response = await fetchDataBackend(
-        "estudiantes/editarPerfil",
+        "estudiantes/completarPerfil",
         formData,
         "PUT",
         {

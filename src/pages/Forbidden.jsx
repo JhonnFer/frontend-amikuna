@@ -35,7 +35,7 @@ const Forbidden = () => {
           </button>
 
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/login")}
             className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-400 to-orange-400 text-white font-semibold shadow-md hover:from-red-500 hover:to-orange-500 transition"
           >
             Ir a inicio

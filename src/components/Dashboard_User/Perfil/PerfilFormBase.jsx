@@ -1,6 +1,10 @@
 // src/components/Dashboard_User/Perfil/PerfilFormBase.jsx
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
+import {
+  formatInteresesFromBackend,
+  isValidInteresesFormat,
+} from "../../../helpers/interesesFormatter";
 
 const steps = ["Personal", "Identidad", "Ubicación", "Foto"];
 
@@ -184,9 +188,12 @@ const validateStep = (step, formData, imagenPreview) => {
   if (step === 3) {
     if (!imagenPreview) errors.imagen = "Sube una foto de perfil";
 
-    // Si el texto NO incluye una coma, lanzamos el error
-    if (formData.intereses.length > 0 && !formData.intereses.includes(",")) {
-      errors.intereses = "Los intereses deben ir separados por comas";
+    const interesesStr = formData.intereses;
+
+    if (!isValidInteresesFormat(interesesStr)) {
+      errors.intereses = !interesesStr.trim()
+        ? "Agrega al menos un interés"
+        : "Despues de una coma no puede estar vacio, sin símbolos ni espacios extra";
     }
   }
 
@@ -194,7 +201,12 @@ const validateStep = (step, formData, imagenPreview) => {
 };
 
 // ──────────────────────────────────────────────────────────────────────────
-const PerfilFormBase = ({ initialData = {}, onSubmit, isEdit = false }) => {
+const PerfilFormBase = ({
+  initialData = {},
+  onSubmit,
+  isEdit = false,
+  isModal = false,
+}) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [imagenArchivo, setImagenArchivo] = useState(null);
   const [imagenPreview, setImagenPreview] = useState("");
@@ -228,14 +240,15 @@ const PerfilFormBase = ({ initialData = {}, onSubmit, isEdit = false }) => {
         nombre: initialData.nombre || "",
         apellido: initialData.apellido || "",
         biografia: initialData.biografia || "",
-        intereses: initialData.intereses?.join(", ") || "",
         genero: initialData.genero || "",
         orientacion: initialData.orientacion || "",
         fechaNacimiento: initialData.fechaNacimiento?.split("T")[0] || "",
         ciudad: initialData.ubicacion?.ciudad || "",
         pais: initialData.ubicacion?.pais || "",
+        intereses: formatInteresesFromBackend(initialData.intereses),
       });
       setImagenPreview(initialData.imagenPerfil || "");
+
       return;
     }
 
@@ -284,7 +297,18 @@ const PerfilFormBase = ({ initialData = {}, onSubmit, isEdit = false }) => {
   // ── HANDLERS ─────────────────────────────────────────────────────────────
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Si es el campo de intereses, limpiar caracteres especiales automáticamente
+    let finalValue = value;
+    if (name === "intereses") {
+      finalValue = value
+        .replace(/[[\]"\\]/g, "") 
+        .replace(/,\s*,/g, ",") // Comas dobles
+        .replace(/,\s+/g, ", ") // Normaliza espacios
+        .trim();
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: finalValue }));
     setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
@@ -412,355 +436,369 @@ const PerfilFormBase = ({ initialData = {}, onSubmit, isEdit = false }) => {
     ) : null;
 
   return (
-    <div className="w-full max-w-[80rem] mx-auto my-9 p-6 bg-gradient-to-br from-red-100 via-orange-50 to-orange-100 rounded-xl shadow-md">
-      {/* ── HEADER ── */}
-      <div className="mb-5">
-        <span className="inline-block bg-orange-50 text-orange-700 text-[11px] font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-2">
-          Paso {currentStep + 1} de {steps.length}
-        </span>
-        <h2
-          className="text-xl font-bold text-stone-800 leading-tight"
-          style={{ fontFamily: "'Sora', sans-serif" }}
-        >
-          {isEdit ? "Editar perfil" : "Completa tu perfil"}
-        </h2>
-        <p className="text-sm text-stone-400 mt-0.5">
-          {stepSubtitles[currentStep]}
-        </p>
-      </div>
-
-      {/* ── STEPPER ── */}
-      <div className="flex items-center mb-5">
-        {steps.map((step, i) => {
-          const isDone = i < currentStep;
-          const isActive = i === currentStep;
-          return (
-            <div key={step} className="flex items-center flex-1">
-              <button
-                onClick={() => handleGoStep(i)}
-                disabled={i >= currentStep}
-                className={[
-                  "w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-all duration-200",
-                  isDone
-                    ? "bg-orange-400 text-white border-2 border-orange-400 cursor-pointer"
-                    : isActive
-                      ? "bg-white text-orange-500 border-2 border-orange-400 ring-4 ring-orange-50 cursor-default"
-                      : "bg-stone-100 text-stone-400 border-2 border-stone-200 cursor-not-allowed opacity-50",
-                ].join(" ")}
-                title={step}
-              >
-                {isDone ? "✓" : i + 1}
-              </button>
-              <span
-                className={[
-                  "text-[11px] font-medium ml-1.5 hidden sm:block",
-                  isActive
-                    ? "text-orange-700"
-                    : isDone
-                      ? "text-stone-500"
-                      : "text-stone-400",
-                ].join(" ")}
-              >
-                {step}
-              </span>
-              {i < steps.length - 1 && (
-                <div
-                  className="flex-1 mx-2 h-px transition-colors duration-300"
-                  style={{ background: isDone ? "#fb923c" : "#e7e5e4" }}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* ── BARRA DE PROGRESO ── */}
-      <div className="mb-5">
-        <div className="flex justify-between text-xs text-stone-400 mb-1.5 font-medium">
-          <span>Completado</span>
-          <span className="text-orange-600 font-semibold">{progress}%</span>
-        </div>
-        <div className="w-full bg-stone-100 rounded-full h-1.5 overflow-hidden">
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${progress}%`,
-              background: "linear-gradient(90deg, #fdba74, #f97316)",
-            }}
-          />
-        </div>
-      </div>
-
-      {/* ── CHECKLIST ── */}
-      <div className="grid grid-cols-2 gap-1.5 mb-5">
-        {checklist.map((item) => (
-          <div
-            key={item.label}
-            className={[
-              "flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all duration-200",
-              item.ok
-                ? "bg-orange-50 border-orange-200 text-orange-700"
-                : "bg-stone-50 border-stone-200 text-stone-500",
-            ].join(" ")}
+    <div
+      className={
+        isModal
+          ? ""
+          : "w-full h-full absolute bg-gradient-to-br from-red-300 via-orange-100 to-orange-200"
+      }
+    >
+      <div
+        className={`${isModal ? "max-w-2xl overflow-y-auto scrollbar-eventos max-h-[60vh]" : "max-w-[80rem]"} mx-auto p-6 bg-gradient-to-t from-gray-100 via-white to-orange-200 rounded-xl shadow-md ${isModal ? "" : "my-9"}`}
+      >
+        {/* ── HEADER ── */}
+        <div className="mb-5">
+          <span className="inline-block bg-orange-50 text-orange-700 text-[11px] font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-2">
+            Paso {currentStep + 1} de {steps.length}
+          </span>
+          <h2
+            className="text-xl font-bold text-stone-800 leading-tight"
+            style={{ fontFamily: "'Sora', sans-serif" }}
           >
-            <span
+            {isEdit ? "Editar perfil" : "Completa tu perfil"}
+          </h2>
+          <p className="text-sm text-stone-400 mt-0.5">
+            {stepSubtitles[currentStep]}
+          </p>
+        </div>
+
+        {/* ── STEPPER ── */}
+        <div className="flex items-center mb-5">
+          {steps.map((step, i) => {
+            const isDone = i < currentStep;
+            const isActive = i === currentStep;
+            return (
+              <div
+                key={step}
+                className={
+                  isModal
+                    ? " relative mx-auto xl:max-w-xl lg:max-w-lg md:max-w-md sm:max-w-sm"
+                    : "flex items-center flex-1"
+                }
+              >
+                <button
+                  onClick={() => handleGoStep(i)}
+                  disabled={i >= currentStep}
+                  className={[
+                    "w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 transition-all duration-200",
+                    isDone
+                      ? "bg-orange-400 text-white border-2 border-orange-400 cursor-pointer"
+                      : isActive
+                        ? "bg-white text-orange-500 border-2 border-orange-400 ring-4 ring-orange-50 cursor-default"
+                        : "bg-stone-100 text-stone-400 border-2 border-stone-200 cursor-not-allowed opacity-50",
+                  ].join(" ")}
+                  title={step}
+                >
+                  {isDone ? "✓" : i + 1}
+                </button>
+                <span
+                  className={[
+                    "text-[11px] font-medium ml-1.5 hidden sm:block",
+                    isActive
+                      ? "text-orange-700"
+                      : isDone
+                        ? "text-stone-500"
+                        : "text-stone-400",
+                  ].join(" ")}
+                >
+                  {step}
+                </span>
+                {i < steps.length - 1 && (
+                  <div
+                    className="flex-1 mx-2 h-px transition-colors duration-300"
+                    style={{ background: isDone ? "#fb923c" : "#e7e5e4" }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── BARRA DE PROGRESO ── */}
+        <div className="mb-5">
+          <div className="flex justify-between text-xs text-stone-400 mb-1.5 font-medium">
+            <span>Completado</span>
+            <span className="text-orange-600 font-semibold">{progress}%</span>
+          </div>
+          <div className="w-full bg-stone-100 rounded-full h-1.5 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${progress}%`,
+                background: "linear-gradient(90deg, #fdba74, #f97316)",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* ── CHECKLIST ── */}
+        <div className="grid grid-cols-2 gap-1.5 mb-5">
+          {checklist.map((item) => (
+            <div
+              key={item.label}
               className={[
-                "w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] flex-shrink-0",
+                "flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all duration-200",
                 item.ok
-                  ? "bg-orange-400 text-white"
-                  : "bg-stone-200 text-stone-400",
+                  ? "bg-orange-50 border-orange-200 text-orange-700"
+                  : "bg-stone-50 border-stone-200 text-stone-500",
               ].join(" ")}
             >
-              {item.ok ? "✓" : ""}
-            </span>
-            {item.label}
-          </div>
-        ))}
-      </div>
-
-      {/* ── BANNER ERROR AL INTENTAR AVANZAR ── */}
-      {submitAttempted && !stepIsValid && (
-        <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3.5 py-2.5 mb-4 text-sm text-red-600 font-medium">
-          <span>⚠</span>
-          Completa correctamente los campos antes de continuar
+              <span
+                className={[
+                  "w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] flex-shrink-0",
+                  item.ok
+                    ? "bg-orange-400 text-white"
+                    : "bg-stone-200 text-stone-400",
+                ].join(" ")}
+              >
+                {item.ok ? "✓" : ""}
+              </span>
+              {item.label}
+            </div>
+          ))}
         </div>
-      )}
 
-      {/* ── CONTENIDO DEL PASO ── */}
-      <div className="min-h-[150px]">
-        {/* STEP 1 — Personal */}
-        {currentStep === 0 && (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Nombre</label>
-                <input
-                  name="nombre"
-                  placeholder="Ana"
-                  value={formData.nombre}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputCls("nombre")}
-                />
-                <ErrorMsg field="nombre" />
-              </div>
-              <div>
-                <label className={labelCls}>Apellido</label>
-                <input
-                  name="apellido"
-                  placeholder="García"
-                  value={formData.apellido}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputCls("apellido")}
-                />
-                <ErrorMsg field="apellido" />
-              </div>
-            </div>
-            <div>
-              <label className={labelCls}>
-                Biografía{" "}
-                <span className="normal-case font-normal text-stone-400">
-                  (opcional)
-                </span>
-              </label>
-              <textarea
-                name="biografia"
-                rows={3}
-                placeholder="Cuéntanos sobre ti..."
-                value={formData.biografia}
-                onChange={handleChange}
-                className={`${inputBase} border-stone-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 resize-none`}
-              />
-              <ErrorMsg field="biografia" />
-            </div>
+        {/* ── BANNER ERROR AL INTENTAR AVANZAR ── */}
+        {submitAttempted && !stepIsValid && (
+          <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-lg px-3.5 py-2.5 mb-4 text-sm text-red-600 font-medium">
+            <span>⚠</span>
+            Completa correctamente los campos antes de continuar
           </div>
         )}
 
-        {/* STEP 2 — Identidad */}
-        {currentStep === 1 && (
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Género</label>
-                <select
-                  name="genero"
-                  value={formData.genero}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputCls("genero")}
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="hombre">Hombre</option>
-                  <option value="mujer">Mujer</option>
-                  <option value="no-binario">No binario</option>
-                  <option value="otro">Otro</option>
-                </select>
-                <ErrorMsg field="genero" />
+        {/* ── CONTENIDO DEL PASO ── */}
+        <div className="min-h-[150px]">
+          {/* STEP 1 — Personal */}
+          {currentStep === 0 && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>Nombre</label>
+                  <input
+                    name="nombre"
+                    placeholder="Ana"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={inputCls("nombre")}
+                  />
+                  <ErrorMsg field="nombre" />
+                </div>
+                <div>
+                  <label className={labelCls}>Apellido</label>
+                  <input
+                    name="apellido"
+                    placeholder="García"
+                    value={formData.apellido}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={inputCls("apellido")}
+                  />
+                  <ErrorMsg field="apellido" />
+                </div>
               </div>
               <div>
                 <label className={labelCls}>
-                  Orientación{" "}
+                  Biografía{" "}
                   <span className="normal-case font-normal text-stone-400">
                     (opcional)
                   </span>
                 </label>
-                <select
-                  name="orientacion"
-                  value={formData.orientacion}
+                <textarea
+                  name="biografia"
+                  rows={3}
+                  placeholder="Cuéntanos sobre ti..."
+                  value={formData.biografia}
                   onChange={handleChange}
-                  className={`${inputBase} border-stone-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100`}
-                >
-                  <option value="">Seleccionar</option>
-                  <option value="heterosexual">Heterosexual</option>
-                  <option value="homosexual">Homosexual</option>
-                  <option value="bisexual">Bisexual</option>
-                  <option value="otro">Otro</option>
-                </select>
+                  className={`${inputBase} border-stone-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 resize-none`}
+                />
+                <ErrorMsg field="biografia" />
               </div>
             </div>
-            <div>
-              <label className={labelCls}>Fecha de nacimiento</label>
-              <DatePicker
-                value={formData.fechaNacimiento}
-                onChange={handleChange}
-                onBlur={() =>
-                  setTouched((prev) => ({ ...prev, fechaNacimiento: true }))
-                }
-                hasError={!!visibleErrors.fechaNacimiento}
-              />
-              <ErrorMsg field="fechaNacimiento" />
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* STEP 3 — Ubicación */}
-        {currentStep === 2 && (
-          <div className="space-y-3">
-            <div>
-              <label className={labelCls}>Ciudad</label>
-              <input
-                name="ciudad"
-                placeholder="Bogotá"
-                value={formData.ciudad}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={inputCls("ciudad")}
-              />
-              <ErrorMsg field="ciudad" />
+          {/* STEP 2 — Identidad */}
+          {currentStep === 1 && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>Género</label>
+                  <select
+                    name="genero"
+                    value={formData.genero}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={inputCls("genero")}
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="hombre">Hombre</option>
+                    <option value="mujer">Mujer</option>
+                    <option value="no-binario">No binario</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                  <ErrorMsg field="genero" />
+                </div>
+                <div>
+                  <label className={labelCls}>
+                    Orientación{" "}
+                    <span className="normal-case font-normal text-stone-400">
+                      (opcional)
+                    </span>
+                  </label>
+                  <select
+                    name="orientacion"
+                    value={formData.orientacion}
+                    onChange={handleChange}
+                    className={`${inputBase} border-stone-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100`}
+                  >
+                    <option value="">Seleccionar</option>
+                    <option value="heterosexual">Heterosexual</option>
+                    <option value="homosexual">Homosexual</option>
+                    <option value="bisexual">Bisexual</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Fecha de nacimiento</label>
+                <DatePicker
+                  value={formData.fechaNacimiento}
+                  onChange={handleChange}
+                  onBlur={() =>
+                    setTouched((prev) => ({ ...prev, fechaNacimiento: true }))
+                  }
+                  hasError={!!visibleErrors.fechaNacimiento}
+                />
+                <ErrorMsg field="fechaNacimiento" />
+              </div>
             </div>
-            <div>
-              <label className={labelCls}>País</label>
-              <input
-                name="pais"
-                placeholder="Colombia"
-                value={formData.pais}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={inputCls("pais")}
-              />
-              <ErrorMsg field="pais" />
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* STEP 4 — Foto */}
-        {currentStep === 3 && (
-          <div className="space-y-3">
-          <div>
-            <label
-              htmlFor="imagen-upload"
-              className={[
-                "flex flex-col items-center justify-center w-full border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200",
-                visibleErrors.imagen
-                  ? "border-red-300 bg-red-50 p-8"
-                  : imagenPreview
-                    ? "border-orange-300 bg-orange-50 p-4"
-                    : "border-stone-200 bg-stone-50 p-8 hover:border-orange-300 hover:bg-orange-50",
-              ].join(" ")}
-            >
-              {imagenPreview ? (
-                <>
-                  <img
-                    src={imagenPreview}
-                    alt="Preview"
-                    className="w-20 h-20 rounded-full object-cover border-2 border-orange-400 mb-2"
-                  />
-                  <span className="text-xs text-orange-600 font-semibold underline">
-                    Cambiar foto
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="text-3xl mb-2">📷</span>
-                  <span className="text-sm font-semibold text-stone-600">
-                    Sube tu foto
-                  </span>
-                  <span className="text-xs text-stone-400 mt-1">
-                    JPG, PNG · máx. 5MB
-                  </span>
-                </>
-              )}
-            </label>
-            <ErrorMsg field="imagen" />
-            <input
-              id="imagen-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImagenChange}
-            />
-          </div>
-          <div>
-              
-              <label className={labelCls}>Intereses</label>
-              <input
-                name="intereses"
-                placeholder="Ej: lectura, deporte, música"
-                value={formData.intereses}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className={inputCls("intereses")}
-              />
-              <ErrorMsg field="intereses" />
-            
-          </div>
+          {/* STEP 3 — Ubicación */}
+          {currentStep === 2 && (
+            <div className="space-y-3">
+              <div>
+                <label className={labelCls}>Ciudad</label>
+                <input
+                  name="ciudad"
+                  placeholder="Bogotá"
+                  value={formData.ciudad}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputCls("ciudad")}
+                />
+                <ErrorMsg field="ciudad" />
+              </div>
+              <div>
+                <label className={labelCls}>País</label>
+                <input
+                  name="pais"
+                  placeholder="Colombia"
+                  value={formData.pais}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputCls("pais")}
+                />
+                <ErrorMsg field="pais" />
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4 — Foto */}
+          {currentStep === 3 && (
+            <div className="space-y-3">
+              <div>
+                <label
+                  htmlFor="imagen-upload"
+                  className={[
+                    "flex flex-col items-center justify-center w-full border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200",
+                    visibleErrors.imagen
+                      ? "border-red-300 bg-red-50 p-8"
+                      : imagenPreview
+                        ? "border-orange-300 bg-orange-50 p-4"
+                        : "border-stone-200 bg-stone-50 p-8 hover:border-orange-300 hover:bg-orange-50",
+                  ].join(" ")}
+                >
+                  {imagenPreview ? (
+                    <>
+                      <img
+                        src={imagenPreview}
+                        alt="Preview"
+                        className="w-20 h-20 rounded-full object-cover border-2 border-orange-400 mb-2"
+                      />
+                      <span className="text-xs text-orange-600 font-semibold underline">
+                        Cambiar foto
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-3xl mb-2">📷</span>
+                      <span className="text-sm font-semibold text-stone-600">
+                        Sube tu foto
+                      </span>
+                      <span className="text-xs text-stone-400 mt-1">
+                        JPG, PNG · máx. 5MB
+                      </span>
+                    </>
+                  )}
+                </label>
+                <ErrorMsg field="imagen" />
+                <input
+                  id="imagen-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImagenChange}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>Intereses</label>
+                <input
+                  name="intereses"
+                  placeholder="Ej: lectura, deporte, música"
+                  value={formData.intereses}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className={inputCls("intereses")}
+                />
+                <ErrorMsg field="intereses" />
+              </div>
+            </div>
+          )}
         </div>
-        )}
-      </div>
 
-      {/* ── BOTONES ── */}
-      <div className="flex gap-2.5 mt-6">
-        <button
-          onClick={handleBack}
-          disabled={currentStep === 0}
-          className="px-5 py-2.5 text-sm font-semibold text-stone-400 border border-stone-200 rounded-lg transition hover:bg-stone-50 hover:text-stone-600 hover:border-stone-400 disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          ← Atrás
-        </button>
+        {/* ── BOTONES ── */}
+        <div className="flex gap-2.5 mt-6">
+          <button
+            onClick={handleBack}
+            disabled={currentStep === 0}
+            className="px-5 py-2.5 text-sm font-semibold text-black border border-stone-200 rounded-lg transition hover:bg-gradinet-r from-red-400 to-orange-500 hover:text-black hover:border-stone-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            ← Atrás
+          </button>
 
-        {!isLast ? (
-          <button
-            onClick={handleNext}
-            className="flex-1 py-2.5 text-sm font-semibold text-white rounded-lg transition-all hover:-translate-y-px active:translate-y-0"
-            style={{ background: "linear-gradient(135deg, #fb923c, #f97316)" }}
-          >
-            Siguiente →
-          </button>
-        ) : (
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="flex-1 py-2.5 text-sm font-semibold text-white rounded-lg transition-all hover:-translate-y-px active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed"
-            style={{
-              background: loading
-                ? "#9ca3af"
-                : "linear-gradient(135deg, #fb923c, #f97316)",
-            }}
-          >
-            {loading ? "Guardando..." : "Guardar perfil ✓"}
-          </button>
-        )}
+          {!isLast ? (
+            <button
+              onClick={handleNext}
+              className="bg-gradient-to-r from-pink-600  to-orange-400 flex-1 py-2.5 text-sm font-semibold text-white rounded-lg transition-all hover:-translate-y-px active:translate-y-0"
+            >
+              Siguiente →
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="flex-1 py-2.5 text-sm font-semibold text-white rounded-lg transition-all hover:-translate-y-px active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed"
+              style={{
+                background: loading
+                  ? "#9ca3af"
+                  : "linear-gradient(135deg, #fb923c, #f97316)",
+              }}
+            >
+              {loading ? "Guardando..." : "Guardar perfil ✓"}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -770,6 +808,7 @@ PerfilFormBase.propTypes = {
   initialData: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
   isEdit: PropTypes.bool,
+  isModal: PropTypes.bool,
   field: PropTypes.string,
 };
 

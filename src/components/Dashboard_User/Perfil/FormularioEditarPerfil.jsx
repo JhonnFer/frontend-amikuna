@@ -2,6 +2,7 @@
 import PerfilFormBase from "./PerfilFormBase";
 import PropTypes from "prop-types";
 import usePerfilUsuarioAutenticado from "../../../hooks/usePerfilUsuarioAutenticado";
+import { formatInteresesForBackend } from "../../../helpers/interesesFormatter";
 
 const buildProfileFormData = (data) => {
   const form = new FormData();
@@ -14,13 +15,9 @@ const buildProfileFormData = (data) => {
   form.append("ubicacion[ciudad]", data.ciudad);
   form.append("ubicacion[pais]", data.pais);
 
-  // Convertir intereses de string a array
+  // Convertir intereses a formato que acepta el backend
   if (data.intereses) {
-    const interesArray = data.intereses
-      .split(",")
-      .map((i) => i.trim())
-      .filter((i) => i.length > 0);
-    form.append("intereses", JSON.stringify(interesArray));
+    form.append("intereses", formatInteresesForBackend(data.intereses));
   }
 
   if (data.imagenArchivo) {
@@ -30,7 +27,7 @@ const buildProfileFormData = (data) => {
 };
 
 const FormularioEditarPerfil = ({ perfil, onClose }) => {
-  const { editarPerfil, loadProfile } = usePerfilUsuarioAutenticado();
+  const { editarPerfil, cargarPerfil } = usePerfilUsuarioAutenticado();
 
   const handleSubmit = async (data) => {
     const form = buildProfileFormData(data);
@@ -38,7 +35,7 @@ const FormularioEditarPerfil = ({ perfil, onClose }) => {
     const success = await editarPerfil(form);
 
     if (success) {
-      await loadProfile();
+      await cargarPerfil();
       onClose?.();
     }
 
@@ -50,6 +47,7 @@ const FormularioEditarPerfil = ({ perfil, onClose }) => {
       initialData={perfil}
       onSubmit={handleSubmit}
       isEdit={true}
+      isModal={true}
     />
   );
 };

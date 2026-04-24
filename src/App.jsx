@@ -15,7 +15,6 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import NuevoPassword from "./pages/NuevoPassword";
-import ForgotAdministrador from "./pages/ForgotAdministrador";
 import ConfirmarCuenta from "./pages/ConfirmarCuenta";
 import Dashboard_Admin from "./layout/Dashboard_Admin";
 import Dashboard_Users from "./layout/Dashboard_Users";
@@ -23,16 +22,15 @@ import Forbidden from "./pages/Forbidden";
 import FormularioCompletarPerfil from "./components/Dashboard_User/Perfil/FormularioCompletarPerfil";
 import Download from "./pages/Community";
 import About from "./pages/About";
-import GoogleSuccess from "./pages/GoogleSuccess";
 
 import { socket } from "./helpers/socket";
 
 function App() {
   const token = storeAuth((state) => state.token);
   const clearProfile = storeProfile((state) => state.clearProfile);
-  const loadProfile = storeProfile((state) => state.loadProfile);  // ✅ añadir
-  const user = storeAuth((state) => state.user);  
-  const socketInitialized = useRef(false);                 // ✅ añadir
+  const loadProfile = storeProfile((state) => state.loadProfile); // ✅ añadir
+  const user = storeAuth((state) => state.user);
+  const socketInitialized = useRef(false); // ✅ añadir
 
   useEffect(() => {
     if (!token) {
@@ -42,31 +40,29 @@ function App() {
 
   // ✅ Cargar perfil cuando hay token y es estudiante
   useEffect(() => {
-  if (token && user?.rol === "estudiante") {
-    loadProfile();
-  }
-}, [token]);
+    if (token && user?.rol === "estudiante") {
+      loadProfile();
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (token && !socketInitialized.current) {
+      socket.auth = { token };
+      socket.connect();
+
+      socketInitialized.current = true;
+    }
+
+    if (!token && socket.connected) {
+      console.log("🔌 Desconectando socket...");
+      socket.disconnect();
+      socketInitialized.current = false;
+    }
+  }, [token]);
 
 
-
-useEffect(() => {
-  if (token && !socketInitialized.current) {
-
-    socket.auth = { token };
-    socket.connect();
-
-    socketInitialized.current = true;
-  }
-
-  if (!token && socket.connected) {
-    console.log("🔌 Desconectando socket...");
-    socket.disconnect();
-    socketInitialized.current = false;
-  }
-}, [token]);
 
   return (
-
     <BrowserRouter>
       <ToastContainer />
 
@@ -80,12 +76,26 @@ useEffect(() => {
         </Route>
 
         {/* Públicas */}
-        <Route path="/" element={<><Navbar /><Home /></>} />
-        <Route path="/confirmar/:token" element={<><Navbar /><ConfirmarCuenta /></>} />
+        <Route
+          path="/"
+          element={
+            <>
+              <Navbar />
+              <Home />
+            </>
+          }
+        />
+        <Route
+          path="/confirmar/:token"
+          element={
+            <>
+              <Navbar />
+              <ConfirmarCuenta />
+            </>
+          }
+        />
         <Route path="/forgot" element={<ForgotPassword />} />
-        <Route path="/forgot2" element={<ForgotAdministrador />} />
         <Route path="/nuevopassword/:token" element={<NuevoPassword />} />
-        <Route path="/auth/google/success" element={<GoogleSuccess />} />
 
         {/* Protegidas */}
         <Route
