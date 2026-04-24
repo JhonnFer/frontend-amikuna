@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { FiArrowLeft } from "react-icons/fi";
@@ -30,11 +31,9 @@ const NuevoPassword = () => {
   const getPasswordStrength = () => {
     if (!password) return { text: "", color: "" };
 
-    if (password.length < 6)
-      return { text: "Débil", color: "bg-red-500" };
+    if (password.length < 6) return { text: "Débil", color: "bg-red-500" };
 
-    if (password.length < 10)
-      return { text: "Media", color: "bg-yellow-500" };
+    if (password.length < 10) return { text: "Media", color: "bg-yellow-500" };
 
     return { text: "Fuerte", color: "bg-green-500" };
   };
@@ -59,6 +58,16 @@ const NuevoPassword = () => {
 
     enviarNuevoPassword(e);
   };
+
+  useEffect(() => {
+    if (serverSuccess) {
+      const timer = setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [serverSuccess, navigate]);
 
   return (
     <div
@@ -97,9 +106,7 @@ const NuevoPassword = () => {
       {/* Token inválido */}
       {token && !tokenVerificando && !tokenValido && (
         <div className="text-center bg-black/40 p-6 rounded-lg backdrop-blur-md">
-          <p className="text-red-400 mb-2">
-            Enlace inválido o expirado
-          </p>
+          <p className="text-red-400 mb-2">Enlace inválido o expirado</p>
           <Link to="/olvidepassword" className="underline">
             Solicitar otro
           </Link>
@@ -141,8 +148,8 @@ const NuevoPassword = () => {
                         password.length < 6
                           ? "33%"
                           : password.length < 10
-                          ? "66%"
-                          : "100%",
+                            ? "66%"
+                            : "100%",
                     }}
                   />
                 </div>
@@ -196,7 +203,7 @@ const NuevoPassword = () => {
 
           {serverSuccess && (
             <p className="text-green-400 text-sm text-center mt-2">
-              {serverSuccess}
+              {serverSuccess} — Redirigiendo...
             </p>
           )}
 
@@ -204,14 +211,10 @@ const NuevoPassword = () => {
           <button
             type="submit"
             disabled={
-              loading ||
-              password.length < 6 ||
-              password !== confirmPassword
+              loading || password.length < 6 || password !== confirmPassword
             }
             className={`w-full mt-4 py-3 rounded-xl font-semibold transition-all duration-200 ${
-              loading ||
-              password.length < 6 ||
-              password !== confirmPassword
+              loading || password.length < 6 || password !== confirmPassword
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-red-500 hover:bg-red-600"
             }`}
