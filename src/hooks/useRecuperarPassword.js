@@ -127,13 +127,12 @@ export const useRecuperarPassword = (token = null) => {
         },
         "POST"
       );
-
-      if (!response?.success) {
-        setServerError(response?.msg || "Error al actualizar");
-        return;
+      console.log("response:", response);
+      if (response?.msg) {
+        setServerError(response.msg );
+      }else {
+        setServerError("Error al actualizar");
       }
-
-      setServerSuccess(response.msg);
 
     } catch (error) {
       setServerError(error?.message || "Error al actualizar");
