@@ -1,36 +1,26 @@
-//src/hooks/usePerfilUsuarioAutenticado.js
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import fetchDataBackend from "../helpers/fetchDataBackend";
 import tokenManager from "../helpers/tokenManager";
+import { socket } from "../helpers/socket";
 
-// ── Validación de perfil completo ───────────────────────
 export const isPerfilCompleto = (perfil) => {
   if (!perfil) return false;
-
-  const tieneFoto = !!perfil.imagenPerfil;
-  const tieneGenero = perfil.genero && perfil.genero !== "otro";
-  const tieneBiografia = !!perfil.biografia?.trim();
-  const tieneIntereses =
-    Array.isArray(perfil.intereses) && perfil.intereses.length > 0;
-  const tieneUbicacion = !!perfil.ubicacion?.ciudad && !!perfil.ubicacion?.pais;
-
   return (
-    tieneFoto &&
-    tieneGenero &&
-    tieneBiografia &&
-    tieneIntereses &&
-    tieneUbicacion
+    !!perfil.imagenPerfil &&
+    perfil.genero && perfil.genero !== "otro" &&
+    !!perfil.biografia?.trim() &&
+    Array.isArray(perfil.intereses) && perfil.intereses.length > 0 &&
+    !!perfil.ubicacion?.ciudad && !!perfil.ubicacion?.pais
   );
 };
 
-function usePerfilUsuarioAutenticado() {
+const usePerfilUsuarioAutenticado = ({ autoCargar = true } = {}) => {
   const [perfil, setPerfil] = useState(null);
-  const [loadingPerfil, setLoadingPerfil] = useState(true);
+  const [loadingPerfil, setLoadingPerfil] = useState(autoCargar);
 
-  // ── Cargar perfil ─────────────────────────────────────
-  const cargarPerfil = async () => {
+  // ✅ useCallback para estabilizar la referencia
+  const cargarPerfil = useCallback(async () => {
     const token = tokenManager.getToken();
-
     if (!token) {
       setLoadingPerfil(false);
       setPerfil(null);
@@ -38,12 +28,10 @@ function usePerfilUsuarioAutenticado() {
     }
 
     setLoadingPerfil(true);
-
     try {
       const data = await fetchDataBackend("estudiantes/perfil", null, "GET", {
         showErrorToast: false,
       });
-
       setPerfil(data);
       return data;
     } catch (error) {
@@ -53,21 +41,32 @@ function usePerfilUsuarioAutenticado() {
     } finally {
       setLoadingPerfil(false);
     }
-  };
+  }, []); // sin dependencias = referencia estable
 
-  // ── COMPLETAR PERFIL ─────────────────────────────────
+  // ✅ Un solo useEffect para auto-carga
+  useEffect(() => {
+    if (autoCargar) cargarPerfil();
+  }, [autoCargar, cargarPerfil]);
+
+  // ✅ Socket corregido: mismo evento en .on y .off
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on("perfil_cambio", cargarPerfil);
+
+    return () => {
+      socket.off("perfil_cambio", cargarPerfil); // ✅ nombre correcto
+    };
+  }, [cargarPerfil]); // socket es estable, no hace falta en deps
+
   const completarPerfil = async (formData) => {
     try {
       const response = await fetchDataBackend(
         "estudiantes/completarPerfil",
         formData,
         "PUT",
-        {
-          showSuccessToast: false,
-          showErrorToast: false,
-        },
+        { showSuccessToast: false, showErrorToast: false }
       );
-
       setPerfil(response.perfilActualizado || response);
       return response;
     } catch (error) {
@@ -76,19 +75,14 @@ function usePerfilUsuarioAutenticado() {
     }
   };
 
-  // ── EDITAR PERFIL ────────────────────────────────────
   const editarPerfil = async (formData) => {
     try {
       const response = await fetchDataBackend(
         "estudiantes/completarPerfil",
         formData,
         "PUT",
-        {
-          showSuccessToast: false,
-          showErrorToast: false,
-        },
+        { showSuccessToast: false, showErrorToast: false }
       );
-
       setPerfil(response.perfilActualizado || response);
       return response;
     } catch (error) {
@@ -97,23 +91,7 @@ function usePerfilUsuarioAutenticado() {
     }
   };
 
-  // ── INIT ─────────────────────────────────────────────
-  useEffect(() => {
-    const token = tokenManager.getToken();
-    if (!token) {
-      setLoadingPerfil(false);
-      return;
-    }
-
-    cargarPerfil();
-  }, []);
-  return {
-    perfil,
-    loadingPerfil,
-    cargarPerfil,
-    completarPerfil,
-    editarPerfil,
-  };
-}
+  return { perfil, loadingPerfil, cargarPerfil, completarPerfil, editarPerfil };
+};
 
 export default usePerfilUsuarioAutenticado;

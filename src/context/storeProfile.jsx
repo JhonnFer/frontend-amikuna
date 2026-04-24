@@ -1,6 +1,7 @@
 // src/context/storeProfile.jsx
 import { create } from "zustand";
 import fetchDataBackend from "../helpers/fetchDataBackend";
+import { socket } from "../helpers/socket";
 
 const storeProfile = create((set, get) => ({
 
@@ -46,6 +47,21 @@ const storeProfile = create((set, get) => ({
       profile: null,
       loaded: false,
     }),
+
+  initSocket: () => {
+    socket.off("perfil_cambio");
+
+     const handleCambioPerfil = () => {
+    get().refreshProfile();
+  };
+
+  socket.on("perfil_cambio", handleCambioPerfil);
+
+    return () => {
+      socket.off("perfil_cambio", handleCambioPerfil); // cleanup
+    };
+  }
+
 }));
 
 export default storeProfile;

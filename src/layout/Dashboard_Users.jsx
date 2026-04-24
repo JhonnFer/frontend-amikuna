@@ -20,6 +20,7 @@ const Dashboard_Users = () => {
   const profile = storeProfile((state) => state.profile);
   const loadProfile = storeProfile((state) => state.loadProfile);
   const loading = storeProfile((state) => state.loading);
+  const initSocket = storeProfile((state) => state.initSocket);
 
   const resetModoEliminarRef = useRef(null); // ← ref para resetear el toggle del ModalGaleria
 
@@ -72,11 +73,19 @@ const Dashboard_Users = () => {
     handleLogout,
   } = useDashboardState();
 
+
+
   useEffect(() => {
     if (!profile) {
       loadProfile();
     }
-  }, [profile, loadProfile]);
+  }, []);
+
+  // 2️⃣ Socket al montar — independiente del perfil
+useEffect(() => {
+  const cleanup = initSocket();
+  return cleanup;
+}, []); // ← solo al montar
 
   if (loading) {
     return <div>Cargando perfil...</div>;

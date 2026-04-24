@@ -1,5 +1,6 @@
 // src/helpers/tokenManager.js
 // ÚNICA fuente de verdad para tokens
+import { socket } from "./socket";
 
 class TokenManager {
   // Observadores para cambios de token
@@ -44,6 +45,10 @@ class TokenManager {
       localStorage.setItem("user", JSON.stringify(user));
     }
 
+    // ✅ Conectar socket con el nuevo token
+    socket.auth = { token };
+    if (!socket.connected) socket.connect();
+
     this.#notifyListeners({ token, user });
     return true;
   }
@@ -54,6 +59,8 @@ class TokenManager {
   clearToken() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
+    if (socket.connected) socket.disconnect();
 
     this.#notifyListeners({ token: null, user: null });
   }
