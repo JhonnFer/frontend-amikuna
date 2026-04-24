@@ -88,9 +88,9 @@ const SwipeCards = () => {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-2 w-full max-w-[570px] h-full">
+    <div className="flex flex-1 flex-col items-center justify-center px-4 py-6 w-full max-w-[570px] h-60  xl:h-full lg:h-[45rem] md:h-[31rem] sm:h-[22rem]">
       {/* CARD */}
-      <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl h-full  items-center justify-center border-2 border-gray-300 rounded-2xl shadow-lg bg-white ">
+      <div className="relative w-full  h-full sm:max-w-md  md:max-w-lg lg:max-w-xl   items-center justify-center border-2 border-gray-300 rounded-2xl shadow-lg bg-white ">
         <AnimatePresence>
           <motion.div
             key={usuarioActual._id}
@@ -132,7 +132,7 @@ const SwipeCards = () => {
             </div>
 
             {/* INFO */}
-            <div className="flex flex-col flex-[4] justify-between p-2 sm:p-4 text-center overflow-hidden bg-white sm:max-h-[45%] ">
+            <div className="flex flex-col overflow-y-auto flex-[4] justify-between p-2 sm:p-4 text-center  bg-white sm:max-h-[45%] ">
               <div className="flex flex-col  gap-0.5 overflow-y-auto scrollbar-sidebar ">
                 <h3
                   className="text-base sm:text-lg md:text-xl font-bold text-gray-800 line-clamp-none"
@@ -168,7 +168,7 @@ const SwipeCards = () => {
                 </p>
                 
                 {/* CONTADORES DE SEGUIDORES Y SEGUIDOS */}
-                <div className="flex  mt-3 items-center justify-center sm:gap-4 md:gap-8 lg:gap-12 xl:gap-16" >
+                <div className="flex  mt-3 items-center justify-center gap-2 sm:gap-1 md:gap-8 lg:gap-12 xl:gap-16 " >
                   <div className="flex flex-col items-center justify-between">
                     <div className="flex flex-col xl:text-lg lg:text-base md:text-sm sm:text-xs bg-gradient-to-r from-pink-600  to-orange-400 bg-clip-text text-transparent">
                       {usuarioActual?.seguidores?.length ?? 0}
@@ -192,7 +192,7 @@ const SwipeCards = () => {
               </div>
 
               {/* BOTONES */}
-              <div className="flex justify-center xl:gap-45 lg:gap-35 md:gap-25 sm:gap-12 mt-2 shrink-0">
+              <div className="flex justify-center  gap-12 xl:gap-45 lg:gap-35 md:gap-25 sm:gap-12 mt-2 shrink-0">
                 <button
                   onClick={() => handleSwipe("left")}
                   className="bg-gradient-to-br from-pink-600  to-orange-400 text-white w-10 h-10 rounded-full shadow-lg hover:from-[#ED213A] hover:to-[#93291E]/90 transition flex items-center justify-center"
