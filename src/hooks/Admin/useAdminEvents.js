@@ -1,4 +1,3 @@
-// src/hooks/Admin/useAdminEvents.js
 import { useState, useEffect, useCallback } from "react";
 import useFetch from "../useFetch";
 
@@ -7,80 +6,97 @@ const useAdminEvents = () => {
 
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+
+  // 🔥 NUEVO manejo tipo register
+  const [serverError, setserverError] = useState(null);
+  const [serverSuccess, setServerSuccess] = useState(null);
 
   const obtenerEventos = useCallback(async () => {
     setLoading(true);
-    setError(null);
+    setserverError(null);
+
     try {
-      const data = await fetchDataBackend("ver-evento", null, "GET", false);
-      setEventos(data);
+      const data = await fetchDataBackend("ver-evento", null, "GET", {
+        showErrorToast: false,
+      });
+
+     
+     setEventos(data ?? []);
     } catch (err) {
-      setError(err.message || "Error al obtener eventos");
+      setserverError(err.message);
     } finally {
       setLoading(false);
     }
   }, [fetchDataBackend]);
 
-  // ✅ sin try/catch innecesario — el error burbujea al componente
   const crearEvento = async (formData) => {
-    // ── DEBUG ──────────────────────────────────────────
-    console.log("🚀 crearEvento — FormData recibido en hook:");
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
-      } else {
-        console.log(`  ${key}: ${value}`);
-      }
+    setserverError(null);
+    setServerSuccess(null);
+
+    try {
+      const data = await fetchDataBackend(
+        "crear-evento",
+        formData,
+        "POST",
+        { showErrorToast: false }
+      );
+
+      setServerSuccess("Evento creado correctamente");
+      await obtenerEventos();
+      return data;
+
+    } catch (err) {
+      setserverError(err.message);
+      throw err;
     }
-    // ──────────────────────────────────────────────────
-    const data = await fetchDataBackend("crear-evento", formData, "POST");
-    await obtenerEventos();
-    return data;
   };
 
-  // ✅ sin try/catch innecesario
   const actualizarEvento = async (id, formData) => {
-    if (!id) throw new Error("ID de evento inválido");
-    // ── DEBUG ──────────────────────────────────────────
-    console.log(`🚀 actualizarEvento(${id}) — FormData recibido en hook:`);
-    for (const [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
-      } else {
-        console.log(`  ${key}: ${value}`);
-      }
+    setserverError(null);
+    setServerSuccess(null);
+
+    try {
+      const data = await fetchDataBackend(
+        `eventos/${id}`,
+        formData,
+        "PUT",
+        { showErrorToast: false }
+      );
+
+      setServerSuccess("Evento actualizado correctamente");
+      await obtenerEventos();
+      return data;
+
+    } catch (err) {
+      setserverError(err.message);
+      throw err;
     }
-    // ──────────────────────────────────────────────────
-    const data = await fetchDataBackend(`eventos/${id}`, formData, "PUT");
-    await obtenerEventos();
-    return data;
   };
 
-  // ✅ sin try/catch innecesario
-  const eliminarEvento = async (id, fechaEvento) => {
-  if (!id) throw new Error("ID de evento inválido");
+  const eliminarEvento = async (id) => {
+    if (!id) throw new Error("ID de evento inválido");
 
-  if (!fechaEvento) {
-    throw new Error("Fecha del evento no proporcionada");
-  }
+    setserverError(null);
+    setServerSuccess(null);
 
-  const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
+    try {
+      const data = await fetchDataBackend(
+        `eliminar-evento/${id}`,
+        null,
+        "DELETE",
+        { showErrorToast: false }
+      );
 
-  const fechaEv = new Date(fechaEvento);
-  fechaEv.setHours(0, 0, 0, 0);
+      setServerSuccess("Evento eliminado correctamente");
+      await obtenerEventos();
+      return data;
 
-  console.log("📅 Comparando:", { hoy, fechaEv });
+    } catch (err) {
+      setserverError(err.message);
+      throw err;
+    }
+  };
 
-  if (fechaEv < hoy) {
-    throw new Error("No se puede eliminar un evento caducado");
-  }
-
-  const data = await fetchDataBackend(`eliminar-evento/${id}`, null, "DELETE");
-  await obtenerEventos();
-  return data;
-};
   useEffect(() => {
     obtenerEventos();
   }, [obtenerEventos]);
@@ -88,7 +104,8 @@ const useAdminEvents = () => {
   return {
     eventos,
     loading,
-    error,
+   serverError,
+    serverSuccess,
     obtenerEventos,
     crearEvento,
     actualizarEvento,

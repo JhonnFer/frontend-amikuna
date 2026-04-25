@@ -32,7 +32,7 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
       const eventosFuturos = (data ?? []).filter((e) => {
         if (!e.hora) return true;
         const [horas, minutos] = e.hora.split(":").map(Number);
-        const fechaEvento = new Date(e.fecha);
+        const fechaEvento = new Date(`${e.fecha.split("T")[0]}T${e.hora}:00`);
         fechaEvento.setUTCHours(horas + 5, minutos, 0, 0);
         return fechaEvento >= ahora;
       });

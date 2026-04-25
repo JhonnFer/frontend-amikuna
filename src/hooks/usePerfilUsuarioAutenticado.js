@@ -18,7 +18,7 @@ const usePerfilUsuarioAutenticado = ({ autoCargar = true } = {}) => {
   const [perfil, setPerfil] = useState(null);
   const [loadingPerfil, setLoadingPerfil] = useState(autoCargar);
 
-  // ✅ useCallback para estabilizar la referencia
+  //  useCallback para estabilizar la referencia
   const cargarPerfil = useCallback(async () => {
     const token = tokenManager.getToken();
     if (!token) {
