@@ -37,17 +37,24 @@ const useAdminEvents = () => {
   }, [fetchDataBackend]);
 
   useEffect(() => {
-  socket.on("asistencia_actualizada", (data) => {
-    console.log("📡 asistencia_actualizada recibida", data);
+    const handleAsistenciaActualizada = (data) => {
+      console.log("📡 asistencia_actualizada recibida", data);
+      obtenerEventos();
+    };
 
-    //  vuelves a pedir los eventos actualizados
-    obtenerEventos();
-  });
+    const handleEventoEliminado = (data) => {
+      console.log("📡 evento_eliminado recibida", data);
+      obtenerEventos();
+    };
 
-  return () => {
-    socket.off("asistencia_actualizada");
-  };
-}, [obtenerEventos]);
+    socket.on("asistencia_actualizada", handleAsistenciaActualizada);
+    socket.on("evento_eliminado", handleEventoEliminado);
+
+    return () => {
+      socket.off("asistencia_actualizada", handleAsistenciaActualizada);
+      socket.off("evento_eliminado", handleEventoEliminado);
+    };
+  }, [obtenerEventos]);
 
   const crearEvento = async (formData) => {
     setserverError(null);
