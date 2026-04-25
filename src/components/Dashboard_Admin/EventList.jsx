@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DatePicker from "../../components/Dashboard_Admin/Eventos/DatePicker";
 import useAdminEvents from "../../hooks/Admin/useAdminEvents";
 
@@ -25,6 +25,25 @@ const EventList = () => {
     hora: "",
     imagen: null,
   });
+
+  // ─── EFECTO: Limpiar formulario después del mensaje de éxito ─────────────────
+  useEffect(() => {
+    if (serverSuccess) {
+      const timer = setTimeout(() => {
+        setForm({
+          titulo: "",
+          descripcion: "",
+          fecha: "",
+          lugar: "",
+          hora: "",
+          imagen: null,
+        });
+        setFileInputKey((prev) => prev + 1);
+      }, 2000); // Espera 2 segundos antes de limpiar
+
+      return () => clearTimeout(timer);
+    }
+  }, [serverSuccess]);
 
   // ─── FUNCIONES DE VALIDACIÓN DE FECHA Y HORA ───────────────────────
 
@@ -161,18 +180,9 @@ const EventList = () => {
         setEditId(null);
       } else {
         await crearEvento(formData);
-        serverSuccess("Evento creado");
+        serverSuccess("Evento creado correctamente");
       }
 
-      setForm({
-        titulo: "",
-        descripcion: "",
-        fecha: "",
-        lugar: "",
-        hora: "",
-        imagen: null,
-      });
-      setFileInputKey((prev) => prev + 1); // ← resetea visualmente el input tras submit
       obtenerEventos();
     } catch (err) {
       /* console.error("❌ Error al guardar evento:", err); */ // ← DEBUG

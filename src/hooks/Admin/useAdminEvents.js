@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import useFetch from "../useFetch";
+import { socket } from "../../helpers/socket";
 
 const useAdminEvents = () => {
   const { fetchDataBackend } = useFetch();
@@ -20,8 +21,14 @@ const useAdminEvents = () => {
         showErrorToast: false,
       });
 
-     
-     setEventos(data ?? []);
+      // Ordenar eventos por fecha descendente (más nuevos primero)
+      const eventosOrdenados = (data ?? []).sort((a, b) => {
+        const dateA = new Date(`${a.fecha.split("T")[0]}T${a.hora}:00`);
+        const dateB = new Date(`${b.fecha.split("T")[0]}T${b.hora}:00`);
+        return dateB - dateA; // Descendente (más nuevos primero)
+      });
+
+      setEventos(eventosOrdenados);
     } catch (err) {
       setserverError(err.message);
     } finally {
@@ -29,22 +36,31 @@ const useAdminEvents = () => {
     }
   }, [fetchDataBackend]);
 
+  useEffect(() => {
+  socket.on("asistencia_actualizada", (data) => {
+    console.log("📡 asistencia_actualizada recibida", data);
+
+    //  vuelves a pedir los eventos actualizados
+    obtenerEventos();
+  });
+
+  return () => {
+    socket.off("asistencia_actualizada");
+  };
+}, [obtenerEventos]);
+
   const crearEvento = async (formData) => {
     setserverError(null);
     setServerSuccess(null);
 
     try {
-      const data = await fetchDataBackend(
-        "crear-evento",
-        formData,
-        "POST",
-        { showErrorToast: false }
-      );
+      const data = await fetchDataBackend("crear-evento", formData, "POST", {
+        showErrorToast: false,
+      });
 
       setServerSuccess("Evento creado correctamente");
       await obtenerEventos();
       return data;
-
     } catch (err) {
       setserverError(err.message);
       throw err;
@@ -56,17 +72,13 @@ const useAdminEvents = () => {
     setServerSuccess(null);
 
     try {
-      const data = await fetchDataBackend(
-        `eventos/${id}`,
-        formData,
-        "PUT",
-        { showErrorToast: false }
-      );
+      const data = await fetchDataBackend(`eventos/${id}`, formData, "PUT", {
+        showErrorToast: false,
+      });
 
       setServerSuccess("Evento actualizado correctamente");
       await obtenerEventos();
       return data;
-
     } catch (err) {
       setserverError(err.message);
       throw err;
@@ -84,13 +96,12 @@ const useAdminEvents = () => {
         `eliminar-evento/${id}`,
         null,
         "DELETE",
-        { showErrorToast: false }
+        { showErrorToast: false },
       );
 
       setServerSuccess("Evento eliminado correctamente");
       await obtenerEventos();
       return data;
-
     } catch (err) {
       setserverError(err.message);
       throw err;
@@ -104,7 +115,7 @@ const useAdminEvents = () => {
   return {
     eventos,
     loading,
-   serverError,
+    serverError,
     serverSuccess,
     obtenerEventos,
     crearEvento,

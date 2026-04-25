@@ -1,6 +1,5 @@
 // src/layout/Dashboard_Admin.jsx
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useSearchParams } from "react-router-dom";
 import useAuth from "../context/storeAuth";
 
 import PerfilAdmin, { CambiarPasswordAdmin } from '../components/Dashboard_Admin/PerfilAdmin';
@@ -16,7 +15,9 @@ const Dashboard_Admin = () => {
   const logout = useAuth((state) => state.logout);
   const user = useAuth((state) => state.user);
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("perfil");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const activeTab = searchParams.get("tab") || "perfil";
 
   const handleLogout = () => {
     logout();
@@ -49,7 +50,7 @@ const Dashboard_Admin = () => {
           {TABS.map((tab) => (
             <li
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => setSearchParams({tab})}
               className={`text-lg font-medium cursor-pointer pb-2 whitespace-nowrap transition-colors duration-200 ${
                 activeTab === tab
                   ? "border-b-4 border-blue-600 text-blue-600 font-bold"
