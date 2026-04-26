@@ -304,7 +304,6 @@ const PerfilFormBase = ({
       finalValue = value
         .replace(/[[\]"\\]/g, "") 
         .replace(/,\s*,/g, ",") // Comas dobles
-        .replace(/,\s+/g, ", ") // Normaliza espacios
         .trim();
     }
 

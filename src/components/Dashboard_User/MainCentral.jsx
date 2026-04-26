@@ -76,14 +76,14 @@ const MainCentral = ({
         </div>
 
         <div className="flex flex-col items-center text-center">
-          <button className="text-gray-600 hover:text-gray-200  sm:h-6 md:h-6 lg:h-7 xl:h-7">
+          <div className="text-gray-600 hover:text-gray-200  sm:h-6 md:h-6 lg:h-7 xl:h-7">
           <BotonNotificaciones
             navbarRef={navbarRef}
             solicitudes={solicitudes}
             loading={loadingSolicitudes}
             onFollow={seguirUsuario}
           />
-          </button>
+          </div>
           <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">Notif</span>
         </div>
 

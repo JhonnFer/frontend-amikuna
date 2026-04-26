@@ -107,6 +107,6 @@ export const isValidInteresesFormat = (interesesString) => {
   // Ej: "fútbol, música, cine" ✓
   // Ej: "fútbol,música,cine" ✓
   // Ej: "fútbol" ✓
-  const regex = /^([a-zA-ZñÑ0-9]+)(,\s*[a-zA-ZñÑ0-9]+)*$/;
+  const regex = /^([a-zA-ZñÑáéíóúÁÉÍÓÚüÜ0-9]+)(,\s*[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ0-9]+)*$/;
   return regex.test(cleaned);
 };
