@@ -32,19 +32,19 @@ const MainCentral = ({
         relative
         grid
         grid-cols-4
-        sm:grid-cols-4 sm:max-w-md
-        md:grid-cols-5 md:max-w-lg
-        lg:grid-cols-7 lg:max-w-full
-        xl:grid-cols-8 xl:max-w-full
+        w-full
+        sm:grid-cols-4 
+        md:grid-cols-5 
+        lg:grid-cols-5 
+        xl:grid-cols-8 
         items-center
-        justify-center
+        justify-between
         gap-2
-        xl:gap-25 lg:gap-2 
+        xl:gap-20 lg:gap-2 
         border
         rounded-lg
         bg-gradient-to-r from-pink-600  to-orange-400
         px-auto
-        py-auto
         overflow-visible 
       "
       >
