@@ -32,7 +32,7 @@ const ModalGaleria = ({
 
   const toggleSeleccion = (foto) => {
     setSeleccionadas((prev) =>
-      prev.includes(foto) ? prev.filter((f) => f !== foto) : [...prev, foto]
+      prev.includes(foto) ? [] : [foto]
     );
   };
 
@@ -100,7 +100,7 @@ const ModalGaleria = ({
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <FiTrash2 className="w-4 h-4" />
-                      Eliminar {seleccionadas.length > 0 ? `(${seleccionadas.length})` : ""}
+                      Eliminar 
                     </button>
                   </div>
                 </>
@@ -110,7 +110,7 @@ const ModalGaleria = ({
                   className="flex items-center gap-2 ml-auto px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
                 >
                   <FiTrash2 className="w-4 h-4" />
-                  Seleccionar fotos
+                  Selecciona foto
                 </button>
               )}
             </div>

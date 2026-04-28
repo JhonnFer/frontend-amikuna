@@ -1,12 +1,12 @@
-// src/hooks/useGaleriaFotos.js
 import { useState } from "react";
 import fetchDataBackend from "../helpers/fetchDataBackend";
+import storeProfile from "../context/storeProfile"; // ← importar store
 
-const useGaleriaFotos = (cargarPerfil) => {
+const useGaleriaFotos = () => { // ← ya no recibe cargarPerfil como parámetro
+  const refreshProfile = storeProfile((state) => state.refreshProfile); // ← del store
   const [loading, setLoading] = useState(false);
   const [fotosSeleccionadas, setFotosSeleccionadas] = useState([]);
 
-  // SUBIR
   const subirFotos = async () => {
     try {
       if (fotosSeleccionadas.length === 0) {
@@ -20,7 +20,7 @@ const useGaleriaFotos = (cargarPerfil) => {
       });
 
       await fetchDataBackend("estudiantes/galeria", formData, "POST");
-      await cargarPerfil();
+      await refreshProfile(); // ← store actualiza el perfil global
       setFotosSeleccionadas([]);
 
       return { ok: true, msg: "Fotos subidas correctamente" };
@@ -31,14 +31,11 @@ const useGaleriaFotos = (cargarPerfil) => {
     }
   };
 
-  // ELIMINAR
   const eliminarFoto = async (url) => {
     try {
       setLoading(true);
-
       await fetchDataBackend("estudiantes/galeria", { url }, "DELETE");
-      await cargarPerfil();
-
+      await refreshProfile(); // ← store
       return { ok: true, msg: "Imagen eliminada" };
     } catch (error) {
       return { ok: false, msg: error.message };
@@ -47,17 +44,13 @@ const useGaleriaFotos = (cargarPerfil) => {
     }
   };
 
-  // REEMPLAZAR
   const reemplazarFoto = async (index, nuevaFoto) => {
     try {
       setLoading(true);
-
       const formData = new FormData();
       formData.append("imagen", nuevaFoto);
-
       await fetchDataBackend(`estudiantes/galeria/${index}`, formData, "PUT");
-      await cargarPerfil();
-
+      await refreshProfile(); // ← store
       return { ok: true };
     } catch (error) {
       return { ok: false, msg: error.message };

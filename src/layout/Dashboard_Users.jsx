@@ -78,7 +78,6 @@ const Dashboard_Users = () => {
     const cleanupSocket = initSocket();
     return cleanupSocket; // ← limpia socket al desmontar
   }, []);
-  
 
   if (loading) {
     return <div>Cargando perfil...</div>;
@@ -213,14 +212,17 @@ const Dashboard_Users = () => {
         onCancelar={() => setFotosAEliminar([])}
         onConfirmar={async () => {
           // Eliminar todas las fotos seleccionadas en paralelo
-          const resultados = await Promise.all(
-            fotosAEliminar.map((f) => eliminarFoto(f)),
-          );
+          const resultados = [];
+          for (const foto of fotosAEliminar) {
+            const resultado = await eliminarFoto(foto);
+            resultados.push(resultado);
+            if (!resultado.ok) break;
+          }
+
           const hayError = resultados.find((r) => !r.ok);
           if (hayError) alert(hayError.msg);
 
           setFotosAEliminar([]);
-          // Reset del toggle en ModalGaleria
           if (resetModoEliminarRef.current) resetModoEliminarRef.current();
         }}
       />
