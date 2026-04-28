@@ -27,7 +27,7 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm();
+  } = useForm({mode:"onChange"});
 
   const password = watch("password");
 
@@ -53,8 +53,8 @@ const Register = () => {
       </button>
 
       {/* FORMULARIO */}
-      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white">
-        <div className="flex items-center mb-6">
+      <div className="md:w-1/2 flex flex-col justify-center items-center p-6 md:p-10 bg-white max-h-[100vh]">
+        <div className="flex items-center mb-6 ">
           <img
             src={logoAmikuna}
             alt="Logo"
@@ -99,7 +99,15 @@ const Register = () => {
             <input
               type="text"
               placeholder="Nombre"
-              {...register("nombre", { required: "El nombre es obligatorio" })}
+              {...register("nombre", {
+                required: "El nombre es obligatorio",
+
+                minLength: { value: 2, message: "Mínimo 2 caracteres" },
+                pattern: {
+                  value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                  message: "El nombre solo puede contener letras",
+                },
+              })}
               className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
             />
             {errors.nombre && (
@@ -114,6 +122,11 @@ const Register = () => {
               placeholder="Apellido"
               {...register("apellido", {
                 required: "El apellido es obligatorio",
+                minLength: { value: 2, message: "Mínimo 2 caracteres" },
+                pattern: {
+                  value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+                  message: "El apellido solo puede contener letras",
+                },
               })}
               className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#B5651D] outline-none bg-gray-50"
             />
