@@ -8,6 +8,8 @@ const EventList = () => {
     loading,
     serverError,
     serverSuccess,
+    setServerError,
+    setServerSuccess,
     crearEvento,
     actualizarEvento,
     eliminarEvento,
@@ -122,7 +124,7 @@ const EventList = () => {
     // Validar fecha y hora antes de procesar
     const validation = isValidEventDateTime(form.fecha, form.hora);
     if (!validation.valid) {
-      serverError(validation.message);
+      setServerError(validation.message);
       return;
     }
 
@@ -180,7 +182,8 @@ const EventList = () => {
         setEditId(null);
       } else {
         await crearEvento(formData);
-        serverSuccess("Evento creado correctamente");
+        serverSuccess(FormData);
+        setServerSuccess("Evento creado correctamente")
       }
 
       obtenerEventos();

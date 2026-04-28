@@ -124,6 +124,8 @@ const useAdminEvents = () => {
     loading,
     serverError,
     serverSuccess,
+    setServerError: setserverError,   // función para setear desde el componente
+    setServerSuccess: setServerSuccess,
     obtenerEventos,
     crearEvento,
     actualizarEvento,

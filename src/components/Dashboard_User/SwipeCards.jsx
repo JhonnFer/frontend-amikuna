@@ -88,7 +88,7 @@ const SwipeCards = () => {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-4 py-6 w-full max-w-[570px] h-60  xl:h-full lg:h-[45rem] md:h-[31rem] sm:h-[22rem]">
+    <div className="flex flex-1 flex-col items-center justify-center px-4 py-6 w-full max-w-[570px] h-60ev  xl:h-full lg:h-[45rem] md:h-[31rem] sm:h-[22rem]">
       {/* CARD */}
       <div className="relative w-full  h-full sm:max-w-md  md:max-w-lg lg:max-w-xl   items-center justify-center border-2 border-gray-300 rounded-2xl shadow-lg bg-white ">
         <AnimatePresence>
