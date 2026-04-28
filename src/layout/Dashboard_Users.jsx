@@ -73,19 +73,12 @@ const Dashboard_Users = () => {
     handleLogout,
   } = useDashboardState();
 
-
-
   useEffect(() => {
-    if (!profile) {
-      loadProfile();
-    }
+    loadProfile();
+    const cleanupSocket = initSocket();
+    return cleanupSocket; // ← limpia socket al desmontar
   }, []);
-
-  // 2️⃣ Socket al montar — independiente del perfil
-useEffect(() => {
-  const cleanup = initSocket();
-  return cleanup;
-}, []); // ← solo al montar
+  
 
   if (loading) {
     return <div>Cargando perfil...</div>;

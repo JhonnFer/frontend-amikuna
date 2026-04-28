@@ -1,9 +1,9 @@
 // src/components/Dashboard_User/Perfil/FormularioCompletarPerfil.jsx
 import { useNavigate } from "react-router-dom";
 import PerfilFormBase from "./PerfilFormBase";
-import usePerfilUsuarioAutenticado from "../../../hooks/usePerfilUsuarioAutenticado";
-import { formatInteresesForBackend } from "../../../helpers/interesesFormatter";
 import storeProfile from "../../../context/storeProfile";
+import { formatInteresesForBackend } from "../../../helpers/interesesFormatter";
+
 
 const buildProfileFormData = (data) => {
   const form = new FormData();
@@ -30,21 +30,14 @@ const buildProfileFormData = (data) => {
 const FormularioCompletarPerfil = () => {
   const navigate = useNavigate();
 
-  const { completarPerfil } = usePerfilUsuarioAutenticado();
+  const updateProfile = storeProfile((state)=> state.updateProfile);
 
-  const refreshProfile = storeProfile((state)=> state.refreshProfile);
   
   const handleSubmit = async (data) => {
     const form = buildProfileFormData(data);
-
-    const success = await completarPerfil(form);
-
-    if (success) {
-      await refreshProfile();
-      navigate("/user/dashboard");
-    }
-
-    return !!success;
+    const updated = await updateProfile(form); // ← una sola llamada, store se actualiza solo
+    if (updated) navigate("/user/dashboard");
+    return !!updated;
   };
 
   return <PerfilFormBase onSubmit={handleSubmit} />;

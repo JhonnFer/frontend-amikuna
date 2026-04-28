@@ -1,7 +1,7 @@
 // src/components/Dashboard_User/Perfil/FormularioEditarPerfil.jsx
 import PerfilFormBase from "./PerfilFormBase";
 import PropTypes from "prop-types";
-import usePerfilUsuarioAutenticado from "../../../hooks/usePerfilUsuarioAutenticado";
+import storeProfile from "../../../context/storeProfile";
 import { formatInteresesForBackend } from "../../../helpers/interesesFormatter";
 
 const buildProfileFormData = (data) => {
@@ -27,19 +27,17 @@ const buildProfileFormData = (data) => {
 };
 
 const FormularioEditarPerfil = ({ perfil, onClose }) => {
-  const { editarPerfil, cargarPerfil } = usePerfilUsuarioAutenticado();
 
+ const updateProfile = storeProfile((state) => state.updateProfile);
   const handleSubmit = async (data) => {
     const form = buildProfileFormData(data);
+    const updated = await updateProfile(form);
 
-    const success = await editarPerfil(form);
-
-    if (success) {
-      await cargarPerfil();
+    if (updated) {
       onClose?.();
     }
 
-    return !!success;
+    return !!updated;
   };
 
   return (

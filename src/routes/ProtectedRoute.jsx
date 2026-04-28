@@ -1,15 +1,27 @@
 import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import PropTypes from "prop-types";
 import storeAuth from "../context/storeAuth";
 import storeProfile from "../context/storeProfile";
 import tokenManager from "../helpers/tokenManager";
-import { isPerfilCompleto } from "../hooks/usePerfilUsuarioAutenticado";
+import { isPerfilCompleto } from "../context/storeProfile";
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const token = storeAuth((state) => state.token);
   const logout = storeAuth((state) => state.logout);
   const user = storeAuth((state) => state.user);
+
   const profile = storeProfile((state) => state.profile);
+  const loading = storeProfile((state) => state.loading);
+  const loaded = storeProfile((state) => state.loaded); // ← una sola declaración
+  const authError = storeProfile((state) => state.authError);
+  const loadProfile = storeProfile((state) => state.loadProfile);
+
+  useEffect(() => {
+    if (requiredRole === "estudiante") {
+      loadProfile();
+    }
+  }, [requiredRole]);
 
   // Sin token válido → login directo sin pasar por perfil
   if (!tokenManager.isAuthenticated()) {
@@ -38,10 +50,6 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
   // Perfil completo
   if (requiredRole === "estudiante") {
-    const loaded = storeProfile.getState().loaded;
-    const loading = storeProfile.getState().loading;
-    const authError = storeProfile.getState().authError;
-
     // 401 detectado → no redirigir, fetchDataBackend ya va a /login
     if (authError)
       return (
@@ -55,8 +63,10 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
     if (loading || !loaded) return null;
 
-    const perfilOk = isPerfilCompleto(profile);
-    if (!perfilOk && window.location.pathname !== "/user/completar-perfil") {
+    if (
+      !isPerfilCompleto(profile) &&
+      window.location.pathname !== "/user/completar-perfil"
+    ) {
       return <Navigate to="/user/completar-perfil" replace />;
     }
   }
