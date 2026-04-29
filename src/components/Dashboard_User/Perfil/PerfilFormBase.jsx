@@ -304,7 +304,6 @@ const PerfilFormBase = ({
       finalValue = value
         .replace(/[[\]"\\]/g, "") 
         .replace(/,\s*,/g, ",") // Comas dobles
-        .replace(/,\s+/g, ", ") // Normaliza espacios
         .trim();
     }
 
@@ -600,9 +599,7 @@ const PerfilFormBase = ({
               <div>
                 <label className={labelCls}>
                   Biografía{" "}
-                  <span className="normal-case font-normal text-stone-400">
-                    (opcional)
-                  </span>
+                  
                 </label>
                 <textarea
                   name="biografia"
@@ -641,9 +638,6 @@ const PerfilFormBase = ({
                 <div>
                   <label className={labelCls}>
                     Orientación{" "}
-                    <span className="normal-case font-normal text-stone-400">
-                      (opcional)
-                    </span>
                   </label>
                   <select
                     name="orientacion"

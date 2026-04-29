@@ -37,39 +37,41 @@ export const useRecuperarPassword = (token = null) => {
   // ─────────────────────────────
   const [email, setEmail] = useState("");
 
-  const solicitarRecuperacion = useCallback(async (e) => {
-    e.preventDefault();
+  const solicitarRecuperacion = useCallback(
+    async (e) => {
+      e.preventDefault();
 
-    if (!email.trim()) {
-      setServerError("Por favor ingresa un correo válido");
-      return;
-    }
-
-    setLoading(true);
-    setServerError(null);
-    setServerSuccess(null);
-
-    try {
-      const response = await fetchDataBackend(
-        "recuperarpassword",
-        { email },
-        "POST"
-      );
-
-      if (!response?.success) {
-        setServerError(response?.msg || "Error al enviar correo");
+      if (!email.trim()) {
+        setServerError("Por favor ingresa un correo válido");
         return;
       }
 
-      setServerSuccess(response.msg);
-      setEmail("");
+      setLoading(true);
+      setServerError(null);
+      setServerSuccess(null);
 
-    } catch (error) {
-      setServerError(error?.message || "Error enviando solicitud");
-    } finally {
-      setLoading(false);
-    }
-  }, [email, fetchDataBackend]);
+      try {
+        const response = await fetchDataBackend(
+          "recuperarpassword",
+          { email },
+          "POST",
+        );
+
+        if (!response?.success) {
+          setServerError(response?.msg || "Error al enviar correo");
+          return;
+        }
+
+        setServerSuccess(response.msg);
+        setEmail("");
+      } catch (error) {
+        setServerError(error?.message || "Error enviando solicitud");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [email, fetchDataBackend],
+  );
 
   // ─────────────────────────────
   // 🔹 STEP 2: VALIDAR TOKEN
@@ -102,44 +104,47 @@ export const useRecuperarPassword = (token = null) => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const enviarNuevoPassword = useCallback(async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (password !== confirmPassword) {
-      setServerError("Las contraseñas no coinciden");
-      return;
+  if (password !== confirmPassword) {
+    setServerError("Las contraseñas no coinciden");
+    return;
+  }
+
+  if (password.length < 6) {
+    setServerError("Mínimo 6 caracteres");
+    return;
+  }
+
+  setLoading(true);
+  setServerError(null);
+  setServerSuccess(null);
+
+  try {
+    const response = await fetchDataBackend(
+      `nuevopassword/${token}`,
+      { password, confirmpassword: confirmPassword },
+      "POST"
+    );
+
+    // El backend exitoso devuelve solo { msg: "..." } con status 200
+    // Los errores devuelven status 4xx — si fetchDataBackend lanza en 4xx,
+    // caen al catch. Si no lanza, distinguimos por el mensaje.
+    const MSG_EXITO = "Contraseña actualizada correctamente";
+
+    if (response?.msg === MSG_EXITO) {
+      setServerSuccess(response.msg);
+    } else {
+      setServerError(response?.msg || "Error al actualizar");
     }
 
-    if (password.length < 6) {
-      setServerError("Mínimo 6 caracteres");
-      return;
-    }
-
-    setLoading(true);
-    setServerError(null);
-    setServerSuccess(null);
-
-    try {
-      const response = await fetchDataBackend(
-        `nuevopassword/${token}`,
-        {
-          password,
-          confirmpassword: confirmPassword,
-        },
-        "POST"
-      );
-      console.log("response:", response);
-      if (response?.msg) {
-        setServerError(response.msg );
-      }else {
-        setServerError("Error al actualizar");
-      }
-
-    } catch (error) {
-      setServerError(error?.message || "Error al actualizar");
-    } finally {
-      setLoading(false);
-    }
-  }, [password, confirmPassword, token, fetchDataBackend]);
+  } catch (error) {
+    // fetchDataBackend lanzó — significa status 4xx del backend
+    setServerError(error?.message || "Error al actualizar");
+  } finally {
+    setLoading(false);
+  }
+}, [password, confirmPassword, token, fetchDataBackend]);
 
   // ─────────────────────────────
   // 🔹 REDIRECCIÓN GLOBAL

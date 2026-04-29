@@ -64,11 +64,11 @@ export const formatInteresesFromBackend = (raw) => {
 /**
  * Transforma el string del formulario al formato que acepta el backend
  * @param {string} interesesString - String del formulario (ej: "fútbol, música, cine")
- * @returns {string} JSON stringify del array (ej: '["fútbol","música","cine"]')
+ * @returns {string} String sin espacios separado por comas (ej: "fútbol,música,cine")
  */
 export const formatInteresesForBackend = (interesesString) => {
   if (!interesesString || typeof interesesString !== "string") {
-    return JSON.stringify([]);
+    return "";
   }
 
   // Dividir por coma, trimear espacios y filtrar vacíos
@@ -77,8 +77,8 @@ export const formatInteresesForBackend = (interesesString) => {
     .map((interes) => interes.trim())
     .filter((interes) => interes.length > 0);
 
-  // Devolver como JSON string
-  return JSON.stringify(interesArray);
+  // Devolver como string simple sin espacios (lo que espera el backend)
+  return interesArray.join(",");
 };
 
 /**
@@ -107,6 +107,6 @@ export const isValidInteresesFormat = (interesesString) => {
   // Ej: "fútbol, música, cine" ✓
   // Ej: "fútbol,música,cine" ✓
   // Ej: "fútbol" ✓
-  const regex = /^([a-zA-ZñÑ0-9]+)(,\s*[a-zA-ZñÑ0-9]+)*$/;
+  const regex = /^([a-zA-ZñÑáéíóúÁÉÍÓÚüÜ0-9]+)(,\s*[a-zA-ZñÑáéíóúÁÉÍÓÚüÜ0-9]+)*$/;
   return regex.test(cleaned);
 };

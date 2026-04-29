@@ -25,9 +25,9 @@ const useConfirmarCuenta = () => {
           false
         );
 
-        if (!response?.success) {
+        if (!response?.msg) {
           setStatus("error");
-          setMessage(response?.msg || "Error al confirmar");
+          setMessage("Error al confirmar");
           return;
         }
 

@@ -8,6 +8,8 @@ const EventList = () => {
     loading,
     serverError,
     serverSuccess,
+    setServerError,
+    setServerSuccess,
     crearEvento,
     actualizarEvento,
     eliminarEvento,
@@ -30,6 +32,9 @@ const EventList = () => {
   useEffect(() => {
     if (serverSuccess) {
       const timer = setTimeout(() => {
+        setServerSuccess("");
+        setServerError(""); // ← limpia error también
+        setEditId(null);
         setForm({
           titulo: "",
           descripcion: "",
@@ -44,6 +49,16 @@ const EventList = () => {
       return () => clearTimeout(timer);
     }
   }, [serverSuccess]);
+
+  useEffect(() => {
+  if (serverError) {
+    const timer = setTimeout(() => {
+      setServerError("");
+    }, 5000); // errores duran un poco más
+
+    return () => clearTimeout(timer);
+  }
+}, [serverError]);
 
   // ─── FUNCIONES DE VALIDACIÓN DE FECHA Y HORA ───────────────────────
 
@@ -122,7 +137,7 @@ const EventList = () => {
     // Validar fecha y hora antes de procesar
     const validation = isValidEventDateTime(form.fecha, form.hora);
     if (!validation.valid) {
-      serverError(validation.message);
+      setServerError(validation.message);
       return;
     }
 
@@ -134,7 +149,7 @@ const EventList = () => {
         eventoOriginal &&
         isEventExpired(eventoOriginal.fecha?.slice(0, 10), eventoOriginal.hora)
       ) {
-        serverError(
+        setServerError(
           "No se puede editar un evento que ya ha caducado. El evento ya pasó de fecha.",
         );
         return;
@@ -163,30 +178,19 @@ const EventList = () => {
         // ← DEBUG
       }
 
-      // ── DEBUG: inspeccionar FormData completo ──────
-      /* console.log("📦 Contenido del FormData:");
-      for (const [key, value] of formData.entries()) {
-        if (value instanceof File) {
-          console.log(`  ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
-        } else {
-          console.log(`  ${key}: ${value}`);
-        }
-      } */
-      // ──────────────────────────────────────────────
-
       if (editId) {
         await actualizarEvento(editId, formData);
-        serverSuccess("Evento actualizado");
+        setServerSuccess("Evento actualizado");
         setEditId(null);
       } else {
         await crearEvento(formData);
-        serverSuccess("Evento creado correctamente");
+        setServerSuccess("Evento creado correctamente");
       }
 
       obtenerEventos();
     } catch (err) {
       /* console.error("❌ Error al guardar evento:", err); */ // ← DEBUG
-      serverError(err.message || "Error al guardar evento");
+      setServerError(err.message || "Error al guardar evento");
     } finally {
       setSaving(false);
     }
@@ -194,13 +198,13 @@ const EventList = () => {
 
   const handleEliminar = async (id, fechaEvento, horaEvento) => {
     if (!id) {
-      serverError("ID inválido");
+      setServerError("ID inválido");
       return;
     }
 
     // Validar que el evento no esté caducado
     if (isEventExpired(fechaEvento?.slice(0, 10), horaEvento)) {
-      serverError(
+      setServerError(
         "No se puede eliminar un evento que ya ha caducado. El evento ya pasó de fecha.",
       );
       return;
@@ -209,10 +213,10 @@ const EventList = () => {
     if (window.confirm("¿Eliminar evento?")) {
       try {
         await eliminarEvento(id, fechaEvento);
-        serverSuccess("Evento eliminado");
+        setServerSuccess("Evento eliminado");
         obtenerEventos();
       } catch (err) {
-        serverError(err.message || "Error al eliminar evento");
+        setServerError(err.message || "Error al eliminar evento");
       }
     }
   };

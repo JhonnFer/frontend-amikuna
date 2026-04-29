@@ -2,6 +2,18 @@
 import { create } from "zustand";
 import fetchDataBackend from "../helpers/fetchDataBackend";
 import { socket } from "../helpers/socket";
+import tokenManager from "../helpers/tokenManager";
+
+export const isPerfilCompleto = (perfil) => {
+  if (!perfil) return false;
+  return (
+    !!perfil.imagenPerfil &&
+    perfil.genero && perfil.genero !== "otro" &&
+    !!perfil.biografia?.trim() &&
+    Array.isArray(perfil.intereses) && perfil.intereses.length > 0 &&
+    !!perfil.ubicacion?.ciudad && !!perfil.ubicacion?.pais
+  );
+};
 
 const storeProfile = create((set, get) => ({
 
@@ -15,20 +27,28 @@ const storeProfile = create((set, get) => ({
     if (loaded) return get().profile;
     if (loading) return null;
 
-    try {
-      set({ loading: true });
-      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", false);
+    const token = tokenManager.getToken();
+    if (!token) return null;
+
+    set({ loading: true, authError: false }); 
+
+        try {
+      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", {
+        showErrorToast: false,
+      });
       set({ profile: data, loading: false, loaded: true });
       return data;
     } catch (error) {
-      set({ loading: false, loaded: false, authError: true }); // ← marcar error
+      set({ loading: false, loaded: false, authError: true });
       return null;
     }
   },
 
-  refreshProfile: async () => {
+    refreshProfile: async () => {
     try {
-      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", false);
+      const data = await fetchDataBackend("estudiantes/perfil", null, "GET", {
+        showErrorToast: false,
+      });
       set({ profile: data, loaded: true });
       return data;
     } catch (error) {
@@ -36,25 +56,35 @@ const storeProfile = create((set, get) => ({
     }
   },
 
- updateProfile: async (formData) => {
-  const data = await fetchDataBackend("estudiantes/completarperfil", formData, "PUT", false);
-  set({ profile: data.perfilActualizado, loaded: true });
-  return data.perfilActualizado;
+
+  updateProfile: async (formData) => {
+  const data = await fetchDataBackend(
+    "estudiantes/completarPerfil",
+    formData,
+    "PUT",
+    { showSuccessToast: false, showErrorToast: false }
+  );
+
+  const perfilActualizado = data.perfilActualizado || data;
+
+  set({ profile: perfilActualizado, loaded: true });
+
+  return perfilActualizado;
 },
 
   clearProfile: () =>
     set({
       profile: null,
       loaded: false,
+      authError: false
     }),
 
   initSocket: () => {
-    socket.off("perfil_cambio");
-
-     const handleCambioPerfil = () => {
+    const handleCambioPerfil = () => {
     get().refreshProfile();
   };
 
+  socket.off("perfil_cambio");
   socket.on("perfil_cambio", handleCambioPerfil);
 
     return () => {

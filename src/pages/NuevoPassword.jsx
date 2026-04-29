@@ -1,9 +1,6 @@
-import { useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
 import { FiArrowLeft } from "react-icons/fi";
 import { useState } from "react";
-import "react-toastify/dist/ReactToastify.css";
 import fondo1 from "../assets/fondo1.webp";
 import { useRecuperarPassword } from "../hooks/useRecuperarPassword";
 
@@ -24,50 +21,22 @@ const NuevoPassword = () => {
     serverSuccess,
   } = useRecuperarPassword(token);
 
-  // 👁️ Mostrar contraseña
   const [showPassword, setShowPassword] = useState(false);
 
-  // 🔐 Fuerza de contraseña
   const getPasswordStrength = () => {
     if (!password) return { text: "", color: "" };
-
     if (password.length < 6) return { text: "Débil", color: "bg-red-500" };
-
     if (password.length < 10) return { text: "Media", color: "bg-yellow-500" };
-
     return { text: "Fuerte", color: "bg-green-500" };
   };
 
   const strength = getPasswordStrength();
 
-  // 🔒 Submit seguro
   const handleSafeSubmit = (e) => {
     e.preventDefault();
-
     if (loading) return;
-
-    if (password.length < 6) {
-      toast.error("Mínimo 6 caracteres");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast.error("Las contraseñas no coinciden");
-      return;
-    }
-
     enviarNuevoPassword(e);
   };
-
-  useEffect(() => {
-    if (serverSuccess) {
-      const timer = setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [serverSuccess, navigate]);
 
   return (
     <div
@@ -78,8 +47,6 @@ const NuevoPassword = () => {
         backgroundPosition: "center",
       }}
     >
-      <ToastContainer />
-
       {/* Botón volver */}
       <button
         onClick={() => navigate("/login")}
@@ -103,7 +70,7 @@ const NuevoPassword = () => {
         <p className="text-white text-lg">Verificando enlace...</p>
       )}
 
-      {/* Token inválido */}
+      {/* Token inválido o expirado */}
       {token && !tokenVerificando && !tokenValido && (
         <div className="text-center bg-black/40 p-6 rounded-lg backdrop-blur-md">
           <p className="text-red-400 mb-2">Enlace inválido o expirado</p>
@@ -137,7 +104,7 @@ const NuevoPassword = () => {
               required
             />
 
-            {/* Fuerza */}
+            {/* Barra de fuerza */}
             {password && (
               <div className="w-full">
                 <div className="h-2 rounded bg-gray-700 overflow-hidden">
@@ -176,7 +143,6 @@ const NuevoPassword = () => {
               required
             />
 
-            {/* Error match */}
             {confirmPassword && password !== confirmPassword && (
               <p className="text-red-400 text-xs">
                 Las contraseñas no coinciden
@@ -184,7 +150,7 @@ const NuevoPassword = () => {
             )}
           </div>
 
-          {/* Toggle */}
+          {/* Toggle mostrar contraseña */}
           <label className="flex items-center text-sm text-gray-300 cursor-pointer mt-3">
             <input
               type="checkbox"
