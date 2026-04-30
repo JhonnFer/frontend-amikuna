@@ -39,23 +39,24 @@ const useNotificaciones = () => {
     }
   };
 
-  useEffect(() => {
-    obtenerNotificaciones();
-  }, []);
-
   // ─── ESCUCHAR EVENTO ELIMINADO PARA REFRESCAR NOTIFICACIONES ─────────────────
   useEffect(() => {
+    obtenerNotificaciones();
+
     const handleEventoEliminado = (data) => {
       console.log("📡 Evento eliminado recibido:", data);
-      // Refrescar las notificaciones cuando se elimine un evento
       obtenerNotificaciones();
     };
-
+    socket.on("notificacion_nueva", obtenerNotificaciones);
     socket.on("evento_eliminado", handleEventoEliminado);
+    
+
 
     return () => {
+      socket.off("notificacion_nueva", obtenerNotificaciones);
       socket.off("evento_eliminado", handleEventoEliminado);
     };
+    
   }, []);
 
   return { notificaciones, loading, marcarLeido, obtenerNotificaciones };

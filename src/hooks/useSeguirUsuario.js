@@ -1,12 +1,12 @@
 // src/hooks/useSeguirUsuario.js
 import { useState } from 'react';
-import useFetch from './useFetch'; // <-- Importa tu hook useFetch
+import useFetch from './useFetch'; 
+
 
 const useSeguirUsuario = () => {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
   
-  // Usa la función fetchDataBackend de tu hook useFetch
   const { fetchDataBackend } = useFetch();
 
   const seguirUsuario = async (idUsuarioAseguir) => {
@@ -14,7 +14,7 @@ const useSeguirUsuario = () => {
     setError(null);
 
     try {
-      // Llama a fetchDataBackend con el endpoint, el método POST
+      
       const data = await fetchDataBackend(`estudiantes/seguir/${idUsuarioAseguir}`, null, "POST");
       
       // Retorna el resultado para que el componente pueda manejarlo
@@ -28,6 +28,8 @@ const useSeguirUsuario = () => {
       setCargando(false);
     }
   };
+
+
 
   return { seguirUsuario, cargando, error };
 };

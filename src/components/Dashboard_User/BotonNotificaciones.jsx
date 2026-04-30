@@ -13,7 +13,15 @@ const BotonNotificaciones = ({ navbarRef }) => {
 
   const { notificaciones, loading, marcarLeido, obtenerNotificaciones } =
     useNotificaciones();
-  const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario();
+  const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario({
+      onNuevoMatch: () => {
+    obtenerNotificaciones(); // refresca la lista
+  },
+  onNuevaNotificacion: () => {
+    obtenerNotificaciones(); // refresca la lista
+  },
+
+  });
 
   const noLeidas = Array.isArray(notificaciones)
     ? notificaciones.filter((n) => !n.leido).length

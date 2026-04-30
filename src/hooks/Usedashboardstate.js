@@ -19,8 +19,8 @@ const useDashboardState = () => {
     loadingPerfil,
     cargarPerfil,
   } = usePerfilUsuarioAutenticado();
-  const { matches, loading: loadingMatches } = useMatches();
-  const { solicitudes, loading: loadingSolicitudes } = useNotificaciones();
+  const { matches, loading: loadingMatches, recargarMatches } = useMatches();
+  const { solicitudes, loading: loadingSolicitudes, obtenerNotificaciones } = useNotificaciones();
   const { unreadCounts, marcarLeido, totalUnread, formatBadge } =
     useUnreadMessages(profile?._id);
 
@@ -36,7 +36,19 @@ const useDashboardState = () => {
     onAsistenciaSuccess: () => obtenerEventos(),
   });
 
-  const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario();
+  const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario({
+
+      onNuevoMatch: () => {
+    recargarMatches();        // refresca lista de matches
+    obtenerNotificaciones();  // refresca notificaciones
+  },
+  onNuevaNotificacion: () => {
+    obtenerNotificaciones();  // refresca notificaciones
+  },
+
+
+  });
+
   const {
     setFotosSeleccionadas,
     subirFotos,
