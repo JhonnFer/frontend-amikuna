@@ -160,6 +160,7 @@ const useDashboardState = () => {
     loadingMatches,
     eventosDisponibles,
     loadingEventos,
+    obtenerEventos,
     confirmarAsistencia,
     rechazarAsistencia,
     cargandoAsistencia,

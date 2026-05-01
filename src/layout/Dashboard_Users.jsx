@@ -17,11 +17,12 @@ import { FaUser } from "react-icons/fa";
 import useDashboardState from "../hooks/Usedashboardstate";
 import storeProfile from "../context/storeProfile";
 
+import { initSocketOrchestrator } from "../helpers/socketOrchestrator";
+
 const Dashboard_Users = () => {
   const profile = storeProfile((state) => state.profile);
   const loadProfile = storeProfile((state) => state.loadProfile);
   const loading = storeProfile((state) => state.loading);
-  const initSocket = storeProfile((state) => state.initSocket);
 
   const resetModoEliminarRef = useRef(null); // ← ref para resetear el toggle del ModalGaleria
 
@@ -33,6 +34,7 @@ const Dashboard_Users = () => {
     loadingSolicitudes,
     eventosDisponibles,
     loadingEventos,
+    obtenerEventos,
     confirmarAsistencia,
     rechazarAsistencia,
     cargandoAsistencia,
@@ -74,24 +76,25 @@ const Dashboard_Users = () => {
     handleLogout,
   } = useDashboardState();
 
-  const initNotificaciones = storeNotificaciones((s) => s.initSocket);
 const obtenerNotificaciones = storeNotificaciones((s) => s.obtenerNotificaciones);
 
 
   useEffect(() => {
   loadProfile();
 
-  const cleanupProfileSocket = initSocket();
-  const cleanupNotiSocket = initNotificaciones();
+  const cleanup = initSocketOrchestrator({
+    onEventos: obtenerEventos,
+    onNotificaciones: obtenerNotificaciones,
+    onPerfil: loadProfile,
+  });
 
+  obtenerEventos();
   obtenerNotificaciones();
 
   return () => {
-    cleanupProfileSocket?.();
-    cleanupNotiSocket?.();
+    cleanup?.();
   };
-}, []);
-
+}, [loadProfile, obtenerEventos, obtenerNotificaciones]);
 
 
   if (loading) {
