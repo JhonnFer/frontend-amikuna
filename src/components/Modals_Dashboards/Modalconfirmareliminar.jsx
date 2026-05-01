@@ -6,7 +6,7 @@ const ModalConfirmarEliminar = ({ fotos, loadingFotos, onCancelar, onConfirmar }
   if (!fotos || fotos.length === 0) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/60 z-[70] flex items-center justify-center ">
       <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4 flex flex-col items-center gap-4">
 
         <div className="bg-red-100 p-4 rounded-full">
@@ -20,16 +20,12 @@ const ModalConfirmarEliminar = ({ fotos, loadingFotos, onCancelar, onConfirmar }
           Esta acción no se puede deshacer. ¿Estás seguro?
         </p>
 
-        {/* Preview de fotos a eliminar */}
-        <div className={`grid gap-1 w-full ${fotos.length === 1 ? "grid-cols-1" : "grid-cols-3"}`}>
+        {/* Preview de foto a eliminar */}
+        <div className={`flex flex-col w-full max-h-50 overflow-y-auto scrollbar-eventos  ${fotos}`}>
           {fotos.slice(0, 6).map((foto, i) => (
-            <img key={i} src={foto} className="w-full h-20 object-cover rounded-lg" />
+            <img key={i} src={foto} className=" w-full   object-cover rounded-lg" />
           ))}
-          {fotos.length > 6 && (
-            <div className="w-full h-20 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500 text-sm font-medium">
-              +{fotos.length - 6} más
-            </div>
-          )}
+
         </div>
 
         <div className="flex gap-3 w-full">

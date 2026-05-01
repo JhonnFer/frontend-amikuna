@@ -6,22 +6,21 @@ import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import useNotificaciones from "../../hooks/useNotificaciones";
 import useSeguirUsuario from "../../hooks/useSeguirUsuario";
+import storeProfile from "../../context/storeProfile";
 
 const BotonNotificaciones = ({ navbarRef }) => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [menuStyle, setMenuStyle] = useState({});
 
+  const profile = storeProfile((state) => state.profile);
+
   const { notificaciones, loading, marcarLeido, obtenerNotificaciones } =
     useNotificaciones();
-  const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario({
-      onNuevoMatch: () => {
-    obtenerNotificaciones(); // refresca la lista
-  },
-  onNuevaNotificacion: () => {
-    obtenerNotificaciones(); // refresca la lista
-  },
-
-  });
+  const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario();
+  const yaSignoA = (fromUser) => {
+  const fromId = fromUser?._id?.toString() || fromUser?.toString();
+  return profile?.siguiendo?.some((id) => id?.toString() === fromId);
+};
 
   const noLeidas = Array.isArray(notificaciones)
     ? notificaciones.filter((n) => !n.leido).length
@@ -58,11 +57,16 @@ const BotonNotificaciones = ({ navbarRef }) => {
     };
   }, [mostrarMenu, navbarRef]);
 
+  // BotonNotificaciones.jsx
   const handleAceptarSolicitud = async (notificacion) => {
     try {
       const idSolicitante = notificacion.fromUser?._id || notificacion.fromUser;
       if (!idSolicitante) {
         toast.error("No se pudo identificar al usuario.");
+        return;
+      }
+      if (notificacion.tipo === "match") {
+        await marcarLeido(notificacion._id);
         return;
       }
       const data = await seguirUsuario(idSolicitante);
@@ -182,23 +186,38 @@ const BotonNotificaciones = ({ navbarRef }) => {
 
                       {/* ACCIONES */}
                       <div className="flex items-center gap-3 flex-wrap">
-                        {n.tipo === "seguidor" && !n.leido ? (
-                          <>
-                            <button
-                              onClick={() => handleAceptarSolicitud(n)}
-                              disabled={cargandoSeguir}
-                              className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full hover:from-blue-600 hover:to-blue-700 shadow-sm transition-all disabled:opacity-50 active:scale-95"
-                            >
-                              <FaCheck size={10} /> Seguir
-                            </button>
-
+                        {n.tipo === "match" ? (
+                          !n.leido && (
                             <button
                               onClick={() => marcarLeido(n._id)}
-                              className="text-xs text-gray-500 font-medium hover:text-gray-700 transition"
+                              className="text-[11px] text-green-600 font-semibold uppercase tracking-tight hover:text-green-800 transition"
                             >
-                              Ignorar
+                              ¡Ver match! ✓
                             </button>
-                          </>
+                          )
+                        ) : n.tipo === "seguidor" && !n.leido ? (
+                          yaSignoA(n.fromUser) ? (
+                            // ✅ Ya lo sigo — mostrar estado en lugar de botón
+                            <span className="text-[11px] text-green-600 font-semibold">
+                              Ya lo sigues ✓
+                            </span>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleAceptarSolicitud(n)}
+                                disabled={cargandoSeguir}
+                                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold px-4 py-1.5 rounded-full hover:from-blue-600 hover:to-blue-700 shadow-sm transition-all disabled:opacity-50 active:scale-95"
+                              >
+                                <FaCheck size={10} /> Seguir
+                              </button>
+                              <button
+                                onClick={() => marcarLeido(n._id)}
+                                className="text-xs text-gray-500 font-medium hover:text-gray-700 transition"
+                              >
+                                Ignorar
+                              </button>
+                            </>
+                          )
                         ) : (
                           !n.leido && (
                             <button

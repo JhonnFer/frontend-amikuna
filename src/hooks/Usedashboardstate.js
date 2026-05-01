@@ -19,8 +19,8 @@ const useDashboardState = () => {
     loadingPerfil,
     cargarPerfil,
   } = usePerfilUsuarioAutenticado();
-  const { matches, loading: loadingMatches, recargarMatches } = useMatches();
-  const { solicitudes, loading: loadingSolicitudes, obtenerNotificaciones } = useNotificaciones();
+  const { matches, loading: loadingMatches } = useMatches();
+  const { solicitudes, loading: loadingSolicitudes } = useNotificaciones();
   const { unreadCounts, marcarLeido, totalUnread, formatBadge } =
     useUnreadMessages(profile?._id);
 
@@ -36,18 +36,7 @@ const useDashboardState = () => {
     onAsistenciaSuccess: () => obtenerEventos(),
   });
 
-  const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario({
-
-      onNuevoMatch: () => {
-    recargarMatches();        // refresca lista de matches
-    obtenerNotificaciones();  // refresca notificaciones
-  },
-  onNuevaNotificacion: () => {
-    obtenerNotificaciones();  // refresca notificaciones
-  },
-
-
-  });
+  const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario();
 
   const {
     setFotosSeleccionadas,
@@ -108,12 +97,11 @@ const useDashboardState = () => {
     [handleAbrirChat, marcarLeido],
   );
 
-  const matchesMutuos = useMemo(() => {
-    if (!profile?.seguidores || !profile?.siguiendo || !matches) return [];
-    const seguidores = new Set(profile.seguidores);
-    const siguiendo = new Set(profile.siguiendo);
-    return matches.filter((m) => seguidores.has(m._id) && siguiendo.has(m._id));
-  }, [matches, profile]);
+ const matchesMutuos = useMemo(() => {
+  if (!profile?.matches || !matches) return [];
+  const misMatches = new Set(profile.matches.map((id) => id?.toString()));
+  return matches.filter((m) => misMatches.has(m._id?.toString()));
+}, [matches, profile]);
 
   const eventosDisponibles = useMemo(() => {
     if (!eventos || !profile?._id) return [];

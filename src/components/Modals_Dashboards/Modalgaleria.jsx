@@ -84,9 +84,7 @@ const ModalGaleria = ({
             <div className="flex overflow-hidden items-center justify-between">
               {modoEliminar ? (
                 <>
-                  <span className="text-sm text-gray-500">
-                    {seleccionadas.length} foto{seleccionadas.length !== 1 ? "s" : ""} seleccionada{seleccionadas.length !== 1 ? "s" : ""}
-                  </span>
+                  
                   <div className="flex gap-2">
                     <button
                       onClick={handleCancelarModo}
@@ -119,6 +117,7 @@ const ModalGaleria = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 overflow-y-auto  max-h-[40vh] scrollbar-eventos">
               {profile.imagenesGaleria.map((foto, i) => {
                 const estaSeleccionada = seleccionadas.includes(foto);
+                
                 return (
                   <div
                     key={i}
@@ -150,7 +149,7 @@ const ModalGaleria = ({
                         }`}
                       >
                         {estaSeleccionada && (
-                          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                          <svg className="w-3 h-3 " fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                           </svg>
                         )}
