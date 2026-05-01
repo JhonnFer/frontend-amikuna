@@ -4,7 +4,7 @@ import { FaBell, FaCheck } from "react-icons/fa";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
-import storeNotificaciones from "../../../context/storeNotificaciones";
+import storeNotificaciones from "./store/storeNotificaciones";
 import useSeguirUsuario from "../../../hooks/useSeguirUsuario";
 import storeProfile from "../../../context/storeProfile";
 
