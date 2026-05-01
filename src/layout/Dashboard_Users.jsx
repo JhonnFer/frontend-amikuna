@@ -10,6 +10,7 @@ import FormularioEditarPerfil from "../components/Dashboard_User/Perfil/Formular
 import VisorFotos from "../components/UI/VisorFotos";
 import ModalGaleria from "../components/Modals_Dashboards/Modalgaleria";
 import ModalConfirmarEliminar from "../components/Modals_Dashboards/Modalconfirmareliminar";
+import storeNotificaciones from "../components/Dashboard_User/Notificaciones/store/storeNotificaciones";
 
 import { FaUser } from "react-icons/fa";
 
@@ -73,11 +74,23 @@ const Dashboard_Users = () => {
     handleLogout,
   } = useDashboardState();
 
+  const initNotificaciones = storeNotificaciones((s) => s.initSocket);
+const obtenerNotificaciones = storeNotificaciones((s) => s.obtenerNotificaciones);
+
+
   useEffect(() => {
-    loadProfile();
-    const cleanupSocket = initSocket();
-    return cleanupSocket; // ← limpia socket al desmontar
-  }, []);
+  loadProfile();
+
+  const cleanupProfileSocket = initSocket();
+  const cleanupNotiSocket = initNotificaciones();
+
+  obtenerNotificaciones();
+
+  return () => {
+    cleanupProfileSocket?.();
+    cleanupNotiSocket?.();
+  };
+}, []);
 
   if (loading) {
     return <div>Cargando perfil...</div>;

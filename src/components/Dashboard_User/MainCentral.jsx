@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { FaUser, FaImages, FaRobot, FaFlag } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import SwipeCards from "./SwipeCards";
-import BotonNotificaciones from "./Notificaciones/BotonNotificaciones";
+import BotonNotificaciones from "./Notificaciones/components/BotonNotificaciones";
 
 const MainCentral = ({
   handleOpenAporteModal,

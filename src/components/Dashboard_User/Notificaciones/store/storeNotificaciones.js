@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import notificacionesService from "../Server/notificacionesService";
-import { listenNotificaciones } from "../helpers/notificacionesSocket";
+import notificacionesService from "../api/notificacionesService";
+import { socket } from "../../../../helpers/socket";
 
 const storeNotificaciones = create((set, get) => ({
   notificaciones: [],
@@ -17,9 +17,9 @@ const storeNotificaciones = create((set, get) => ({
     }
   },
 
-  marcarNotificacionLeida: async (id) => {
+  // ✅ nombre consistente
+  marcarLeido: async (id) => {
     await notificacionesService.markAsRead(id);
-
     set((state) => ({
       notificaciones: state.notificaciones.map((n) =>
         n._id === id ? { ...n, leido: true } : n,
@@ -27,26 +27,35 @@ const storeNotificaciones = create((set, get) => ({
     }));
   },
 
-  agregarNotificacion: (nueva) => {
-    set((state) => {
-      if (state.notificaciones.some((n) => n._id === nueva._id)) {
-        return state;
-      }
-
-      return {
-        notificaciones: [nueva, ...state.notificaciones],
-      };
-    });
+  marcarTodasLeidas: async () => {
+    const noLeidas = get().notificaciones.filter((n) => !n.leido);
+    if (noLeidas.length === 0) return;
+    await Promise.all(
+      noLeidas.map((n) => notificacionesService.markAsRead(n._id))
+    );
+    set((state) => ({
+      notificaciones: state.notificaciones.map((n) => ({ ...n, leido: true })),
+    }));
   },
 
   initSocket: () => {
     if (get().inicializado) return () => {};
 
-    const unsubscribe = listenNotificaciones(get().agregarNotificacion);
+    // ✅ al llegar señal, hacer fetch completo
+    const handleNueva = () => {
+      get().obtenerNotificaciones();
+    };
+
+    socket.on("notificacion_nueva", handleNueva);
+    socket.on("evento_eliminado", handleNueva);
 
     set({ inicializado: true });
 
-    return unsubscribe;
+    return () => {
+      socket.off("notificacion_nueva", handleNueva);
+      socket.off("evento_eliminado", handleNueva);
+      set({ inicializado: false });
+    };
   },
 }));
 
