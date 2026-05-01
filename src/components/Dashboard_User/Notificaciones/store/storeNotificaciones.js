@@ -17,7 +17,6 @@ const storeNotificaciones = create((set, get) => ({
     }
   },
 
-  // ✅ nombre consistente
   marcarLeido: async (id) => {
     await notificacionesService.markAsRead(id);
     set((state) => ({
@@ -31,32 +30,42 @@ const storeNotificaciones = create((set, get) => ({
     const noLeidas = get().notificaciones.filter((n) => !n.leido);
     if (noLeidas.length === 0) return;
     await Promise.all(
-      noLeidas.map((n) => notificacionesService.markAsRead(n._id))
+      noLeidas.map((n) => notificacionesService.markAsRead(n._id)),
     );
     set((state) => ({
       notificaciones: state.notificaciones.map((n) => ({ ...n, leido: true })),
     }));
   },
-
+  
   initSocket: () => {
-    if (get().inicializado) return () => {};
+  if (get().inicializado) return () => {};
 
-    // ✅ al llegar señal, hacer fetch completo
-    const handleNueva = () => {
-      get().obtenerNotificaciones();
-    };
+  const handleRefreshSocket = () => {
+    get().obtenerNotificaciones();
+  };
 
-    socket.on("notificacion_nueva", handleNueva);
-    socket.on("evento_eliminado", handleNueva);
+  const handleRefreshWindow = () => {
+    get().obtenerNotificaciones();
+  };
 
-    set({ inicializado: true });
+  // SOCKET EVENTS
+  socket.on("notificacion_nueva", handleRefreshSocket);
+  socket.on("notificacion_update", handleRefreshSocket);
 
-    return () => {
-      socket.off("notificacion_nueva", handleNueva);
-      socket.off("evento_eliminado", handleNueva);
-      set({ inicializado: false });
-    };
-  },
+  // WINDOW EVENTS (desde dashboard)
+  window.addEventListener("refetch_notificaciones", handleRefreshWindow);
+
+  set({ inicializado: true });
+
+  return () => {
+    socket.off("notificacion_nueva", handleRefreshSocket);
+    socket.off("notificacion_update", handleRefreshSocket);
+
+    window.removeEventListener("refetch_notificaciones", handleRefreshWindow);
+
+    set({ inicializado: false });
+  };
+},
 }));
 
 export default storeNotificaciones;

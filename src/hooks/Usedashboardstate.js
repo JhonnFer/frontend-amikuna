@@ -1,11 +1,12 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import storeAuth from "../context/storeAuth";
+import { socket } from "../helpers/socket";
 
 import usePerfilUsuarioAutenticado from "./usePerfilUsuarioAutenticado";
 import useMatches from "./useMatches";
 
-import useEventos from "./useEventos";
+import useEventos from "./eventos/useEventos";
 import useSeguirUsuario from "./useSeguirUsuario";
 import useGaleriaFotos from "./useGaleriaFotos";
 import useChatSocket from "../helpers/Usechatsocket";
@@ -73,6 +74,40 @@ const useDashboardState = () => {
   useEffect(() => {
     if (!loadingPerfil && !profile) cargarPerfil();
   }, [loadingPerfil, profile, cargarPerfil]);
+
+  useEffect(() => {
+  if (!socket) return;
+
+  // =====================
+  // EVENTOS
+  // =====================
+  const refreshEventos = () => obtenerEventos();
+
+  // =====================
+  // NOTIFICACIONES
+  // =====================
+  const refreshNotificaciones = () => {
+    window.dispatchEvent(new Event("refetch_notificaciones"));
+  };
+
+  socket.on("evento_creado", refreshEventos);
+  socket.on("evento_actualizado", refreshEventos);
+  socket.on("evento_eliminado", refreshEventos);
+  socket.on("asistencia_actualizada", refreshEventos);
+
+  socket.on("notificacion_nueva", refreshNotificaciones);
+  socket.on("notificacion_update", refreshNotificaciones);
+
+  return () => {
+    socket.off("evento_creado", refreshEventos);
+    socket.off("evento_actualizado", refreshEventos);
+    socket.off("evento_eliminado", refreshEventos);
+    socket.off("asistencia_actualizada", refreshEventos);
+
+    socket.off("notificacion_nueva", refreshNotificaciones);
+    socket.off("notificacion_update", refreshNotificaciones);
+  };
+}, [obtenerEventos]);
 
   const handleLogout = useCallback(async () => {
     await storeAuth.getState().logout();

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import fetchDataBackend from "../helpers/fetchDataBackend"; // ✅ import directo
-import { socket } from "../helpers/socket";
+import fetchDataBackend from "../../helpers/fetchDataBackend"; // ✅ import directo
+import { socket } from "../../helpers/socket";
 
 const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
   // ── Estado: eventos públicos ───────────────────────────────────────────────
@@ -150,31 +150,16 @@ const useEventos = ({ autoCargar = true, onAsistenciaSuccess } = {}) => {
   }, []);
   // ── SOCKET: sincronización en tiempo real ─────────────────────────────────
   useEffect(() => {
-    if (!socket) return;
+  const handleRefetch = () => {
+    obtenerEventos();
+  };
 
-    const handleCambioEventos = () => {
-      obtenerEventos();
-      obtenerMisEventos();
-    };
+  window.addEventListener("refetch_eventos", handleRefetch);
 
-    const handleAsistencia = () => {
-      console.log("📡 Cambio en asistencia detectado");
-      obtenerMisEventos();
-    };
-
-    socket.on("evento_creado", handleCambioEventos);
-    socket.on("evento_actualizado", handleCambioEventos);
-    socket.on("evento_eliminado", handleCambioEventos);
-
-    socket.on("asistencia_actualizada", handleAsistencia);
-
-    return () => {
-      socket.off("evento_creado", handleCambioEventos);
-      socket.off("evento_actualizado", handleCambioEventos);
-      socket.off("evento_eliminado", handleCambioEventos);
-      socket.off("asistencia_actualizada", handleAsistencia);
-    };
-  }, [socket, obtenerEventos, obtenerMisEventos]);
+  return () => {
+    window.removeEventListener("refetch_eventos", handleRefetch);
+  };
+}, [obtenerEventos]);
 
   return {
     eventos,

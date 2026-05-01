@@ -92,6 +92,8 @@ const obtenerNotificaciones = storeNotificaciones((s) => s.obtenerNotificaciones
   };
 }, []);
 
+
+
   if (loading) {
     return <div>Cargando perfil...</div>;
   }

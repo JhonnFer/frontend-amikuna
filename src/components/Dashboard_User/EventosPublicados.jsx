@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { FaCalendarCheck, FaTimesCircle, FaClock } from "react-icons/fa";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-import useEventos from "../../hooks/useEventos";
+import useEventos from "../../hooks/eventos/useEventos";
 import Modal from "../Modals_Dashboards/modal";
 
 // ── Modal: Mis Eventos ─────────────────────────────────────────────────────────
