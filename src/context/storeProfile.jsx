@@ -85,10 +85,15 @@ const storeProfile = create((set, get) => ({
   };
 
   socket.off("perfil_cambio");
+  socket.off("notificacion_nueva");
+
   socket.on("perfil_cambio", handleCambioPerfil);
+  socket.on("notificacion_nueva", handleCambioPerfil); 
 
     return () => {
       socket.off("perfil_cambio", handleCambioPerfil); // cleanup
+      socket.off("notificacion_nueva", handleCambioPerfil);
+
     };
   }
 
