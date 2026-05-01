@@ -4,7 +4,7 @@ import storeAuth from "../context/storeAuth";
 
 import usePerfilUsuarioAutenticado from "./usePerfilUsuarioAutenticado";
 import useMatches from "./useMatches";
-import useNotificaciones from "./useNotificaciones";
+
 import useEventos from "./useEventos";
 import useSeguirUsuario from "./useSeguirUsuario";
 import useGaleriaFotos from "./useGaleriaFotos";
@@ -20,7 +20,7 @@ const useDashboardState = () => {
     cargarPerfil,
   } = usePerfilUsuarioAutenticado();
   const { matches, loading: loadingMatches } = useMatches();
-  const { solicitudes, loading: loadingSolicitudes } = useNotificaciones();
+
   const { unreadCounts, marcarLeido, totalUnread, formatBadge } =
     useUnreadMessages(profile?._id);
 
@@ -123,8 +123,6 @@ const useDashboardState = () => {
     cargarPerfil,
     matches,
     loadingMatches,
-    solicitudes,
-    loadingSolicitudes,
     eventosDisponibles,
     loadingEventos,
     confirmarAsistencia,

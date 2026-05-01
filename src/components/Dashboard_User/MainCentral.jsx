@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { FaUser, FaImages, FaRobot, FaFlag } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import SwipeCards from "./SwipeCards";
-import BotonNotificaciones from "./BotonNotificaciones";
+import BotonNotificaciones from "./Notificaciones/BotonNotificaciones";
 
 const MainCentral = ({
   handleOpenAporteModal,
@@ -18,13 +18,12 @@ const MainCentral = ({
   handleLogout,
   loadingMatches,
   usuarios,
-  cargandoSeguir
+  cargandoSeguir,
 }) => {
   const navbarRef = useRef(null);
 
   return (
     <main className="flex-1 flex flex-col overflow-hidden min-h-0 max-w-5xl mx-auto px-4 py-2 h-full">
-
       {/* NAVBAR */}
       <div
         ref={navbarRef}
@@ -53,7 +52,7 @@ const MainCentral = ({
             handleOpenAporteModal(
               10,
               "Apoyo a la app",
-              "Contribución para mejoras de la plataforma Amikuna"
+              "Contribución para mejoras de la plataforma Amikuna",
             )
           }
           className="bg-gradient-to-r from-[#ff6e7f] to-[#bfe9ff] text-gray-800 mx-auto  sm:px-0 px-2  sm:text-xs md:text-sm lg:text-md xl:text-lg  py-1 rounded-full whitespace-nowrap"
@@ -65,26 +64,32 @@ const MainCentral = ({
           <button onClick={() => setMostrarEditarPerfil(true)}>
             <FaUser className="text-gray-600 hover:text-gray-200 w-5 h-5 md:w-6 md:h-6" />
           </button>
-          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg  text-gray-800">Perfil</span>
+          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg  text-gray-800">
+            Perfil
+          </span>
         </div>
 
         <div className="flex flex-col items-center text-center px-auto mx-auto ">
           <button onClick={() => setMostrarGaleriaFotos(true)}>
             <FaImages className="text-gray-600 hover:text-gray-200 w-5 h-5  md:w-6 md:h-6" />
           </button>
-          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">Fotos</span>
+          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">
+            Fotos
+          </span>
         </div>
 
         <div className="flex flex-col items-center text-center">
           <div className="text-gray-600 hover:text-gray-200  sm:h-6 md:h-6 lg:h-7 xl:h-7">
-          <BotonNotificaciones
-            navbarRef={navbarRef}
-            solicitudes={solicitudes}
-            loading={loadingSolicitudes}
-            onFollow={seguirUsuario}
-          />
+            <BotonNotificaciones
+              navbarRef={navbarRef}
+              solicitudes={solicitudes}
+              loading={loadingSolicitudes}
+              onFollow={seguirUsuario}
+            />
           </div>
-          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">Notif</span>
+          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">
+            Notif
+          </span>
         </div>
 
         <button
@@ -92,7 +97,9 @@ const MainCentral = ({
           className="flex flex-col items-center text-center"
         >
           <FaRobot className="text-gray-600 hover:text-gray-200 md:w-6 sm:w-5 sm:h-5 md:h-4 lg:h-5 xl:h-6" />
-          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">ChatBot</span>
+          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">
+            ChatBot
+          </span>
         </button>
 
         <button
@@ -100,7 +107,9 @@ const MainCentral = ({
           className="flex flex-col items-center text-center px-auto mx-auto"
         >
           <FaFlag className="text-gray-600 hover:text-gray-200  md:w-5 sm:w-4  sm:h-5 md:h-4 lg:h-5 xl:h-6" />
-          <span className=" sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">Feedback</span>
+          <span className=" sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">
+            Feedback
+          </span>
         </button>
 
         <button
@@ -108,7 +117,9 @@ const MainCentral = ({
           className="flex flex-col items-center text-center mx-auto px-6 "
         >
           <FiLogOut className="text-[#51040492] hover:text-red-200  md:w-6 sm:w-5 sm:h-5 md:h-4 lg:h-5 xl:h-6" />
-          <span className="mx-auto sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">Salir</span>
+          <span className="mx-auto sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">
+            Salir
+          </span>
         </button>
       </div>
 
@@ -126,7 +137,6 @@ const MainCentral = ({
           />
         )}
       </div>
-
     </main>
   );
 };
@@ -144,7 +154,7 @@ MainCentral.propTypes = {
   handleLogout: PropTypes.func.isRequired,
   loadingMatches: PropTypes.bool.isRequired,
   usuarios: PropTypes.array.isRequired,
-  cargandoSeguir: PropTypes.bool.isRequired
+  cargandoSeguir: PropTypes.bool.isRequired,
 };
 
 export default MainCentral;

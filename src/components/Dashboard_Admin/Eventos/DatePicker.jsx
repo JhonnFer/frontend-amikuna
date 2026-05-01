@@ -21,11 +21,15 @@ const DatePicker = ({ value, onChange, onBlur, hasError, name = "fecha" }) => {
 
   // Inicializar desde value (YYYY-MM-DD)
   useEffect(() => {
-    if (value) {
+    if (value && value.includes("-")) {
       const [y, m, d] = value.split("-");
       setYear(y || "");
       setMonth(m ? String(parseInt(m)) : "");
       setDay(d ? String(parseInt(d)) : "");
+    } else {
+      setYear("");
+      setMonth("");
+      setDay("");
     }
   }, [value]);
 

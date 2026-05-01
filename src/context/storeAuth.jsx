@@ -35,10 +35,10 @@ const storeAuth = create((set) => ({
       socket.disconnect();
       set({ user: null, token: null });
       storeProfile.getState().clearProfile();
-      await new Promise((r) => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 500));
       window.location.href = "/login";
     }
-  },
+},
 }));
 
 export default storeAuth;

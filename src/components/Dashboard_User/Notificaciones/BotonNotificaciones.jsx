@@ -4,9 +4,9 @@ import { FaBell, FaCheck } from "react-icons/fa";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
-import useNotificaciones from "../../hooks/useNotificaciones";
-import useSeguirUsuario from "../../hooks/useSeguirUsuario";
-import storeProfile from "../../context/storeProfile";
+import storeNotificaciones from "../../../context/storeNotificaciones";
+import useSeguirUsuario from "../../../hooks/useSeguirUsuario";
+import storeProfile from "../../../context/storeProfile";
 
 const BotonNotificaciones = ({ navbarRef }) => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
@@ -15,12 +15,12 @@ const BotonNotificaciones = ({ navbarRef }) => {
   const profile = storeProfile((state) => state.profile);
 
   const { notificaciones, loading, marcarLeido, obtenerNotificaciones } =
-    useNotificaciones();
+    storeNotificaciones();
   const { seguirUsuario, cargando: cargandoSeguir } = useSeguirUsuario();
   const yaSignoA = (fromUser) => {
-  const fromId = fromUser?._id?.toString() || fromUser?.toString();
-  return profile?.siguiendo?.some((id) => id?.toString() === fromId);
-};
+    const fromId = fromUser?._id?.toString() || fromUser?.toString();
+    return profile?.siguiendo?.some((id) => id?.toString() === fromId);
+  };
 
   const noLeidas = Array.isArray(notificaciones)
     ? notificaciones.filter((n) => !n.leido).length
