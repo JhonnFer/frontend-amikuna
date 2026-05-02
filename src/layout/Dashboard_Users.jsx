@@ -10,12 +10,12 @@ import FormularioEditarPerfil from "../components/Dashboard_User/Perfil/Formular
 import VisorFotos from "../components/UI/VisorFotos";
 import ModalGaleria from "../components/Modals_Dashboards/Modalgaleria";
 import ModalConfirmarEliminar from "../components/Modals_Dashboards/Modalconfirmareliminar";
-import storeNotificaciones from "../components/Dashboard_User/Notificaciones/store/storeNotificaciones";
 
 import { FaUser } from "react-icons/fa";
 
 import useDashboardState from "../hooks/Usedashboardstate";
 import storeProfile from "../context/storeProfile";
+import storeNotificaciones from "../components/Dashboard_User/Notificaciones/store/storeNotificaciones";
 
 import { initSocketOrchestrator } from "../helpers/socketOrchestrator";
 
@@ -34,7 +34,6 @@ const Dashboard_Users = () => {
     loadingSolicitudes,
     eventosDisponibles,
     loadingEventos,
-    obtenerEventos,
     confirmarAsistencia,
     rechazarAsistencia,
     cargandoAsistencia,
@@ -76,26 +75,24 @@ const Dashboard_Users = () => {
     handleLogout,
   } = useDashboardState();
 
-const obtenerNotificaciones = storeNotificaciones((s) => s.obtenerNotificaciones);
-
-
+  // ✅ CARGAR PERFIL
   useEffect(() => {
-  loadProfile();
+    loadProfile();
+  }, [loadProfile]);
 
-  const cleanup = initSocketOrchestrator({
-    onEventos: obtenerEventos,
-    onNotificaciones: obtenerNotificaciones,
-    onPerfil: loadProfile,
-  });
+  // ✅ CARGAR NOTIFICACIONES UNA SOLA VEZ al montar
+  useEffect(() => {
+    const { obtenerNotificaciones } = storeNotificaciones.getState();
+    obtenerNotificaciones();
+  }, []);
 
-  obtenerEventos();
-  obtenerNotificaciones();
-
-  return () => {
-    cleanup?.();
-  };
-}, [loadProfile, obtenerEventos, obtenerNotificaciones]);
-
+  // ✅ INICIALIZAR SOCKET LISTENERS (una sola vez)
+  useEffect(() => {
+    const cleanup = initSocketOrchestrator();
+    return () => {
+      cleanup?.();
+    };
+  }, []);
 
   if (loading) {
     return <div>Cargando perfil...</div>;

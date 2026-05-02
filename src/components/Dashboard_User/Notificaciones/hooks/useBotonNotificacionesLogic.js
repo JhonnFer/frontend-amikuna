@@ -1,5 +1,5 @@
-import {  useState } from "react";
-import useNotificaciones from "./useNotificaciones"; 
+import { useState } from "react";
+import useNotificaciones from "./useNotificaciones";
 import useSeguirUsuario from "../../../../hooks/useSeguirUsuario";
 import storeProfile from "../../../../context/storeProfile";
 import { toast } from "react-toastify";
@@ -7,21 +7,19 @@ import { toast } from "react-toastify";
 const useBotonNotificacionesLogic = () => {
   const profile = storeProfile((state) => state.profile);
 
-  const {
-    notificaciones,
-    loading,
-    marcarLeido,
-    marcarTodasLeidas,
-    obtenerNotificaciones,
-  } = useNotificaciones(); // ✅ usa el hook que ya inicializa socket y fetch
+  const { notificaciones, loading, marcarLeido, marcarTodasLeidas } =
+    useNotificaciones(); // ✅ usa el hook que ya inicializa socket y fetch
 
   const { seguirUsuario, cargando } = useSeguirUsuario();
 
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [menuStyle, setMenuStyle] = useState({});
 
+  // 🛡️ Filtrar notificaciones válidas y contar sin leer
   const noLeidas = Array.isArray(notificaciones)
-    ? notificaciones.filter((n) => !n.leido).length
+    ? notificaciones.filter(
+        (n) => n && typeof n === "object" && n.leido === false,
+      ).length
     : 0;
 
   const yaSigue = (fromUser) => {
@@ -56,13 +54,22 @@ const useBotonNotificacionesLogic = () => {
     setMostrarMenu((prev) => !prev);
   };
 
+  const handleMarcarTodas = async () => {
+  try {
+    await marcarTodasLeidas();
+    toast.success("Notificaciones marcadas como leídas");
+  } catch (err) {
+    console.error(err);
+    toast.error("Error al marcar notificaciones");
+  }
+};
+
   return {
     profile,
     notificaciones,
     loading,
     marcarLeido,
     marcarTodasLeidas,
-    obtenerNotificaciones,
     seguirUsuario,
     cargando,
     mostrarMenu,
@@ -73,6 +80,7 @@ const useBotonNotificacionesLogic = () => {
     yaSigue,
     handleAceptarSolicitud,
     abrirNotificaciones,
+    handleMarcarTodas,
   };
 };
 

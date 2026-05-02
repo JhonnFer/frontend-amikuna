@@ -1,31 +1,33 @@
-import { useEffect } from "react";
 import storeNotificaciones from "../store/storeNotificaciones";
-import storeProfile from "../../../../context/storeProfile";
 
+// Hook PURO: solo consume el store
+// Los listeners de socket están en socketOrchestrator.js
 const useNotificaciones = () => {
-  const profile = storeProfile((state) => state.profile);
-
   const notificaciones = storeNotificaciones((state) => state.notificaciones);
   const loading = storeNotificaciones((state) => state.loading);
-  const obtenerNotificaciones = storeNotificaciones((state) => state.obtenerNotificaciones);
+  const obtenerNotificaciones = storeNotificaciones(
+    (state) => state.obtenerNotificaciones,
+  );
   const marcarLeido = storeNotificaciones((state) => state.marcarLeido);
-  const marcarTodasLeidas = storeNotificaciones((state) => state.marcarTodasLeidas);
-  const initSocket = storeNotificaciones((state) => state.initSocket);
-
-  useEffect(() => {
-    if (!profile?._id) return;
-
-    obtenerNotificaciones(); // ✅ carga inicial — badge aparece al montar
-    const cleanup = initSocket();
-    return cleanup;
-  }, [profile?._id]); // ← solo cuando cambia el usuario
+  const marcarTodasLeidas = storeNotificaciones(
+    (state) => state.marcarTodasLeidas,
+  );
+  const contarNoLeidas = storeNotificaciones((state) => state.contarNoLeidas);
+  const filtrarPorTipo = storeNotificaciones((state) => state.filtrarPorTipo);
+  const buscar = storeNotificaciones((state) => state.buscar);
 
   return {
+    // Estado
     notificaciones,
     loading,
+    // Acciones
     obtenerNotificaciones,
     marcarLeido,
     marcarTodasLeidas,
+    // Helpers (sin refetch)
+    contarNoLeidas,
+    filtrarPorTipo,
+    buscar,
   };
 };
 

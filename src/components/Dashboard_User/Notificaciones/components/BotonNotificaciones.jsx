@@ -18,6 +18,7 @@ const BotonNotificaciones = ({ navbarRef }) => {
     yaSigue,
     handleAceptarSolicitud,
     abrirNotificaciones,
+    handleMarcarTodas,
   } = useBotonNotificacionesLogic();
 
   useEffect(() => {
@@ -53,7 +54,6 @@ const BotonNotificaciones = ({ navbarRef }) => {
 
   return (
     <div className="relative inline-block text-left">
-
       {/* BOTÓN */}
       <button
         onClick={abrirNotificaciones}
@@ -99,15 +99,24 @@ const BotonNotificaciones = ({ navbarRef }) => {
               <div className="flex items-center gap-2">
                 <FaBell className="w-4 h-4 text-white" />
                 <h3 className="text-sm font-bold text-white">Notificaciones</h3>
+                {noLeidas > 0 && (
+                <button
+                  onClick={handleMarcarTodas}
+                  className="text-xs text-white bg-green-500 hover:bg-green-600 px-2 py-1 rounded-full transition"
+                >
+                  Marcar todas
+                </button>
+              )}
               </div>
+              
               <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">
                 {noLeidas} nuevas
               </span>
+              
             </div>
 
             {/* LISTA */}
             <ul className="max-h-[50vh] overflow-y-auto divide-y divide-gray-100">
-
               {loading && (
                 <li className="p-6 space-y-3 animate-pulse">
                   {[1, 2, 3].map((i) => (
@@ -126,83 +135,92 @@ const BotonNotificaciones = ({ navbarRef }) => {
               )}
 
               {!loading &&
-                notificaciones.map((n) => (
-                  <motion.li
-                    key={n._id}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className={`p-4 flex flex-col gap-2 hover:bg-white/60 transition-colors ${
-                      n.leido ? "opacity-60" : "bg-blue-50/40"
-                    }`}
-                  >
-                    {/* MENSAJE */}
-                    <div className="flex justify-between items-start gap-3">
-                      <p className={n.leido ? "text-gray-400 text-sm" : "text-gray-800 font-medium text-sm"}>
-                        {n.mensaje}
-                      </p>
-                      {!n.leido && (
-                        <span className="h-2.5 w-2.5 bg-blue-500 rounded-full mt-1 shrink-0 animate-pulse" />
-                      )}
-                    </div>
-
-                    {/* ACCIONES */}
-                    <div className="flex gap-2 flex-wrap items-center">
-
-                      {n.tipo === "match" && !n.leido && (
-                        <button
-                          onClick={() => marcarLeido(n._id)}
-                          className="text-green-600 text-xs font-semibold hover:text-green-800 transition"
+                notificaciones
+                  .filter((n) => n && typeof n === "object" && n._id)
+                  .map((n) => (
+                    <motion.li
+                      key={n._id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className={`p-4 flex flex-col gap-2 hover:bg-white/60 transition-colors ${
+                        n.leido ? "opacity-60" : "bg-blue-50/40"
+                      }`}
+                    >
+                      {/* MENSAJE */}
+                      <div className="flex justify-between items-start gap-3">
+                        <p
+                          className={
+                            n.leido
+                              ? "text-gray-400 text-sm"
+                              : "text-gray-800 font-medium text-sm"
+                          }
                         >
-                          ¡Ver match! ✓
-                        </button>
-                      )}
+                          {n.mensaje}
+                        </p>
+                        {!n.leido && (
+                          <span className="h-2.5 w-2.5 bg-blue-500 rounded-full mt-1 shrink-0 animate-pulse" />
+                        )}
+                      </div>
 
-                      {n.tipo === "seguidor" && !n.leido && (
-                        <>
-                          {yaSigue(n.fromUser) ? (
-                            <div className="flex items-center gap-2">
-                              <span className="text-green-600 text-xs font-semibold">
-                                Ya lo sigues ✓
-                              </span>
-                              <button
-                                onClick={() => marcarLeido(n._id)}
-                                className="text-xs text-gray-400 hover:text-gray-600 transition"
-                              >
-                                Marcar leída
-                              </button>
-                            </div>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => handleAceptarSolicitud(n)}
-                                disabled={cargando}
-                                className="flex items-center gap-1 text-xs bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-full disabled:opacity-50 active:scale-95 transition-all"
-                              >
-                                <FaCheck size={10} /> Seguir
-                              </button>
-                              <button
-                                onClick={() => marcarLeido(n._id)}
-                                className="text-xs text-gray-500 hover:text-gray-700 transition"
-                              >
-                                Ignorar
-                              </button>
-                            </>
+                      {/* ACCIONES */}
+                      <div className="flex gap-2 flex-wrap items-center">
+                        {n.tipo === "match" && !n.leido && (
+                          <button
+                            onClick={() => marcarLeido(n._id)}
+                            className="text-green-600 text-xs font-semibold hover:text-green-800 transition"
+                          >
+                            ¡Ver match! ✓
+                          </button>
+                        )}
+
+                        {n.tipo === "seguidor" && !n.leido && (
+                          <>
+                            {yaSigue(n.fromUser) ? (
+                              <div className="flex items-center gap-2">
+                                <span className="text-green-600 text-xs font-semibold">
+                                  Ya lo sigues ✓
+                                </span>
+                                <button
+                                  onClick={() => marcarLeido(n._id)}
+                                  className="text-xs text-gray-400 hover:text-gray-600 transition"
+                                >
+                                  Marcar leída
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => handleAceptarSolicitud(n)}
+                                  disabled={cargando}
+                                  className="flex items-center gap-1 text-xs bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-full disabled:opacity-50 active:scale-95 transition-all"
+                                >
+                                  <FaCheck size={10} /> Seguir
+                                </button>
+                                <button
+                                  onClick={() => marcarLeido(n._id)}
+                                  className="text-xs text-gray-500 hover:text-gray-700 transition"
+                                >
+                                  Ignorar
+                                </button>
+                              </>
+                            )}
+                          </>
+                        )}
+
+                        {n.tipo !== "match" &&
+                          n.tipo !== "seguidor" &&
+                          !n.leido && (
+                            <button
+                              onClick={() => marcarLeido(n._id)}
+                              className="text-xs text-blue-600 font-semibold hover:text-blue-800 transition"
+                            >
+                              Marcar leída
+                            </button>
                           )}
-                        </>
-                      )}
-
-                      {n.tipo !== "match" && n.tipo !== "seguidor" && !n.leido && (
-                        <button
-                          onClick={() => marcarLeido(n._id)}
-                          className="text-xs text-blue-600 font-semibold hover:text-blue-800 transition"
-                        >
-                          Marcar leída
-                        </button>
-                      )}
-                    </div>
-                  </motion.li>
-                ))}
+                      </div>
+                    </motion.li>
+                  ))}
             </ul>
           </motion.div>
         )}

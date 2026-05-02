@@ -1,71 +1,135 @@
 import { create } from "zustand";
 import notificacionesService from "../api/notificacionesService";
-import { socket } from "../../../../helpers/socket";
 
 const storeNotificaciones = create((set, get) => ({
   notificaciones: [],
   loading: false,
   inicializado: false,
 
+  // =====================
+  // CARGA INICIAL (solo 1 vez al montar Dashboard)
+  // =====================
   obtenerNotificaciones: async () => {
     set({ loading: true });
     try {
       const res = await notificacionesService.getAll();
-      set({ notificaciones: res?.notificaciones ?? [] });
+      set({
+        notificaciones: res?.notificaciones ?? [],
+        inicializado: true,
+      });
+    } catch (error) {
+      console.error("Error cargando notificaciones:", error);
+      set({ inicializado: true });
     } finally {
       set({ loading: false });
     }
   },
 
+  // =====================
+  // MARK READ (con optimistic update)
+  // =====================
   marcarLeido: async (id) => {
-    await notificacionesService.markAsRead(id);
+    // 1. Optimistic update en memoria
     set((state) => ({
       notificaciones: state.notificaciones.map((n) =>
         n._id === id ? { ...n, leido: true } : n,
       ),
     }));
+
+    // 2. Sincronizar con backend (fire & forget)
+    try {
+      await notificacionesService.markAsRead(id);
+    } catch (error) {
+      console.error("Error marcando notificación como leída:", error);
+      // Revertir cambio si falla (opcional)
+      set((state) => ({
+        notificaciones: state.notificaciones.map((n) =>
+          n._id === id ? { ...n, leido: false } : n,
+        ),
+      }));
+    }
   },
 
+  // =====================
+  // MARK ALL READ (con optimistic update)
+  // =====================
   marcarTodasLeidas: async () => {
-    const noLeidas = get().notificaciones.filter((n) => !n.leido);
-    if (noLeidas.length === 0) return;
-    await Promise.all(
-      noLeidas.map((n) => notificacionesService.markAsRead(n._id)),
-    );
+  const noLeidas = get().notificaciones.filter((n) => !n.leido);
+  if (noLeidas.length === 0) return;
+
+  await Promise.all(
+    noLeidas.map((n) => notificacionesService.markAsRead(n._id))
+  );
+
+  set((state) => ({
+    notificaciones: state.notificaciones.map((n) => ({
+      ...n,
+      leido: true,
+    })),
+  }));
+},
+
+  // =====================
+  // PUSH REAL-TIME (socket - sin lógica de API)
+  // =====================
+  agregarNotificacion: (nueva) => {
+    // 🛡️ VALIDACIÓN: Solo agregar notificaciones válidas
+    if (!nueva || typeof nueva !== "object" || !nueva._id || !nueva.tipo) {
+      console.warn("⚠️ No se puede agregar notificación inválida:", nueva);
+      return;
+    }
     set((state) => ({
-      notificaciones: state.notificaciones.map((n) => ({ ...n, leido: true })),
+      notificaciones: [nueva, ...state.notificaciones],
     }));
   },
-  
-  initSocket: () => {
-  if (get().inicializado) return () => {};
 
-  const handleRefreshSocket = () => {
-    get().obtenerNotificaciones();
-  };
+  actualizarNotificacion: (update) => {
+    // 🛡️ VALIDACIÓN: Solo actualizar notificaciones válidas
+    if (!update || typeof update !== "object" || !update._id) {
+      console.warn("⚠️ No se puede actualizar notificación inválida:", update);
+      return;
+    }
+    set((state) => ({
+      notificaciones: state.notificaciones.map((n) =>
+        n._id === update._id ? { ...n, ...update } : n,
+      ),
+    }));
+  },
 
-  const handleRefreshWindow = () => {
-    get().obtenerNotificaciones();
-  };
+  eliminarNotificacion: (id) =>
+    set((state) => ({
+      notificaciones: state.notificaciones.filter((n) => n._id !== id),
+    })),
 
-  // SOCKET EVENTS
-  socket.on("notificacion_nueva", handleRefreshSocket);
-  socket.on("notificacion_update", handleRefreshSocket);
+  // =====================
+  // HELPERS (sin refetch)
+  // =====================
+  contarNoLeidas: () => {
+    const state = get();
+    return state.notificaciones.filter((n) => !n.leido).length;
+  },
 
-  // WINDOW EVENTS (desde dashboard)
-  window.addEventListener("refetch_notificaciones", handleRefreshWindow);
+  filtrarPorTipo: (tipo) => {
+    const state = get();
+    return state.notificaciones.filter((n) => n.tipo === tipo);
+  },
 
-  set({ inicializado: true });
+  buscar: (termino) => {
+    const state = get();
+    const termBajo = termino.toLowerCase();
+    return state.notificaciones.filter(
+      (n) =>
+        n.mensaje?.toLowerCase().includes(termBajo) ||
+        n.tipo?.toLowerCase().includes(termBajo),
+    );
+  },
 
-  return () => {
-    socket.off("notificacion_nueva", handleRefreshSocket);
-    socket.off("notificacion_update", handleRefreshSocket);
-
-    window.removeEventListener("refetch_notificaciones", handleRefreshWindow);
-
-    set({ inicializado: false });
-  };
-},
+  limpiar: () =>
+    set({
+      notificaciones: [],
+      loading: false,
+      inicializado: false,
+    }),
 }));
 
 export default storeNotificaciones;
