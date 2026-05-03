@@ -1,8 +1,11 @@
-import  { useState, useEffect, useCallback } from "react";
+import  { useState, useCallback } from "react";
 import useMatches from "../hooks/useMatches";
 import useChat from "../hooks/useChat";
 import ChatConversacion from "./ChatConversacion";
 import ChatIconWithBadge from "../UI/ChatIconWithBadge";
+import storeUnread from "./ListaChats/store/storeUnread";
+import { useShallow } from "zustand/react/shallow";
+
 
 const ListaMatches = ({ miId }) => {
   const { matches, loading } = useMatches();
@@ -10,18 +13,26 @@ const ListaMatches = ({ miId }) => {
     abrirChat,
     obtenerMensajes,
     enviarMensaje,
-    subscribeToNewMessages,
-    chatIdActivo,
-    
   } = useChat();
+
+  // se consume el store global
+  const { unreadCounts, userChatMap, marcarLeido, agregarChatMap } = storeUnread(
+  useShallow((state) => ({
+    unreadCounts: state.unreadCounts,
+    userChatMap: state.userChatMap,
+    marcarLeido: state.marcarLeido,
+    agregarChatMap: state.agregarChatMap,
+  }))
+);
 
   const [chatInfo, setChatInfo] = useState(null);
   const [mensajes, setMensajes] = useState([]);
-  const [unreadCounts, setUnreadCounts] = useState({});
 
+ 
   const handleAbrirChat = async (match) => {
     const chat = await abrirChat(match._id);
-    if (chat && chat._id) {
+    if (!chat?._id) return;
+     agregarChatMap(match._id, chat._id);
       setChatInfo({
         chatId: chat._id,
         nombre: match.nombre,
@@ -31,8 +42,8 @@ const ListaMatches = ({ miId }) => {
       const msgs = await obtenerMensajes(chat._id);
       setMensajes(msgs);
 
-      setUnreadCounts((prev) => ({ ...prev, [chat._id]: 0 }));
-    }
+      marcarLeido(chat._id);
+    
   };
 
   const handleEnviarMensaje = useCallback(
@@ -48,32 +59,11 @@ const ListaMatches = ({ miId }) => {
 
       setMensajes((prev) => [...prev, nuevoMensajeTemp]);
 
-      const mensajeGuardado = await enviarMensaje(chatInfo.chatId, contenido);
-
-      if (mensajeGuardado) {
-        setMensajes((prev) =>
-          prev.map((m) => (m._id === nuevoMensajeTemp._id ? mensajeGuardado : m))
-        );
-      }
+      await enviarMensaje(chatInfo.chatId, contenido);
     },
     [chatInfo, enviarMensaje, miId]
   );
 
-  useEffect(() => {
-    // Suscribirse a mensajes nuevos y actualizar unreadCounts y mensajes
-    const unsubscribe = subscribeToNewMessages(({ chatId, ...mensaje }) => {
-      if (chatIdActivo === chatId) {
-        setMensajes((prev) => [...prev, mensaje]);
-      } else {
-        setUnreadCounts((prev) => ({
-          ...prev,
-          [chatId]: (prev[chatId] || 0) + 1,
-        }));
-      }
-    });
-
-    return () => unsubscribe();
-  }, [subscribeToNewMessages, chatIdActivo]);
 
   if (loading) return <p>Cargando matches...</p>;
   if (matches.length === 0) return <p>No hay matches disponibles</p>;
@@ -82,8 +72,10 @@ const ListaMatches = ({ miId }) => {
     <>
       <ul>
         {matches.map((match) => {
-          // Suponiendo que tienes un map para relacionar user <-> chatId
-          const chatId = chatIdActivo === match._id ? chatIdActivo : null;
+          //  Buscar chatId real desde el map o desde los datos del match
+          const chatId = userChatMap[match._id] || match.chatId;
+          const count = chatId ? (unreadCounts[chatId] || 0) : 0;
+          console.log("match:", match.nombre, "chatId:", chatId, "count:", count);
 
           return (
             <li
@@ -101,7 +93,7 @@ const ListaMatches = ({ miId }) => {
 
               {chatId && (
                 <ChatIconWithBadge
-                  count={unreadCounts[chatId] || 0}
+                  count={count}
                   onClick={() => handleAbrirChat(match)}
                 />
               )}

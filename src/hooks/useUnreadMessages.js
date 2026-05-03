@@ -1,47 +1,24 @@
-//src/hooks/useUnreadMessages.js
-import { useState, useEffect, useCallback } from "react";
-import { socket } from "../helpers/socket";
+// src/hooks/useUnreadMessages.js
+import { useEffect, useRef } from "react";
+import storeUnread from "../components/Dashboard_User/ListaChats/store/storeUnread";
 
-const useUnreadMessages = (miId) => {
-  // { chatId: count } — cuántos mensajes no leídos por chat
-  const [unreadCounts, setUnreadCounts] = useState({});
+const useUnreadMessages = (miId, unreadCountsIniciales = {}) => {
+  const unreadCounts = storeUnread((state) => state.unreadCounts);
+  const inicializarCounts = storeUnread((state) => state.inicializarCounts);
+  const marcarLeido = storeUnread((state) => state.marcarLeido);
 
-  // Incrementar contador cuando llega mensaje nuevo
+  const inicializado = useRef(false);
+
+  // poblar desde backend al cargar matches
   useEffect(() => {
-    if (!miId) return;
+    if(inicializado.current)return;
+    if (Object.keys(unreadCountsIniciales).length === 0) return;
 
-    const handleNuevoMensaje = (data) => {
-      const mensaje = data.mensaje;
-      // Solo contar si el mensaje NO es mío
-      if (mensaje?.emisor?._id?.toString() === miId?.toString()) return;
+    inicializarCounts(unreadCountsIniciales);
+    inicializado.current = true; 
+  }, [JSON.stringify(unreadCountsIniciales)]);
 
-      const chatId = mensaje?.chat || data?.chatId;
-      if (!chatId) return;
-
-      setUnreadCounts((prev) => ({
-        ...prev,
-        [chatId]: (prev[chatId] || 0) + 1,
-      }));
-    };
-
-    socket.on("mensaje:nuevo", handleNuevoMensaje);
-    return () => socket.off("mensaje:nuevo", handleNuevoMensaje);
-  }, [miId]);
-
-  // Limpiar contador cuando se abre el chat
-  const marcarLeido = useCallback((chatId) => {
-    if (!chatId) return;
-    setUnreadCounts((prev) => {
-      const next = { ...prev };
-      delete next[chatId];
-      return next;
-    });
-  }, []);
-
-  // Total de mensajes no leídos en todos los chats
   const totalUnread = Object.values(unreadCounts).reduce((a, b) => a + b, 0);
-
-  // Badge formateado: ≤9 → número, >9 → "+9"
   const formatBadge = (count) => (count > 9 ? "+9" : count);
 
   return { unreadCounts, marcarLeido, totalUnread, formatBadge };

@@ -1,44 +1,33 @@
 // src/components/Dashboard_User/SwipeCards.jsx
 
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-import useFetch from "../../hooks/useFetch";
+
 import useSeguirUsuario from "../../hooks/useSeguirUsuario";
+import useUsuariosSwipe from "../../hooks/useUsuariosSwipe"; 
 import { toast } from "react-toastify";
 import { FaImages, FaHeart, FaTimes } from "react-icons/fa";
 import VisorFotos from "../UI/VisorFotos";
 
+
 const SwipeCards = () => {
-  const { fetchDataBackend } = useFetch();
+  
+  const { usuarios, loading: cargando, eliminarUsuario } = useUsuariosSwipe(); // 👈
   const { seguirUsuario } = useSeguirUsuario();
 
-  const [usuarios, setUsuarios] = useState([]);
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(null);
-  const [cargando, setCargando] = useState(true);
+ 
 
   const [showGallery, setShowGallery] = useState(false);
   const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
   const [fotoIndex, setFotoIndex] = useState(0);
 
-  const cargarUsuarios = async () => {
-    try {
-      const data = await fetchDataBackend("estudiantes/matches");
-      setUsuarios(data);
-    } catch (error) {
-      console.error(error);
-      toast.error("No se pudieron cargar los candidatos.");
-    } finally {
-      setCargando(false);
-    }
-  };
-
-  useEffect(() => {
-    cargarUsuarios();
-  }, []);
-
+console.log("usuarios swipe:", usuarios.map(u => u.nombre));
+console.log("index actual:", index);
   const handleSwipe = async (dir) => {
+    
     if (!usuarios[index]) return;
 
     if (dir === "up") {
@@ -48,6 +37,9 @@ const SwipeCards = () => {
 
       if (data && data.huboMatch) {
         toast.success(`💖 ¡Match con ${usuarios[index].nombre}!`);
+        eliminarUsuario(idUsuarioAseguir);
+        setIndex((prev) => (prev >= usuarios.length - 1 ? 0 : prev));
+        return;
       }
     }
 

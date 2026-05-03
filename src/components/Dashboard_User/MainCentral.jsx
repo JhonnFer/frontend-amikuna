@@ -19,6 +19,7 @@ const MainCentral = ({
   loadingMatches,
   usuarios,
   cargandoSeguir,
+  eliminarUsuario,
 }) => {
   const navbarRef = useRef(null);
 
@@ -134,6 +135,7 @@ const MainCentral = ({
             usuarios={usuarios || []}
             onFollow={seguirUsuario}
             cargandoSeguir={cargandoSeguir}
+            eliminarUsuario={eliminarUsuario}
           />
         )}
       </div>

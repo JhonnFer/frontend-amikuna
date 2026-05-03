@@ -13,6 +13,7 @@ const useMatches = () => {
     setError(null);
     try {
       const data = await fetchDataBackend("estudiantes/listarmatches");
+      console.log("✅ matches raw:", data);
       setMatches(data);
     } catch (err) {
       setError(err.message || "Error al cargar matches");
@@ -21,20 +22,24 @@ const useMatches = () => {
     }
   }, [fetchDataBackend]);
 
-  // 🔵 carga inicial
   useEffect(() => {
     fetchMatches();
   }, [fetchMatches]);
 
-  // 🎧 listeners socket (AHORA COMPLETO)
   useEffect(() => {
-    const handleNuevoMatch = () => {
-      fetchMatches();
+    // patrón optimista: actualizar estado local sin refetch
+    const handleNuevoMatch = (nuevoMatch) => {
+      setMatches((prev) => {
+        if (!nuevoMatch?._id) return prev;
+
+        const existe = prev.some((m) => m?._id === nuevoMatch._id);
+        if (existe) return prev;
+        return [nuevoMatch, ...prev];
+      });
     };
 
     const handleMatchEliminado = (data) => {
-      console.log("🔥 match eliminado recibido:", data);
-      fetchMatches(); // 🔥 clave: refrescar lista
+      setMatches((prev) => prev.filter((m) => m._id !== data.matchId));
     };
 
     socket.on("nuevo_match", handleNuevoMatch);
@@ -44,9 +49,17 @@ const useMatches = () => {
       socket.off("nuevo_match", handleNuevoMatch);
       socket.off("match_eliminado", handleMatchEliminado);
     };
-  }, [fetchMatches]);
+  }, []);
 
-  return { matches, loading, error, refetch: fetchMatches };
+  // extraer unreadCounts de los matches al cargar
+  const unreadCountsIniciales = matches.reduce((acc, match) => {
+    if (match.chatId && match.unreadCount > 0) {
+      acc[match.chatId] = match.unreadCount;
+    }
+    return acc;
+  }, {});
+
+  return { matches, loading, error, refetch: fetchMatches, unreadCountsIniciales };
 };
 
 export default useMatches;

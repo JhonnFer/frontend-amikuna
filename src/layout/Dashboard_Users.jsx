@@ -29,7 +29,7 @@ const Dashboard_Users = () => {
   const {
     loadingPerfil,
     matches,
-    loadingMatches,
+    
     solicitudes,
     loadingSolicitudes,
     eventosDisponibles,
@@ -73,6 +73,9 @@ const Dashboard_Users = () => {
     handleOpenAporteModal,
     handleAporteSuccess,
     handleLogout,
+    usuarios,
+    loadingUsuarios,
+    eliminarUsuario,
   } = useDashboardState();
 
   // ✅ CARGAR PERFIL
@@ -139,8 +142,10 @@ const Dashboard_Users = () => {
         mostrarChatbot={mostrarChatbot}
         setMostrarModalStrike={setMostrarModalStrike}
         handleLogout={handleLogout}
-        loadingMatches={loadingMatches}
-        usuarios={matches || []}
+        usuarios={usuarios || []}  
+         loadingMatches={loadingUsuarios} 
+         eliminarUsuario={eliminarUsuario}  
+        
         cargandoSeguir={cargandoSeguir || false}
       />
 

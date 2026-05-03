@@ -11,6 +11,9 @@ import useSeguirUsuario from "./useSeguirUsuario";
 import useGaleriaFotos from "./useGaleriaFotos";
 import useChatSocket from "../helpers/Usechatsocket";
 import useUnreadMessages from "./useUnreadMessages";
+import storeUnread from "../components/Dashboard_User/ListaChats/store/storeUnread";
+import { useShallow } from "zustand/react/shallow";
+import useUsuariosSwipe from "./useUsuariosSwipe";
 
 const useDashboardState = () => {
   const navigate = useNavigate();
@@ -20,10 +23,24 @@ const useDashboardState = () => {
     loadingPerfil,
     cargarPerfil,
   } = usePerfilUsuarioAutenticado();
-  const { matches, loading: loadingMatches } = useMatches();
 
+  const {
+    usuarios,
+    loading: loadingUsuarios,
+    eliminarUsuario,
+  } = useUsuariosSwipe();
+
+  const {
+    matches,
+    loading: loadingMatches,
+    unreadCountsIniciales,
+  } = useMatches();
   const { unreadCounts, marcarLeido, totalUnread, formatBadge } =
-    useUnreadMessages(profile?._id);
+    useUnreadMessages(profile?._id, unreadCountsIniciales);
+
+  const { userChatMap } = storeUnread(
+    useShallow((state) => ({ userChatMap: state.userChatMap })),
+  );
 
   const {
     eventos,
@@ -46,6 +63,7 @@ const useDashboardState = () => {
     reemplazarFoto,
     loading: loadingFotos,
   } = useGaleriaFotos(cargarPerfil);
+
   const {
     chatInfo,
     mensajes,
@@ -76,38 +94,38 @@ const useDashboardState = () => {
   }, [loadingPerfil, profile, cargarPerfil]);
 
   useEffect(() => {
-  if (!socket) return;
+    if (!socket) return;
 
-  // =====================
-  // EVENTOS
-  // =====================
-  const refreshEventos = () => obtenerEventos();
+    // =====================
+    // EVENTOS
+    // =====================
+    const refreshEventos = () => obtenerEventos();
 
-  // =====================
-  // NOTIFICACIONES
-  // =====================
-  const refreshNotificaciones = () => {
-    window.dispatchEvent(new Event("refetch_notificaciones"));
-  };
+    // =====================
+    // NOTIFICACIONES
+    // =====================
+    const refreshNotificaciones = () => {
+      window.dispatchEvent(new Event("refetch_notificaciones"));
+    };
 
-  socket.on("evento_creado", refreshEventos);
-  socket.on("evento_actualizado", refreshEventos);
-  socket.on("evento_eliminado", refreshEventos);
-  socket.on("asistencia_actualizada", refreshEventos);
+    socket.on("evento_creado", refreshEventos);
+    socket.on("evento_actualizado", refreshEventos);
+    socket.on("evento_eliminado", refreshEventos);
+    socket.on("asistencia_actualizada", refreshEventos);
 
-  socket.on("notificacion_nueva", refreshNotificaciones);
-  socket.on("notificacion_update", refreshNotificaciones);
+    socket.on("notificacion_nueva", refreshNotificaciones);
+    socket.on("notificacion_update", refreshNotificaciones);
 
-  return () => {
-    socket.off("evento_creado", refreshEventos);
-    socket.off("evento_actualizado", refreshEventos);
-    socket.off("evento_eliminado", refreshEventos);
-    socket.off("asistencia_actualizada", refreshEventos);
+    return () => {
+      socket.off("evento_creado", refreshEventos);
+      socket.off("evento_actualizado", refreshEventos);
+      socket.off("evento_eliminado", refreshEventos);
+      socket.off("asistencia_actualizada", refreshEventos);
 
-    socket.off("notificacion_nueva", refreshNotificaciones);
-    socket.off("notificacion_update", refreshNotificaciones);
-  };
-}, [obtenerEventos]);
+      socket.off("notificacion_nueva", refreshNotificaciones);
+      socket.off("notificacion_update", refreshNotificaciones);
+    };
+  }, [obtenerEventos]);
 
   const handleLogout = useCallback(async () => {
     await storeAuth.getState().logout();
@@ -132,11 +150,17 @@ const useDashboardState = () => {
     [handleAbrirChat, marcarLeido],
   );
 
- const matchesMutuos = useMemo(() => {
-  if (!profile?.matches || !matches) return [];
-  const misMatches = new Set(profile.matches.map((id) => id?.toString()));
-  return matches.filter((m) => misMatches.has(m._id?.toString()));
-}, [matches, profile]);
+  const matchesMutuos = useMemo(() => {
+    if (!profile?.matches || !matches) return [];
+    const misMatches = new Set(profile.matches.map((id) => id?.toString()));
+    return matches
+      .filter((m) => misMatches.has(m._id?.toString()))
+      .map((m) => ({
+        ...m,
+        // chatId del store si existe, sino el que vino del fetch
+        chatId: userChatMap[m._id?.toString()] || m.chatId || null,
+      }));
+  }, [matches, profile, userChatMap]);
 
   const eventosDisponibles = useMemo(() => {
     if (!eventos || !profile?._id) return [];
@@ -204,6 +228,9 @@ const useDashboardState = () => {
     totalUnread,
     formatBadge,
     handleAbrirChatConLeido,
+    usuarios,
+    loadingUsuarios,
+    eliminarUsuario,
   };
 };
 
