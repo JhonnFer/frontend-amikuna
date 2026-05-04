@@ -210,6 +210,7 @@ const PerfilFormBase = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [imagenArchivo, setImagenArchivo] = useState(null);
   const [imagenPreview, setImagenPreview] = useState("");
+  const [interesInput, setInteresInput] = useState("");
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -302,7 +303,7 @@ const PerfilFormBase = ({
     let finalValue = value;
     if (name === "intereses") {
       finalValue = value
-        .replace(/[[\]"\\]/g, "") 
+        .replace(/[[\]"\\]/g, "")
         .replace(/,\s*,/g, ",") // Comas dobles
         .trim();
     }
@@ -348,6 +349,40 @@ const PerfilFormBase = ({
     if (i >= currentStep) return;
     setSubmitAttempted(false);
     setCurrentStep(i);
+  };
+
+  const agregarInteres = () => {
+    const limpio = interesInput.trim();
+    if (!limpio) return;
+    if (limpio.length > 30) return; // límite por palabra/frase
+
+    const listaActual = formData.intereses
+      ? formData.intereses
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+
+    if (listaActual.includes(limpio)) {
+      setInteresInput("");
+      return;
+    }
+
+    if (listaActual.length >= 10) return; // máximo 10 intereses
+
+    const nuevaLista = [...listaActual, limpio];
+    setFormData((prev) => ({ ...prev, intereses: nuevaLista.join(",") }));
+    setTouched((prev) => ({ ...prev, intereses: true }));
+    setInteresInput("");
+  };
+
+  const eliminarInteres = (item) => {
+    const nuevaLista = formData.intereses
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s && s !== item);
+    setFormData((prev) => ({ ...prev, intereses: nuevaLista.join(",") }));
+    setTouched((prev) => ({ ...prev, intereses: true }));
   };
 
   const handleSubmit = async () => {
@@ -597,10 +632,7 @@ const PerfilFormBase = ({
                 </div>
               </div>
               <div>
-                <label className={labelCls}>
-                  Biografía{" "}
-                  
-                </label>
+                <label className={labelCls}>Biografía </label>
                 <textarea
                   name="biografia"
                   rows={3}
@@ -636,9 +668,7 @@ const PerfilFormBase = ({
                   <ErrorMsg field="genero" />
                 </div>
                 <div>
-                  <label className={labelCls}>
-                    Orientación{" "}
-                  </label>
+                  <label className={labelCls}>Orientación </label>
                   <select
                     name="orientacion"
                     value={formData.orientacion}
@@ -746,15 +776,71 @@ const PerfilFormBase = ({
                 />
               </div>
               <div>
-                <label className={labelCls}>Intereses</label>
-                <input
-                  name="intereses"
-                  placeholder="Ej: lectura, deporte, música"
-                  value={formData.intereses}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={inputCls("intereses")}
-                />
+                <label className={labelCls}>
+                  Intereses{" "}
+                  <span className="text-stone-400 normal-case font-normal">
+                    (máx. 10 · 30 caracteres c/u)
+                  </span>
+                </label>
+
+                {/* Tags */}
+                {formData.intereses && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {formData.intereses
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter(Boolean)
+                      .map((item) => (
+                        <span
+                          key={item}
+                          className="flex items-center gap-1 bg-orange-100 text-orange-700 text-xs font-semibold px-2.5 py-1 rounded-full"
+                        >
+                          {item}
+                          <button
+                            type="button"
+                            onClick={() => eliminarInteres(item)}
+                            className="hover:text-red-500 transition-colors font-bold leading-none ml-0.5"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                  </div>
+                )}
+
+                {/* Input + Agregar */}
+                <div className="flex gap-2">
+                  <input
+                    placeholder="Ej: música, deporte, viajes..."
+                    value={interesInput}
+                    maxLength={30}
+                    onChange={(e) => setInteresInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        agregarInteres();
+                      }
+                    }}
+                    className={inputCls("intereses")}
+                  />
+                  <button
+                    type="button"
+                    onClick={agregarInteres}
+                    disabled={!interesInput.trim()}
+                    className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-pink-600 to-orange-400 rounded-lg hover:opacity-90 transition whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    + Agregar
+                  </button>
+                </div>
+
+                <p className="text-[11px] text-stone-400 mt-1">
+                  Presiona Enter o el botón ·{" "}
+                  {formData.intereses
+                    ? formData.intereses.split(",").filter(Boolean).length
+                    : 0}
+                  /10 intereses
+                </p>
+
                 <ErrorMsg field="intereses" />
               </div>
             </div>
