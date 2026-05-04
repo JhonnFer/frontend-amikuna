@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import {
   formatInteresesFromBackend,
-  isValidInteresesFormat,
 } from "../../../helpers/interesesFormatter";
 
 const steps = ["Personal", "Identidad", "Ubicación", "Foto"];
@@ -188,13 +187,10 @@ const validateStep = (step, formData, imagenPreview) => {
   if (step === 3) {
     if (!imagenPreview) errors.imagen = "Sube una foto de perfil";
 
-    const interesesStr = formData.intereses;
-
-    if (!isValidInteresesFormat(interesesStr)) {
-      errors.intereses = !interesesStr.trim()
-        ? "Agrega al menos un interés"
-        : "Despues de una coma no puede estar vacio, sin símbolos ni espacios extra";
-    }
+    if (!formData.intereses.trim()) {
+  errors.intereses = "Agrega al menos un interés";
+}
+    
   }
 
   return errors;
