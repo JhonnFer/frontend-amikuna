@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { toast } from "react-toastify";
 import usePaypal from "../../hooks/usePaypal";
 
 const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
@@ -8,7 +7,28 @@ const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID;
 const ModalPayment = ({ onClose, onPaymentSuccess, aporte }) => {
   const [monto, setMonto]       = useState(aporte?.monto || 10);
   const [pagando, setPagando]   = useState(false);
+  const [serverError, setServerError]   = useState("");
+  const [serverSuccess, setServerSuccess] = useState("");
   const { crearOrden, capturarPago } = usePaypal();
+
+     // ── Auto-limpiar mensajes (igual que EventList) ───────────────────────────
+  useEffect(() => {
+    if (serverSuccess) {
+      const timer = setTimeout(() => {
+        setServerSuccess("");
+        onPaymentSuccess?.();
+        onClose();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [serverSuccess]);
+
+  useEffect(() => {
+    if (serverError) {
+      const timer = setTimeout(() => setServerError(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [serverError]);
 
   const handleCreateOrder = async () => {
     const orderId = await crearOrden(monto);
@@ -21,11 +41,10 @@ const ModalPayment = ({ onClose, onPaymentSuccess, aporte }) => {
     try {
       const resultado = await capturarPago(data.orderID, monto);
       if (resultado.ok) {
-        toast.success("¡Aporte realizado! Gracias por apoyar Amikuna 🎉");
-        onPaymentSuccess?.();
+        setServerSuccess("¡Aporte realizado! Gracias por apoyar Amikuna 🎉");
         onClose();
       } else {
-        toast.error(resultado.mensaje || "Error al procesar el pago");
+        setServerError(resultado.mensaje || "Error al procesar el pago");
       }
     } finally {
       setPagando(false);
@@ -34,7 +53,7 @@ const ModalPayment = ({ onClose, onPaymentSuccess, aporte }) => {
 
   const handleError = (err) => {
     console.error("PayPal error:", err);
-    toast.error("Error en el pago. Intenta de nuevo.");
+    setServerError("Error en el pago. Intenta de nuevo.");
   };
 
   return (
@@ -42,9 +61,9 @@ const ModalPayment = ({ onClose, onPaymentSuccess, aporte }) => {
       "client-id": PAYPAL_CLIENT_ID,
       currency: "USD",
     }}>
-      <div className="space-y-6 p-2">
+      <div className="space-y-7 px-2  overflow-y-auto  max-h-[80vh] scrollbar-eventos">
         {/* Descripción del aporte */}
-        <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+        <div className="bg-orange-50 rounded-xl p-4 border border-orange-100 ">
           <p className="text-sm font-semibold text-orange-700">
             {aporte?.concepto || "Aporte voluntario"}
           </p>
@@ -53,13 +72,25 @@ const ModalPayment = ({ onClose, onPaymentSuccess, aporte }) => {
           </p>
         </div>
 
+        {/* ── Mensajes inline ── */}
+        {serverError && (
+          <p className="text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded p-2">
+            {serverError}
+          </p>
+        )}
+        {serverSuccess && (
+          <p className="text-green-600 text-sm text-center bg-green-50 border border-green-200 rounded p-2">
+            {serverSuccess}
+          </p>
+        )}
+
         {/* Selector de monto */}
         <div>
           <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
             Monto a aportar (USD)
           </label>
           <div className="flex gap-2 mt-2 flex-wrap">
-            {[5, 10, 20, 50].map((m) => (
+            {[1, 5, 10, 20, 50].map((m) => (
               <button
                 key={m}
                 onClick={() => setMonto(m)}
@@ -84,7 +115,7 @@ const ModalPayment = ({ onClose, onPaymentSuccess, aporte }) => {
         </div>
 
         {/* Botón PayPal */}
-        <div className="pt-2">
+        <div className="pt-2 max-h-40 ">
           {pagando ? (
             <div className="text-center text-sm text-gray-500 py-4 animate-pulse">
               Procesando pago...
@@ -95,18 +126,18 @@ const ModalPayment = ({ onClose, onPaymentSuccess, aporte }) => {
               createOrder={handleCreateOrder}
               onApprove={handleApprove}
               onError={handleError}
-              onCancel={() => toast.info("Pago cancelado")}
+              onCancel={() => setServerError("Pago cancelado")}
               disabled={!monto || monto <= 0}
             />
           )}
-        </div>
 
-        <button
+          <button
           onClick={onClose}
-          className="w-full py-2 border border-gray-300 rounded-lg text-sm text-gray-500 hover:bg-gray-50 transition"
+          className="w-full py-2 my-3 border border-gray-300 rounded-lg text-sm text-gray-500 hover:bg-gray-50 transition"
         >
           Cancelar
         </button>
+        </div>
       </div>
     </PayPalScriptProvider>
   );
