@@ -1,9 +1,9 @@
 // src/components/Dashboard_User/Perfil/FormularioCompletarPerfil.jsx
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import PerfilFormBase from "./PerfilFormBase";
 import storeProfile from "../../../context/storeProfile";
 import { formatInteresesForBackend } from "../../../helpers/interesesFormatter";
-
 
 const buildProfileFormData = (data) => {
   const form = new FormData();
@@ -16,7 +16,6 @@ const buildProfileFormData = (data) => {
   form.append("ubicacion[ciudad]", data.ciudad);
   form.append("ubicacion[pais]", data.pais);
 
-  // Convertir intereses a formato que acepta el backend
   if (data.intereses) {
     form.append("intereses", formatInteresesForBackend(data.intereses));
   }
@@ -28,19 +27,29 @@ const buildProfileFormData = (data) => {
 };
 
 const FormularioCompletarPerfil = () => {
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const updateProfile = storeProfile((state) => state.updateProfile);
+  const loadProfile   = storeProfile((state) => state.loadProfile);
+  const profile       = storeProfile((state) => state.profile);
 
-  const updateProfile = storeProfile((state)=> state.updateProfile);
+  useEffect(() => {
+    if (!profile) loadProfile();
+  }, []);
 
-  
   const handleSubmit = async (data) => {
     const form = buildProfileFormData(data);
-    const updated = await updateProfile(form); // ← una sola llamada, store se actualiza solo
+    const updated = await updateProfile(form);
     if (updated) navigate("/user/dashboard");
     return !!updated;
   };
 
-  return <PerfilFormBase onSubmit={handleSubmit} />;
+  // Solo nombre y apellido — el resto lo completa el usuario en el form
+  const initialData = {
+    nombre:   profile?.nombre   ?? "",
+    apellido: profile?.apellido ?? "",
+  };
+
+  return <PerfilFormBase onSubmit={handleSubmit} initialData={initialData} />;
 };
 
 export default FormularioCompletarPerfil;
