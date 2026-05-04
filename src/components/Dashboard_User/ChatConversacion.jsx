@@ -5,7 +5,7 @@ import useChat from "../../hooks/useChat";
 import useSocket from "../../hooks/useSocket";
 import useStrike from "../../hooks/useStrike";
 import { FaTimes, FaFlag } from "react-icons/fa";
-
+import { motion, AnimatePresence } from "framer-motion";
 import PerfilUsuarioReadOnly from "./PerfilUsuarioReadOnly";
 
 // --- Panel de Denuncia ---
@@ -23,7 +23,6 @@ const PanelDenuncia = ({ onCerrar, onEnviar, enviando }) => {
       enviando: PropTypes.bool.isRequired,
     };
   };
-
 
   return (
     <>
@@ -153,132 +152,158 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
   };
 
   useEffect(() => {
-  const handleEsc = (e) => {
-    if (e.key === "Escape") onCloseChat();
-  };
-  window.addEventListener("keydown", handleEsc);
-  return () => window.removeEventListener("keydown", handleEsc);
-}, [onCloseChat]);
+    const handleEsc = (e) => {
+      if (e.key !== "Escape") return;
+
+      if (mostrarDenuncia) {
+        setMostrarDenuncia(false);
+      } else if (mostrarPerfil) {
+        setMostrarDenuncia(false);
+      } else {
+        onCloseChat();
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [onCloseChat, mostrarDenuncia, mostrarPerfil]);
 
   return (
-    <div
-      className="
+    <AnimatePresence>
+      <>
+        <motion.div
+          className="fixed inset-0 z-40"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onCloseChat}
+        />
+
+        <motion.div
+          className="
   fixed z-50
   bottom-4
   right-2 sm:right-65 md:right-75 lg:right-85 xl:right-96
   w-[calc(100vw-1rem)] sm:w-80 md:w-88 lg:w-96
-  h-[70vh] sm:h-[500px] md:h-[550px] lg:h-[600px]
+  h-[50vh] sm:h-[500px] md:h-[550px] lg:h-[600px]
   bg-white/95 backdrop-blur-md shadow-2xl rounded-xl
   flex flex-col border border-gray-200 overflow-hidden
   transition-all duration-300 hover:shadow-3xl
 "
-    >
-      {" "}
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-pink-600  to-orange-400 text-white">
-        <div
-          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
-          onClick={() => setMostrarPerfil(true)}
-          title="Ver perfil"
+
+          initial={{ opacity: 0, scale: 0.9, y: 30 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: 40 }}
+          transition={{ duration: 0.12, ease: "easeOut" }}
         >
-          <img
-            src={chatInfo.imagenPerfil || "https://placehold.co/40x40"}
-            alt={chatInfo.nombre}
-            className="w-10 h-10 rounded-full border border-white shadow-sm"
-          />
-          <span className="font-semibold">{chatInfo.nombre}</span>
-        </div>
+          {/* Header */}
+          <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-pink-600  to-orange-400 text-white">
+            <div
+              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
+              onClick={() => setMostrarPerfil(true)}
+              title="Ver perfil"
+            >
+              <img
+                src={chatInfo.imagenPerfil || "https://placehold.co/40x40"}
+                alt={chatInfo.nombre}
+                className="w-10 h-10 rounded-full border border-white shadow-sm"
+              />
+              <span className="font-semibold">{chatInfo.nombre}</span>
+            </div>
 
-        <div className="flex items-center gap-3">
-          {/* ✅ Botón reportar */}
+            <div className="flex items-center gap-3">
+              {/* ✅ Botón reportar */}
 
-          <button
-            onClick={() => setMostrarDenuncia(true)}
-            title="Reportar usuario"
-            className="text-white/80 hover:text-white transition items-center justify-around flex gap-1 text-xs font-semibold"
-          >
-            Reportar Usuario <FaFlag size={10} />
-          </button>
-          <button
-            onClick={onCloseChat}
-            className="text-white/80 hover:text-white transition-colors"
-          >
-            <FaTimes size={20} />
-          </button>
-        </div>
-      </div>
-
-      {/* Mensajes */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
-        {mensajes.length > 0 ? (
-          mensajes.map((mensaje, index) => {
-            const emisorId =
-              mensaje.emisor?._id?.toString() || mensaje.emisor?.toString();
-            const esMensajeMio = emisorId === miId.toString();
-            return (
-              <div
-                key={index}
-                className={`flex ${esMensajeMio ? "justify-end" : "justify-start"}`}
+              <button
+                onClick={() => setMostrarDenuncia(true)}
+                title="Reportar usuario"
+                className="text-white/80 hover:text-white transition items-center justify-around flex gap-1 text-xs font-semibold"
               >
-                <div
-                  className={`max-w-[70%] p-3 rounded-xl ${esMensajeMio ? "bg-gradient-to-br from-pink-700  to-orange-500 text-white font-semibold" : "bg-gray-200 text-black"}`}
-                >
-                  <p>{mensaje.contenido}</p>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <p className="text-center text-gray-500">
-            {isConnected
-              ? "Inicia una conversación..."
-              : "Conectando al chat..."}
-          </p>
-        )}
+                Reportar Usuario <FaFlag size={10} />
+              </button>
+              <button
+                onClick={onCloseChat}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <FaTimes size={20} />
+              </button>
+            </div>
+          </div>
+          {/* Mensajes */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 relative">
+            {mensajes.length > 0 ? (
+              mensajes.map((mensaje, index) => {
+                const emisorId =
+                  mensaje.emisor?._id?.toString() || mensaje.emisor?.toString();
+                const esMensajeMio = emisorId === miId.toString();
+                return (
+                  <div
+                    key={index}
+                    className={`flex ${esMensajeMio ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[70%] p-3 rounded-xl ${esMensajeMio ? "bg-gradient-to-br from-pink-700  to-orange-500 text-white font-semibold" : "bg-gray-200 text-black"}`}
+                    >
+                      <p>{mensaje.contenido}</p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-center text-gray-500">
+                {isConnected
+                  ? "Inicia una conversación..."
+                  : "Conectando al chat..."}
+              </p>
+            )}
 
-        <div ref={messagesEndRef} />
-      </div>
-      {/* Input */}
-      <form onSubmit={handleEnviarMensaje} className="p-4 border-t flex gap-2">
-        <input
-          type="text"
-          value={textoMensaje}
-          onChange={(e) => setTextoMensaje(e.target.value)}
-          placeholder="Escribe un mensaje..."
-          disabled={!isConnected || enviando}
-          className="flex-1 p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-        />
-        <button
-          type="submit"
-          disabled={!isConnected || !textoMensaje.trim() || enviando}
-          className="bg-gradient-to-br from-pink-500 to-orange-300 text-white hover:bg-gradient-to-br hover:from-pink-700 hover:to-orange-500 px-4 rounded-full "
-        >
-          {enviando ? "..." : "Enviar"}
-        </button>
-      </form>
-      {/* ✅ Mensaje de éxito denuncia */}
-      {exitoDenuncia && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
-          <p className="bg-gradient-to-r from-pink-500 to-orange-400 text-white text-xs px-4 py-2 rounded-full shadow-sm font-serif">
-            Reporte enviado. Gracias por ayudarnos a mejorar la comunidad.
-          </p>
-        </div>
-      )}
-      {/* ✅ Panel denuncia */}
-      {mostrarDenuncia && (
-        <PanelDenuncia
-          onCerrar={() => setMostrarDenuncia(false)}
-          onEnviar={handleEnviarDenuncia}
-          enviando={enviandoDenuncia}
-        />
-      )}
-      {mostrarPerfil && (
-        <PerfilUsuarioReadOnly
-          perfil={chatInfo}
-          onCerrar={() => setMostrarPerfil(false)}
-        />
-      )}
-    </div>
+            <div ref={messagesEndRef} />
+          </div>
+          {/* Input */}
+          <form
+            onSubmit={handleEnviarMensaje}
+            className="p-4 border-t flex gap-3"
+          >
+            <input
+              type="text"
+              value={textoMensaje}
+              onChange={(e) => setTextoMensaje(e.target.value)}
+              placeholder="Escribe un mensaje..."
+              disabled={!isConnected || enviando}
+              className="flex-1 p-2 w-2.5  border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+            />
+            <button
+              type="submit"
+              disabled={!isConnected || !textoMensaje.trim() || enviando}
+              className="bg-gradient-to-br from-pink-500 to-orange-300 text-white hover:bg-gradient-to-br hover:from-pink-700 hover:to-orange-500 px-4 rounded-full "
+            >
+              {enviando ? "..." : "Enviar"}
+            </button>
+          </form>
+          {/* ✅ Mensaje de éxito denuncia */}
+          {exitoDenuncia && (
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4">
+              <p className="bg-gradient-to-r from-pink-500 to-orange-400 text-white text-xs px-4 py-2 rounded-full shadow-sm font-serif">
+                Reporte enviado. Gracias por ayudarnos a mejorar la comunidad.
+              </p>
+            </div>
+          )}
+          {/* ✅ Panel denuncia */}
+          {mostrarDenuncia && (
+            <PanelDenuncia
+              onCerrar={() => setMostrarDenuncia(false)}
+              onEnviar={handleEnviarDenuncia}
+              enviando={enviandoDenuncia}
+            />
+          )}
+          {mostrarPerfil && (
+            <PerfilUsuarioReadOnly
+              perfil={chatInfo}
+              onCerrar={() => setMostrarPerfil(false)}
+            />
+          )}
+        </motion.div>
+      </>
+    </AnimatePresence>
   );
 };
 
