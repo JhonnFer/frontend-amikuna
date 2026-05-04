@@ -1,13 +1,28 @@
 // src/components/Dashboard_User/StrikeForm.jsx
 import { useState, useEffect } from "react";
 import useStrike from "../../hooks/useStrike";
+import storeNotificaciones from "./Notificaciones/store/storeNotificaciones";
 
 const StrikeForm = () => {
   const [tipo, setTipo] = useState("queja");
   const [razon, setRazon] = useState("");
   const [misStrikes, setMisStrikes] = useState([]);
   const [vistaActiva, setVistaActiva] = useState("formulario");
-  const { enviarStrike, obtenerStrikes, marcarNotificacionLeidaPorStrike, loading, error, success } = useStrike();
+  const {
+    enviarStrike,
+    obtenerStrikes,
+    marcarNotificacionLeidaPorStrike,
+    loading,
+    error,
+    success,
+  } = useStrike();
+
+  const strikeNoLeidas = storeNotificaciones(
+    (state) =>
+      state.notificaciones.filter(
+        (n) => n.tipo === "respuesta_strike" && !n.leido,
+      ).length,
+  );
 
   useEffect(() => {
     const cargarStrikes = async () => {
@@ -24,6 +39,11 @@ const StrikeForm = () => {
   // ✅ Cuando el usuario abre "Mis envíos" marca automáticamente como leídas
   useEffect(() => {
     if (vistaActiva !== "historial") return;
+
+    const { notificaciones, marcarLeido } = storeNotificaciones.getState();
+    notificaciones
+      .filter((n) => n.tipo === "respuesta_strike" && !n.leido)
+      .forEach((n) => marcarLeido(n._id));
 
     misStrikes.forEach((s) => {
       if (s.respondido && s.respuesta) {
@@ -60,7 +80,6 @@ const StrikeForm = () => {
 
   return (
     <div className="w-full">
-
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
         {["formulario", "historial"].map((vista) => (
@@ -73,9 +92,24 @@ const StrikeForm = () => {
                 : "text-gray-400 hover:text-gray-600"
             }`}
           >
-            {vista === "formulario"
-              ? "Enviar"
-              : `Mis envíos${misStrikes.length > 0 ? ` (${misStrikes.length})` : ""}`}
+            {vista === "formulario" ? (
+              "Enviar"
+            ) : (
+              <>
+                {vista === "historial" ? (
+                  <span className="flex items-center gap-1.5">
+                    {`Mis envíos${misStrikes.length > 0 ? ` (${misStrikes.length})` : ""}`}
+                    {strikeNoLeidas > 0 && (
+                      <span className="bg-orange-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                        {strikeNoLeidas > 9 ? "9+" : strikeNoLeidas}
+                      </span>
+                    )}
+                  </span>
+                ) : (
+                  "Enviar"
+                )}
+              </>
+            )}
           </button>
         ))}
       </div>
@@ -108,8 +142,16 @@ const StrikeForm = () => {
             className="w-full p-3 border border-gray-100 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-transparent transition bg-gray-50"
           />
 
-          {error && <p className="text-red-500 text-xs bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
-          {success && <p className="text-green-600 text-xs bg-green-50 px-3 py-2 rounded-lg">✓ {success}</p>}
+          {error && (
+            <p className="text-red-500 text-xs bg-red-50 px-3 py-2 rounded-lg">
+              {error}
+            </p>
+          )}
+          {success && (
+            <p className="text-green-600 text-xs bg-green-50 px-3 py-2 rounded-lg">
+              ✓ {success}
+            </p>
+          )}
 
           <button
             type="submit"
@@ -136,10 +178,14 @@ const StrikeForm = () => {
                 className="border border-gray-100 rounded-xl p-4 space-y-2 hover:shadow-sm transition bg-gray-50/50"
               >
                 <div className="flex justify-between items-center">
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${badgeColor(s.tipo)}`}>
+                  <span
+                    className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${badgeColor(s.tipo)}`}
+                  >
                     {s.tipo}
                   </span>
-                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusColor(s.status, s.respondido)}`}>
+                  <span
+                    className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusColor(s.status, s.respondido)}`}
+                  >
                     {statusLabel(s.status, s.respondido)}
                   </span>
                 </div>
@@ -148,7 +194,9 @@ const StrikeForm = () => {
 
                 {s.respondido && s.respuesta && (
                   <div className="bg-pink-50 border border-pink-100 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-pink-500 mb-1">💬 Respuesta del equipo</p>
+                    <p className="text-xs font-semibold text-pink-500 mb-1">
+                      💬 Respuesta del equipo
+                    </p>
                     <p className="text-xs text-gray-500">{s.respuesta}</p>
                   </div>
                 )}

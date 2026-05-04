@@ -109,10 +109,9 @@ export const initSocketOrchestrator = () => {
     storeStrikes.getState().marcarRespondido(strikeId);
   };
 
-  const handleMatchEliminado = ({ id: strikeId }) => {
+  const handleMatchEliminado = ({ strikeId }) => {
     console.log("🗑️ Match eliminado, strike resuelto:", strikeId);
-    if (!strikeId) return;
-    storeStrikes.getState().resolverStrike(strikeId);
+    if (strikeId) storeStrikes.getState().resolverStrike(strikeId);
   };
 
   // Registrar listeners (una sola vez)

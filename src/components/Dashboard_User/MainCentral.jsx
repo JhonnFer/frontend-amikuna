@@ -4,6 +4,7 @@ import { FaUser, FaImages, FaRobot, FaFlag } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
 import SwipeCards from "./SwipeCards";
 import BotonNotificaciones from "./Notificaciones/components/BotonNotificaciones";
+import storeNotificaciones from "./Notificaciones/store/storeNotificaciones";
 
 const MainCentral = ({
   handleOpenAporteModal,
@@ -22,6 +23,13 @@ const MainCentral = ({
   eliminarUsuario,
 }) => {
   const navbarRef = useRef(null);
+
+  const strikeNoLeidas = storeNotificaciones(
+    (state) =>
+      state.notificaciones.filter(
+        (n) => n.tipo === "respuesta_strike" && !n.leido,
+      ).length,
+  );
 
   return (
     <main className="flex-1 flex flex-col overflow-hidden min-h-0 max-w-5xl mx-auto px-4 py-2 h-full">
@@ -107,7 +115,15 @@ const MainCentral = ({
           onClick={() => setMostrarModalStrike(true)}
           className="flex flex-col items-center text-center px-auto mx-auto"
         >
-          <FaFlag className="text-gray-600 hover:text-gray-200  md:w-5 sm:w-4  sm:h-5 md:h-4 lg:h-5 xl:h-6" />
+          <div className="relative">
+            <FaFlag className="text-gray-600 hover:text-gray-200  md:w-5 sm:w-4  sm:h-5 md:h-4 lg:h-5 xl:h-6" />
+
+            {strikeNoLeidas > 0 && (
+              <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {strikeNoLeidas > 9 ? "9+" : strikeNoLeidas}
+              </span>
+            )}
+          </div>
           <span className=" sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">
             Feedback
           </span>
