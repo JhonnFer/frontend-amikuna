@@ -2,6 +2,7 @@ import { socket } from "./socket";
 import storeNotificaciones from "../components/Dashboard_User/Notificaciones/store/storeNotificaciones";
 import storeSwipe from "../components/Dashboard_User/CardsSwipe/store/storeSwipe";
 import storeUnread from "../components/Dashboard_User/ListaChats/store/storeUnread";
+import storeStrikes from "../components/Dashboard_Admin/MisStrikes/store/storeStrikes"; // ← nuevo
 /**
  * ORQUESTADOR CENTRALIZADO DE SOCKET
  *
@@ -74,31 +75,56 @@ export const initSocketOrchestrator = () => {
     storeNotificaciones.getState().eliminarNotificacion(data._id);
   };
 
-    const handleUnreadUpdate = (data) => {
+  const handleUnreadUpdate = (data) => {
     console.log("🔴 unread update:", data);
     if (!data?.chatId || !data?.emisorId) return;
     storeUnread.getState().incrementarCount(data.chatId);
   };
 
   const handleChatCreado = ({ chatId, otherUserId }) => {
-  console.log("💬 Chat creado:", chatId, "con usuario:", otherUserId);
-  if (!chatId || !otherUserId) return;
-  storeUnread.getState().agregarChatMap(otherUserId, chatId);
-};
+    console.log("💬 Chat creado:", chatId, "con usuario:", otherUserId);
+    if (!chatId || !otherUserId) return;
+    storeUnread.getState().agregarChatMap(otherUserId, chatId);
+  };
 
-const handleNuevoMatch = (data) => {
-  console.log("💖 Nuevo match:", data);
-  if (!data?._id) return;
-  storeSwipe.getState().setMatchUserId(data._id.toString());
-};
+  const handleNuevoMatch = (data) => {
+    console.log("💖 Nuevo match:", data);
+    if (!data?._id) return;
+    storeSwipe.getState().setMatchUserId(data._id.toString());
+  };
+
+  // ── Admin Strikes ──────────────────────────────────────────────────────────
+  const handleStrikeNuevo = (data) => {
+    console.log("⚠️ Strike nuevo recibido:", data);
+    if (!data?._id || !data?.tipo) {
+      console.warn("⚠️ Strike inválido, ignorando...", data);
+      return;
+    }
+    storeStrikes.getState().agregarStrike(data);
+  };
+
+  const handleStrikeRespondido = ({ strikeId }) => {
+    console.log("✅ Strike respondido:", strikeId);
+    if (!strikeId) return;
+    storeStrikes.getState().marcarRespondido(strikeId);
+  };
+
+  const handleMatchEliminado = ({ id: strikeId }) => {
+    console.log("🗑️ Match eliminado, strike resuelto:", strikeId);
+    if (!strikeId) return;
+    storeStrikes.getState().resolverStrike(strikeId);
+  };
 
   // Registrar listeners (una sola vez)
   socket.on("notificacion_nueva", handleNotificacion);
   socket.on("notificacion_update", handleUpdate);
   socket.on("notificacion_eliminar", handleEliminar);
   socket.on("chat:created", handleChatCreado);
-   socket.on("chat:unread_update", handleUnreadUpdate);
-   socket.on("nuevo_match", handleNuevoMatch);
+  socket.on("chat:unread_update", handleUnreadUpdate);
+  socket.on("nuevo_match", handleNuevoMatch);
+  socket.on("strike_nuevo",       handleStrikeNuevo);
+  socket.on("strike_respondido", handleStrikeRespondido); // ← nuevo
+  socket.on("match_eliminado", handleMatchEliminado);
 
   // Cleanup function
   return () => {
@@ -109,6 +135,9 @@ const handleNuevoMatch = (data) => {
     socket.off("chat:created", handleChatCreado);
     socket.off("chat:unread_update", handleUnreadUpdate);
     socket.off("nuevo_match", handleNuevoMatch);
+    socket.off("strike_nuevo",      handleStrikeNuevo);  
+    socket.off("strike_respondido", handleStrikeRespondido); // ← nuevo
+    socket.off("match_eliminado", handleMatchEliminado);
     listenersMounted = false;
   };
 };

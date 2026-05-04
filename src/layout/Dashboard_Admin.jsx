@@ -1,9 +1,10 @@
 // src/layout/Dashboard_Admin.jsx
+import { useEffect } from "react";
 import { useNavigate,useSearchParams } from "react-router-dom";
 import useAuth from "../context/storeAuth";
+import { initSocketOrchestrator } from "../helpers/socketOrchestrator";
 
 import PerfilAdmin, { CambiarPasswordAdmin } from '../components/Dashboard_Admin/PerfilAdmin';
-
 import EventList from "../components/Dashboard_Admin/EventList";
 import UserList from "../components/Dashboard_Admin/UserList";
 import MisStrikes from "../components/Dashboard_Admin/MisStrikes";
@@ -18,6 +19,13 @@ const Dashboard_Admin = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const activeTab = searchParams.get("tab") || "perfil";
+
+    useEffect(() => {
+    const cleanup = initSocketOrchestrator();
+    return () => {
+      cleanup?.();
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
