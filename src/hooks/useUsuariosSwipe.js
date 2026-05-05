@@ -9,12 +9,18 @@ function useUsuariosSwipe() {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { matchUserId, setMatchUserId } = storeSwipe(
+  const { matchUserId, setMatchUserId , perfilActualizado, clearRefetchSwipe } = storeSwipe(
     useShallow((state) => ({
       matchUserId: state.matchUserId,
       setMatchUserId: state.setMatchUserId,
-    }))
+      perfilActualizado: state.perfilActualizado, 
+      clearRefetchSwipe: state.clearRefetchSwipe,
+    })),
+
+    
   );
+
+  
 
   const obtenerUsuarios = async () => {
     try {
@@ -27,18 +33,18 @@ function useUsuariosSwipe() {
     }
   };
 
+  
+
   // ✅ Reaccionar cuando orquestador detecta nuevo match
   useEffect(() => {
     if (!matchUserId) return;
-    setUsuarios((prev) =>
-      prev.filter((u) => u._id.toString() !== matchUserId)
-    );
+    setUsuarios((prev) => prev.filter((u) => u._id.toString() !== matchUserId));
     setMatchUserId(null); // limpiar
   }, [matchUserId]);
 
   const eliminarUsuario = (id) => {
     setUsuarios((prev) =>
-      prev.filter((u) => u._id.toString() !== id.toString())
+      prev.filter((u) => u._id.toString() !== id.toString()),
     );
   };
 
@@ -46,6 +52,12 @@ function useUsuariosSwipe() {
     obtenerUsuarios();
   }, []);
 
-  return { usuarios, loading, eliminarUsuario };
+  useEffect(() => {
+  if (!perfilActualizado) return;
+  obtenerUsuarios();
+  clearRefetchSwipe();
+}, [perfilActualizado]);
+
+  return { usuarios, loading, eliminarUsuario, refetch: obtenerUsuarios };
 }
 export default useUsuariosSwipe;

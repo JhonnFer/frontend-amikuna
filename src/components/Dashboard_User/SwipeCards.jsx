@@ -13,7 +13,7 @@ import VisorFotos from "../UI/VisorFotos";
 
 const SwipeCards = () => {
   
-  const { usuarios, loading: cargando, eliminarUsuario } = useUsuariosSwipe(); // 👈
+  const { usuarios, loading: cargando, eliminarUsuario, refetch } = useUsuariosSwipe(); 
   const { seguirUsuario } = useSeguirUsuario();
 
   const [index, setIndex] = useState(0);

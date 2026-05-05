@@ -2,6 +2,7 @@
 import PerfilFormBase from "./PerfilFormBase";
 import PropTypes from "prop-types";
 import storeProfile from "../../../context/storeProfile";
+import storeSwipe from "../CardsSwipe/store/storeSwipe";
 import { formatInteresesForBackend } from "../../../helpers/interesesFormatter";
 
 const buildProfileFormData = (data) => {
@@ -29,11 +30,14 @@ const buildProfileFormData = (data) => {
 const FormularioEditarPerfil = ({ perfil, onClose }) => {
 
  const updateProfile = storeProfile((state) => state.updateProfile);
+ const triggerRefetchSwipe = storeSwipe((state) => state.triggerRefetchSwipe);
+
   const handleSubmit = async (data) => {
     const form = buildProfileFormData(data);
     const updated = await updateProfile(form);
 
     if (updated) {
+      triggerRefetchSwipe();
       onClose?.();
     }
 
