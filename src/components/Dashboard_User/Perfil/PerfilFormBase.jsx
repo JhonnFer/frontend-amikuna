@@ -658,7 +658,6 @@ const PerfilFormBase = ({
                     <option value="">Seleccionar</option>
                     <option value="hombre">Hombre</option>
                     <option value="mujer">Mujer</option>
-                    <option value="no-binario">No binario</option>
                     <option value="otro">Otro</option>
                   </select>
                   <ErrorMsg field="genero" />

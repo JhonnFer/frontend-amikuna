@@ -8,7 +8,7 @@ export const isPerfilCompleto = (perfil) => {
   if (!perfil) return false;
   return (
     !!perfil.imagenPerfil &&
-    perfil.genero && perfil.genero !== "otro" &&
+    perfil.genero && 
     !!perfil.biografia?.trim() &&
     Array.isArray(perfil.intereses) && perfil.intereses.length > 0 &&
     !!perfil.ubicacion?.ciudad && !!perfil.ubicacion?.pais
