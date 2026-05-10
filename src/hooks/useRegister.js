@@ -8,37 +8,31 @@ const useRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   // ── REGISTRO ─────────────────────────────────────────
-  const registerUser = useCallback(async (formData) => {
+  const registerUser = useCallback(async (formData, resetForm) => {
     setIsLoading(true);
     setServerError(null);
     setServerSuccess(null);
 
     try {
-      const response = await fetchDataBackend(
-        "registro",
-        formData,
-        "POST",
-        false 
-      );
+      const response = await fetchDataBackend("registro", formData, "POST", {
+        showSuccessToast: false,
+        showErrorToast: false,
+      });
 
-      
-      if (!response?.success) {
+      if (response?.success === false) {
         setServerError(response?.msg || "Error en el registro");
         return;
       }
 
-      
       if (response?.msg) {
+        resetForm?.();
         setServerSuccess(response.msg);
       }
-
     } catch (error) {
       console.error("[useRegister] registerUser:", error);
 
       setServerSuccess(null);
-      setServerError(
-        error?.message || "Ocurrió un error. Intenta más tarde."
-      );
+      setServerError(error?.message || "Ocurrió un error. Intenta más tarde.");
     } finally {
       setIsLoading(false);
     }

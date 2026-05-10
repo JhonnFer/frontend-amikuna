@@ -27,6 +27,7 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
   } = useForm({mode:"onChange"});
 
   const password = watch("password");
@@ -36,7 +37,7 @@ const Register = () => {
     if (serverSuccess) {
       const timer = setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 5000);
 
       return () => clearTimeout(timer);
     }
@@ -66,7 +67,7 @@ const Register = () => {
         </div>
 
         <form
-          onSubmit={handleSubmit(registerUser)}
+          onSubmit={handleSubmit((data) => registerUser(data, reset))}
           className="flex flex-col gap-4 w-full max-w-sm"
         >
           <h2 className="text-xl font-bold text-center text-gray-700">
