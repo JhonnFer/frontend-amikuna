@@ -162,6 +162,8 @@ const validateStep = (step, formData, imagenPreview) => {
   if (step === 1) {
     if (!formData.genero) errors.genero = "Selecciona tu género";
 
+    if (!formData.orientacion) errors.orientacion = "Selecciona tu orientación";
+
     if (!formData.fechaNacimiento) {
       errors.fechaNacimiento = "La fecha de nacimiento es requerida";
     } else {
@@ -425,7 +427,7 @@ const PerfilFormBase = ({
         formData.apellido.trim().length >= 2
       ),
     },
-    { label: "Identidad", ok: !!(formData.genero && formData.fechaNacimiento) },
+    { label: "Identidad", ok: !!(formData.genero && formData.orientacion && formData.fechaNacimiento) },
     {
       label: "Ubicación",
       ok: !!(formData.ciudad.trim() && formData.pais.trim()),
@@ -668,6 +670,7 @@ const PerfilFormBase = ({
                     name="orientacion"
                     value={formData.orientacion}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     className={`${inputBase} border-stone-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100`}
                   >
                     <option value="">Seleccionar</option>
@@ -676,6 +679,7 @@ const PerfilFormBase = ({
                     <option value="bisexual">Bisexual</option>
                     <option value="otro">Otro</option>
                   </select>
+                  <ErrorMsg field="orientacion" />
                 </div>
               </div>
               <div>
