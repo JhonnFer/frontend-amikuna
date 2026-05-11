@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import { FaUser, FaImages, FaRobot, FaFlag } from "react-icons/fa";
 import { FiLogOut } from "react-icons/fi";
@@ -23,6 +23,8 @@ const MainCentral = ({
   eliminarUsuario,
 }) => {
   const navbarRef = useRef(null);
+
+  const [hoverNotif, setHoverNotif] = useState(false);
 
   const strikeNoLeidas = storeNotificaciones(
     (state) =>
@@ -87,8 +89,13 @@ const MainCentral = ({
           </span>
         </div>
 
-        <div className="flex flex-col items-center text-center">
-          <div className="text-gray-600 hover:text-gray-200  sm:h-6 md:h-6 lg:h-7 xl:h-7">
+        <div
+          className="flex flex-col items-center text-center cursor-pointer pb-1"
+          onMouseEnter={() => setHoverNotif(true)}
+          onMouseLeave={() => setHoverNotif(false)}
+          onClickCapture={() => setHoverNotif(false)}
+        >
+          <div className="text-gray-600 hover:text-gray-200 sm:h-6 md:h-6 lg:h-7 xl:h-8 w-5 md:w-6 lg:w-7 xl:w-8 mb-2 ">
             <BotonNotificaciones
               navbarRef={navbarRef}
               solicitudes={solicitudes}
@@ -96,9 +103,39 @@ const MainCentral = ({
               onFollow={seguirUsuario}
             />
           </div>
-          <span className="sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">
-            Notif
-          </span>
+
+          <div
+            style={{
+              overflow: "hidden",
+              width: "70px",
+              height: "20px",
+              position: "relative",
+            }}
+          >
+            {/* Sin hover → Notif quieto */}
+            {!hoverNotif && (
+              <span className="absolute inset-0 flex items-center justify-center sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800 pb-2 ">
+                Notif
+              </span>
+            )}
+
+            {/* Con hover → marquee loop */}
+            {hoverNotif && (
+              <div className="absolute inset-0 ">
+                <div
+                  className="animate-ticker whitespace-nowrap flex "
+                  style={{ position: "absolute" }}
+                >
+                  <span className="sm:text-xs md:text-sm text-gray-800">
+                    Notificaciones&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  </span>
+                  <span className="sm:text-xs md:text-sm text-gray-800">
+                    Notificaciones&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <button
