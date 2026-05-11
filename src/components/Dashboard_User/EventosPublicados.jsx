@@ -101,7 +101,15 @@ const ModalMisEventos = () => {
                         {evento.lugar && <span>📍 {evento.lugar}</span>}
                       </div>
 
-                      
+                      {/* Creador */}
+                      {evento.creador && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          Organizado por:{" Amikuna"}
+                          <span className="font-medium text-gray-600">
+                            {evento.creador.nombre} {evento.creador.apellido}
+                          </span>
+                        </p>
+                      )}
 
                       {/* Asistentes */}
                       {evento.asistentes?.length > 0 && (
