@@ -14,6 +14,7 @@ const useBotonNotificacionesLogic = () => {
 
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [menuStyle, setMenuStyle] = useState({});
+  const [marcando, setMarcando] = useState(false);
 
   // 🛡️ Filtrar notificaciones válidas y contar sin leer
   const noLeidas = Array.isArray(notificaciones)
@@ -55,12 +56,16 @@ const useBotonNotificacionesLogic = () => {
   };
 
   const handleMarcarTodas = async () => {
+    if (marcando) return;
+    setMarcando(true);
   try {
     await marcarTodasLeidas();
     toast.success("Notificaciones marcadas como leídas");
   } catch (err) {
     console.error(err);
     toast.error("Error al marcar notificaciones");
+  } finally{
+    setMarcando(false);
   }
 };
 
@@ -81,6 +86,7 @@ const useBotonNotificacionesLogic = () => {
     handleAceptarSolicitud,
     abrirNotificaciones,
     handleMarcarTodas,
+    marcando,
   };
 };
 

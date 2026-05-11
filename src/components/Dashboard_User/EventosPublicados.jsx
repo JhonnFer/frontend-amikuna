@@ -88,9 +88,9 @@ const ModalMisEventos = () => {
                           <span>
                             📅{" "}
                             {fechaCompleta.toLocaleString("es-EC", {
-                              weekday: "short",
+                              weekday: "long",
                               day: "numeric",
-                              month: "short",
+                              month: "long",
                               year: "numeric",
                               hour: "2-digit",
                               minute: "2-digit",
@@ -101,15 +101,7 @@ const ModalMisEventos = () => {
                         {evento.lugar && <span>📍 {evento.lugar}</span>}
                       </div>
 
-                      {/* Creador */}
-                      {evento.creador && (
-                        <p className="text-xs text-gray-400 mt-1">
-                          Organizado por:{" "}
-                          <span className="font-medium text-gray-600">
-                            {evento.creador.nombre} {evento.creador.apellido}
-                          </span>
-                        </p>
-                      )}
+                      
 
                       {/* Asistentes */}
                       {evento.asistentes?.length > 0 && (
@@ -246,9 +238,9 @@ const EventosPublicados = ({
                       <span className="text-xs text-gray-500 ">
                         📅{" "}
                         {fechaCompleta.toLocaleString("es-EC", {
-                          weekday: "short",
+                          weekday: "long",
                           day: "numeric",
-                          month: "short",
+                          month: "long",
                           year: "numeric",
                           hour: "2-digit",
                           minute: "2-digit",

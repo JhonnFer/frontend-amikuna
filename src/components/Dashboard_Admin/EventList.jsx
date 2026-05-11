@@ -379,9 +379,9 @@ const EventList = () => {
                       <p className="text-xs text-gray-500 mt-1">
                         {fechaEvento.toLocaleString("es-EC", {
                           timeZone: "America/Guayaquil",
-                          weekday: "short",
+                          weekday: "long",
                           day: "numeric",
-                          month: "short",
+                          month: "long",
                           year: "numeric",
                           hour: "2-digit",
                           minute: "2-digit",

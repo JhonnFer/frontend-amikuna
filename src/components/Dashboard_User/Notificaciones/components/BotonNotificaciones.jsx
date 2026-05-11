@@ -19,6 +19,7 @@ const BotonNotificaciones = ({ navbarRef }) => {
     handleAceptarSolicitud,
     abrirNotificaciones,
     handleMarcarTodas,
+    marcando,
   } = useBotonNotificacionesLogic();
 
   useEffect(() => {
@@ -102,9 +103,10 @@ const BotonNotificaciones = ({ navbarRef }) => {
                 {noLeidas > 0 && (
                 <button
                   onClick={handleMarcarTodas}
-                  className="text-xs text-white bg-green-500 hover:bg-green-600 px-2 py-1 rounded-full transition"
+                  disabled={marcando}
+                  className={marcando ? "opacity-50 cursor-not-allowed" : "cursor-pointer text-xs text-white bg-green-500 hover:bg-green-600 px-2 py-1 rounded-full transition"}
                 >
-                  Marcar todas
+                  {marcando ? "Marcando..." : "Marcar todas"}
                 </button>
               )}
               </div>
