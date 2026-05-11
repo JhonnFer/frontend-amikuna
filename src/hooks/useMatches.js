@@ -27,14 +27,10 @@ const useMatches = () => {
 
   useEffect(() => {
     // patrón optimista: actualizar estado local sin refetch
-    const handleNuevoMatch = (nuevoMatch) => {
-      setMatches((prev) => {
-        if (!nuevoMatch?._id) return prev;
 
-        const existe = prev.some((m) => m?._id === nuevoMatch._id);
-        if (existe) return prev;
-        return [nuevoMatch, ...prev];
-      });
+    const handleNuevoMatch = async (nuevoMatch) => {
+      if (!nuevoMatch?._id) return;
+      await fetchMatches();
     };
 
     const handleMatchEliminado = (data) => {
@@ -58,7 +54,13 @@ const useMatches = () => {
     return acc;
   }, {});
 
-  return { matches, loading, error, refetch: fetchMatches, unreadCountsIniciales };
+  return {
+    matches,
+    loading,
+    error,
+    refetch: fetchMatches,
+    unreadCountsIniciales,
+  };
 };
 
 export default useMatches;

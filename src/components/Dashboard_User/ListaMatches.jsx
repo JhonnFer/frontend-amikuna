@@ -25,6 +25,7 @@ const ListaMatches = ({ miId }) => {
   const [mensajes, setMensajes] = useState([]);
 
   const handleAbrirChat = async (match) => {
+     console.log("MATCH COMPLETO:", match); 
     const chat = await abrirChat(match._id);
     if (!chat?._id) return;
     agregarChatMap(match._id, chat._id);

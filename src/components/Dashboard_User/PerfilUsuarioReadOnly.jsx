@@ -5,6 +5,7 @@ import { FaTimes, FaImages } from "react-icons/fa";
 import VisorFotos from "../UI/VisorFotos";
 
 const PerfilUsuarioReadOnly = ({ perfil, onCerrar }) => {
+  console.log("PERFIL RECIBIDO:", perfil); 
   const [showGallery, setShowGallery] = useState(false);
   const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
   const [fotoIndex, setFotoIndex] = useState(0);
