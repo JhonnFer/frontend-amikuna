@@ -68,7 +68,10 @@ const MainCentral = ({
           }
           className="bg-gradient-to-r from-[#ff6e7f] to-[#bfe9ff] text-gray-800 mx-auto  sm:px-0 px-2  sm:text-xs md:text-sm lg:text-md xl:text-lg  py-1 rounded-full whitespace-nowrap"
         >
+          <span className=" mx-2">
           Apoyar
+          </span>
+          
         </button>
 
         <div className="flex flex-col items-center text-center px-auto mx-auto ">
