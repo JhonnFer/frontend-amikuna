@@ -61,7 +61,7 @@ const PerfilUsuarioReadOnly = ({ perfil, onCerrar }) => {
         </div>
 
         {/* INFO — igual que SwipeCards */}
-        <div className="flex flex-col p-4 gap-1 overflow-y-auto">
+        <div className="flex flex-col p-4 gap-1 overflow-y-auto max-h-full relative">
           <h3 className="text-2xl font-bold text-gray-800 truncate text-center">
             {perfil.nombre}
           </h3>
