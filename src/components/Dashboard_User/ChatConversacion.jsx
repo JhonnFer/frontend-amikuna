@@ -205,7 +205,8 @@ const ChatConversacion = ({ chatInfo, miId, onCloseChat }) => {
               <img
                 src={chatInfo.imagenPerfil || "https://placehold.co/40x40"}
                 alt={chatInfo.nombre}
-                className="w-10 h-10 rounded-full border border-white shadow-sm"
+                className="w-10 h-10 justify-center aspect-square items-center  rounded-full border border-white shadow-sm"
+                
               />
               <span className="font-semibold">{chatInfo.nombre}</span>
             </div>

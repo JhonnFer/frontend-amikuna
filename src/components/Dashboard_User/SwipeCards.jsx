@@ -25,8 +25,6 @@ const SwipeCards = () => {
   const [fotoSeleccionada, setFotoSeleccionada] = useState(null);
   const [fotoIndex, setFotoIndex] = useState(0);
 
-console.log("usuarios swipe:", usuarios.map(u => u.nombre));
-console.log("index actual:", index);
   const handleSwipe = async (dir) => {
     
     if (!usuarios[index]) return;

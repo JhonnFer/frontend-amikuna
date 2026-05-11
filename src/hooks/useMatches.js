@@ -13,7 +13,6 @@ const useMatches = () => {
     setError(null);
     try {
       const data = await fetchDataBackend("estudiantes/listarmatches");
-      console.log("✅ matches raw:", data);
       setMatches(data);
     } catch (err) {
       setError(err.message || "Error al cargar matches");

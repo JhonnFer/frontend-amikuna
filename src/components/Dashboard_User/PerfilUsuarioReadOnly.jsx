@@ -22,7 +22,7 @@ const PerfilUsuarioReadOnly = ({ perfil, onCerrar }) => {
       <div className="absolute inset-0 bg-black/40 z-10" onClick={onCerrar} />
 
       {/* Panel */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl z-20 shadow-2xl animate-slide-up flex flex-col max-h-[90%] overflow-hidden">
+      <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl z-20 shadow-2xl animate-slide-up flex flex-col sm:max-h-[90%] max-h-full overflow-y-auto scrollbar-eventos">
 
         {/* FOTO PRINCIPAL — misma técnica SwipeCards */}
         <div
@@ -61,7 +61,7 @@ const PerfilUsuarioReadOnly = ({ perfil, onCerrar }) => {
         </div>
 
         {/* INFO — igual que SwipeCards */}
-        <div className="flex flex-col p-4 gap-1 overflow-y-auto max-h-full relative">
+        <div className="flex flex-col p-4 gap-1 ">
           <h3 className="text-2xl font-bold text-gray-800 truncate text-center">
             {perfil.nombre}
           </h3>
