@@ -24,7 +24,9 @@ const MainCentral = ({
 }) => {
   const navbarRef = useRef(null);
 
+  //parte en la que se muestra texto para botones del navbar de main central, con efecto marquee al hacer hover
   const [hoverNotif, setHoverNotif] = useState(false);
+  const [hoverFeedback, setHoverFeedback] = useState(false);
 
   const strikeNoLeidas = storeNotificaciones(
     (state) =>
@@ -68,10 +70,7 @@ const MainCentral = ({
           }
           className="bg-gradient-to-r from-[#ff6e7f] to-[#bfe9ff] text-gray-800 mx-auto  sm:px-0 px-2  sm:text-xs md:text-sm lg:text-md xl:text-lg  py-1 rounded-full whitespace-nowrap"
         >
-          <span className=" mx-2">
-          Apoyar
-          </span>
-          
+          <span className=" mx-2">Apoyar</span>
         </button>
 
         <div className="flex flex-col items-center text-center px-auto mx-auto ">
@@ -151,23 +150,61 @@ const MainCentral = ({
           </span>
         </button>
 
-        <button
-          onClick={() => setMostrarModalStrike(true)}
-          className="flex flex-col items-center text-center px-auto mx-auto"
+        <div
+          className="flex flex-col items-center text-center cursor-pointer "
+          onMouseEnter={() => setHoverFeedback(true)}
+          onMouseLeave={() => setHoverFeedback(false)}
+          onClickCapture={() => setHoverFeedback(false)}
         >
-          <div className="relative">
-            <FaFlag className="text-gray-600 hover:text-gray-200  md:w-5 sm:w-4  sm:h-5 md:h-4 lg:h-5 xl:h-6" />
+          <button
+            onClick={() => setMostrarModalStrike(true)}
+            className="flex flex-col items-center text-center px-auto mx-auto"
+          >
+            <div className="relative">
+              <FaFlag className="text-gray-600 hover:text-gray-200  md:w-5 sm:w-4  sm:h-5 md:h-4 lg:h-5 xl:h-6" />
 
-            {strikeNoLeidas > 0 && (
-              <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {strikeNoLeidas > 9 ? "9+" : strikeNoLeidas}
-              </span>
-            )}
-          </div>
-          <span className=" sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800">
-            Feedback
-          </span>
-        </button>
+              {strikeNoLeidas > 0 && (
+                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {strikeNoLeidas > 9 ? "9+" : strikeNoLeidas}
+                </span>
+              )}
+            </div>
+
+            <div
+              style={{
+                overflow: "hidden",
+                width: "90px",
+                height: "20px",
+                position: "relative",
+              }}
+            >
+              {/* Sin hover → Notif quieto */}
+              {!hoverFeedback && (
+                <span className="absolute inset-0 flex items-center justify-center  sm:text-xs md:text-sm lg:text-md xl:text-lg text-gray-800  ">
+                  Feedback
+                </span>
+              )}
+
+              {/* Con hover → marquee loop */}
+              {hoverFeedback && (
+                <div className="absolute inset-0 ">
+                  <div
+                    className="animate-ticker whitespace-nowrap flex "
+                    style={{ position: "absolute" }}
+                  >
+                    <span className="sm:text-xs md:text-sm text-gray-800">
+                      Sugerencias / Quejas&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span>
+
+                    <span className="sm:text-xs md:text-sm text-gray-800">
+                      Sugerencias / Quejas&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </button>
+        </div>
 
         <button
           onClick={handleLogout}
