@@ -29,9 +29,22 @@ const useSeguirUsuario = () => {
     }
   };
 
+  const noSeguirUsuario = async (idUsuario) => {
+    setCargando(true);
+    setError(null);
+    try {
+      const data = await fetchDataBackend(`estudiantes/no-seguir/${idUsuario}`, null, "POST");
+      return data;
+    } catch (err) {
+      setError(err.message);
+      return false;
+    } finally {
+      setCargando(false);
+    }
+  };
 
 
-  return { seguirUsuario, cargando, error };
+  return { seguirUsuario, noSeguirUsuario, cargando, error };
 };
 
 export default useSeguirUsuario;

@@ -11,10 +11,11 @@ import { FaImages, FaHeart, FaTimes } from "react-icons/fa";
 import VisorFotos from "../UI/VisorFotos";
 
 
+
 const SwipeCards = () => {
   
-  const { usuarios, loading: cargando, eliminarUsuario, refetch } = useUsuariosSwipe(); 
-  const { seguirUsuario } = useSeguirUsuario();
+  const { usuarios, loading: cargando, eliminarUsuario } = useUsuariosSwipe(); 
+  const { seguirUsuario, noSeguirUsuario } = useSeguirUsuario();
 
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(null);
@@ -41,6 +42,11 @@ console.log("index actual:", index);
         setIndex((prev) => (prev >= usuarios.length - 1 ? 0 : prev));
         return;
       }
+    }
+
+    if (dir==="left") {
+      const idUsusario =  usuarios[index]._id;
+      await noSeguirUsuario(idUsusario);
     }
 
     setDirection(dir);
