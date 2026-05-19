@@ -1,7 +1,7 @@
 //src\hooks\Admin\useAdminUpdatePassword.js
 // src/hooks/Admin/useAdminUpdatePassword.js
-import { useState } from 'react';
-import fetchDataBackend from '../../helpers/fetchDataBackend';
+import { useState } from "react";
+import fetchDataBackend from "../../helpers/fetchDataBackend";
 
 const useAdminUpdatePassword = () => {
   const [loading, setLoading] = useState(false);
@@ -9,12 +9,12 @@ const useAdminUpdatePassword = () => {
 
   const cambiarPassword = async ({ newPassword, confirmPassword }) => {
     if (!newPassword || !confirmPassword) {
-      setError('Todos los campos son obligatorios');
+      setError("Todos los campos son obligatorios");
       return null;
     }
 
     if (newPassword !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError("Las contraseñas no coinciden");
       return null;
     }
 
@@ -23,13 +23,17 @@ const useAdminUpdatePassword = () => {
 
     try {
       const data = await fetchDataBackend(
-        'admin/cambiar-password',
+        "admin/cambiar-password",
         { newPassword, confirmPassword },
-        'PUT'
+        "PUT",
+        {
+          showSuccessToast: true,
+          showErrorToast: true,
+        },
       );
       return data;
     } catch (err) {
-      setError(err.message || 'Error al cambiar la contraseña');
+      setError(err.message || "Error al cambiar la contraseña");
       return null;
     } finally {
       setLoading(false);
