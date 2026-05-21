@@ -42,7 +42,6 @@ const ModalPayment = ({ onClose, onPaymentSuccess, aporte }) => {
       const resultado = await capturarPago(data.orderID, monto);
       if (resultado.ok) {
         setServerSuccess("¡Aporte realizado! Gracias por apoyar Amikuna 🎉");
-        onClose();
       } else {
         setServerError(resultado.mensaje || "Error al procesar el pago");
       }
