@@ -23,6 +23,13 @@ const storeStrikes = create((set) => ({
         s._id === strikeId ? { ...s, respondido: true } : s
       ),
     })),
+
+  actualizarRespuesta : (strikeId, respuesta) =>
+    set((state) => ({
+      strikes: state.strikes.map((strike)=>
+        strike._id === strikeId ?{...strike, respondido:true, respuesta,}: strike
+    ),
+    })),
 }));
 
 export default storeStrikes;

@@ -154,6 +154,7 @@ const MisStrikes = () => {
   const [strikeSeleccionado, setStrikeSeleccionado] = useState(null); // para ModalResponder
   const [denunciaSeleccionada, setDenunciaSeleccionada] = useState(null); // para ModalDetalle
 
+  
   useEffect(() => {
     const fetchStrikes = async () => {
       setLoading(true);
@@ -173,6 +174,7 @@ const MisStrikes = () => {
     try {
       await responderStrike(strikeId, datos);
       storeStrikes.getState().marcarRespondido(strikeId);
+      storeStrikes.getState().actualizarRespuesta(strikeId, datos?.respuesta);
     } catch (error) {
       console.error("Error al responder strike:", error);
     }
