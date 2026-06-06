@@ -1,10 +1,11 @@
 import PropTypes from "prop-types";
 
-const ChatbotWidget = ({ isOpen }) => {
+const ChatbotWidget = ({ isOpen, userId }) => {
   return (
     <div style={{ display: isOpen ? "block" : "none", width: "100%", height: "100%" }}>
       <iframe
-        src="https://cdn.botpress.cloud/webchat/v3.6/shareable.html?configUrl=https://files.bpcontent.cloud/2026/04/23/02/20260423024610-NNKB4Q1Y.json"
+        key={userId} // 👈 sesión única por usuario
+        src={`https://cdn.botpress.cloud/webchat/v3.6/shareable.html?configUrl=https://files.bpcontent.cloud/2026/04/23/02/20260423024610-NNKB4Q1Y.json&userId=${userId}`}
         style={{
           width: "100%",
           height: "100%",
@@ -19,6 +20,7 @@ const ChatbotWidget = ({ isOpen }) => {
 
 ChatbotWidget.propTypes = {
   isOpen: PropTypes.bool.isRequired,
+  userId: PropTypes.string,
 };
 
 export default ChatbotWidget;
