@@ -28,6 +28,10 @@ const SidebarDerecho = ({
     return () => window.removeEventListener("keydown", handleEsc);
   }, [setMostrarChatbot]);
 
+  // Arriba del componente, antes del return
+  const usuarioId = localStorage.getItem("id") || 
+                  JSON.parse(localStorage.getItem("usuario") );
+
   return (
     <>
       <aside
@@ -112,7 +116,9 @@ const SidebarDerecho = ({
             </button>
           </div>
           <div className="flex-1 overflow-hidden">
-            <ChatbotWidget isOpen={mostrarChatbot} />
+            <ChatbotWidget isOpen={mostrarChatbot}
+              userId={usuarioId} 
+            />
           </div>
         </div>
       </div>
